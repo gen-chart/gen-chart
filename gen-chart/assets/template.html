@@ -168,6 +168,15 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
 .gc-card ul { padding-left: 1.1rem; font-size: 0.85rem; }
 .gc-card li { margin: 0.2rem 0; }
+/* Narrow screens: scaling a 960px chart down to phone width shrinks 11px
+   axis type to roughly 3px. Hold a legible minimum and let the chart scroll
+   inside its own panel instead, so the page body never scrolls sideways. */
+@media (max-width: 700px) {
+  body { padding: 1.25rem 0.75rem; }
+  .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
+  svg.gc-chart { min-width: 560px; }
+  .gc-panel { padding: 1rem 0.85rem; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -471,10 +480,10 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     tooltip.style.display = 'block';
     var pad = 14;
     var tw = tooltip.offsetWidth;
-    var x = evt.clientX + pad;
-    if (x + tw > window.innerWidth - 8) x = evt.clientX - tw - pad;
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
     tooltip.style.left = x + 'px';
-    tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
   }
   if (isAxis && payload.tooltip !== 'off' && hit) {
     hit.addEventListener('pointermove', function (evt) { if (!brushing) showTip(evt); });
@@ -506,13 +515,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       tooltip.style.display = 'none';
     });
   }
-  function moveTip(evt) {
+  function moveTip(evt) { moveTipTo(evt.clientX, evt.clientY); }
+  function moveTipTo(clientX, clientY) {
     var pad = 14;
     var tw = tooltip.offsetWidth;
-    var x = evt.clientX + pad;
-    if (x + tw > window.innerWidth - 8) x = evt.clientX - tw - pad;
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
     tooltip.style.left = x + 'px';
-    tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
   }
 
   // Brush drag on the hit rect.
@@ -759,6 +769,47 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var rect = svg.getBoundingClientRect();
     var scale = rect.width / payload.width;
     showTipAt(i, rect.left + px * scale, rect.top + rect.height / 2);
+  }
+
+  // Element families (distribution, proportion, matrix) walk their marks
+  // rather than an x axis, but the keyboard contract is identical.
+  if (!isAxis && figure) {
+    var marks = [].slice.call(svg.querySelectorAll('[data-tip]'));
+    var mi = -1;
+    var focusMark = function () {
+      marks.forEach(function (m) { m.classList.remove('gc-hot'); });
+      var el = marks[mi];
+      if (!el) return;
+      el.classList.add('gc-hot');
+      var spec = JSON.parse(el.getAttribute('data-tip'));
+      var html = '<div class="gc-tt-x">' + esc(spec.title) + '</div>';
+      var spoken = [spec.title];
+      spec.rows.forEach(function (rw) {
+        html += '<div class="gc-tt-row">' + esc(rw.label) +
+          '<span class="gc-tt-val">' + esc(rw.value) + '</span></div>';
+        spoken.push(rw.label + ' ' + rw.value);
+      });
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      var b = el.getBoundingClientRect();
+      moveTipTo(b.left + b.width / 2, b.top + b.height / 2);
+      if (live) live.textContent = spoken.join(', ');
+    };
+    if (marks.length) {
+      figure.setAttribute('tabindex', '0');
+      figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+      figure.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); mi = Math.min(marks.length - 1, mi + 1); focusMark(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); mi = Math.max(0, mi - 1); focusMark(); }
+        else if (e.key === 'Home') { e.preventDefault(); mi = 0; focusMark(); }
+        else if (e.key === 'End') { e.preventDefault(); mi = marks.length - 1; focusMark(); }
+      });
+      figure.addEventListener('blur', function () {
+        marks.forEach(function (m) { m.classList.remove('gc-hot'); });
+        tooltip.style.display = 'none';
+        mi = -1;
+      });
+    }
   }
 
   // ----------------------------------------------------- guided views
