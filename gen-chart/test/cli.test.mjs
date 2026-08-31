@@ -96,9 +96,24 @@ test('showcase quality turns warnings into failure; standard passes them', () =>
   assert.equal(JSON.parse(err.stdout).ok, false);
 });
 
-test('unimplemented commands exit 2, unknown commands exit 1', () => {
-  assert.equal(runFail(['visual-check', 'x.html']).status, 2);
+test('unknown commands exit 1', () => {
   assert.equal(runFail(['nonsense']).status, 1);
+});
+
+test('visual-check without a browser exits 2 with a skipped receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  run(['deliver', 'cartesian', example, out, '--json']);
+  try {
+    execFileSync(process.execPath, [cli, 'visual-check', out, '--json'], {
+      encoding: 'utf8', stdio: 'pipe',
+      env: { ...process.env, GEN_CHART_CHROME: '/nonexistent/chrome' }
+    });
+    assert.fail('expected exit 2');
+  } catch (err) {
+    assert.equal(err.status, 2);
+    assert.equal(JSON.parse(err.stdout).status, 'skipped');
+  }
 });
 
 test('guide --json returns a structured recommendation', () => {

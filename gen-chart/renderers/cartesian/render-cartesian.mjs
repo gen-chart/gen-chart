@@ -101,6 +101,14 @@ export function analyzeCartesian(spec) {
   }
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
+  if (spec.interactions?.brush === 'x' && (hasBar || enc.x.scale === 'band')) {
+    diagnostics.push(diag('semantic/brush-unsupported', 'error', '/interactions/brush',
+      'brush zoom applies to line marks over a time or linear x scale; band scales and bar marks have no meaningful zoom window', {
+        supportedFixes: ['remove interactions.brush', 'change bar series to line marks over a time or linear x']
+      }));
+    return { diagnostics };
+  }
+
   if (hasBar && enc.y.zero === false) {
     diagnostics.push(diag('honesty/bar-zero-baseline', 'error', '/encoding/y/zero',
       'bar marks encode value as length, so the y axis must include zero; "zero": false is rejected while a bar series is present', {
@@ -369,8 +377,8 @@ export function renderSvg(spec, analysis) {
     for (const a of annotations) {
       if (a.kind === 'x-line') {
         const x = round(a.x);
-        out.push(`<line x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}"/>`);
-        if (a.label) out.push(`<text x="${x + 5}" y="${plotTop + 11}" text-anchor="start">${escapeXml(a.label)}</text>`);
+        out.push(`<line data-ox="${x}" x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}"/>`);
+        if (a.label) out.push(`<text data-ox="${x}" x="${x + 5}" y="${plotTop + 11}" text-anchor="start">${escapeXml(a.label)}</text>`);
       } else {
         const y = round(a.y);
         out.push(`<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}"/>`);
@@ -381,7 +389,7 @@ export function renderSvg(spec, analysis) {
   }
 
   // hover layer: crosshair + one marker per line series, driven by the viewer
-  out.push(`<g class="gc-hover" aria-hidden="true"><line class="gc-crosshair" x1="0" y1="${plotTop}" x2="0" y2="${plotBottom}" style="display:none"/>`);
+  out.push(`<g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="${plotTop}" x2="0" y2="${plotBottom}" style="display:none"/>`);
   for (const s of spec.series) {
     if (s.mark !== 'line') continue;
     out.push(`<circle class="gc-hover-dot" data-for="${escapeXml(s.id)}" r="4" style="display:none;--sc:${colors.get(s.id)}"/>`);
@@ -401,11 +409,16 @@ export function buildPayload(spec, analysis) {
       : xCol.type === 'number' ? fmtValue(v)
         : v);
   return {
+    title: spec.meta.title,
     unit: layout.unit,
+    xType: spec.encoding.x.scale,
     tooltip: spec.interactions?.tooltip ?? 'auto',
     legendToggle: spec.interactions?.legend_toggle ?? true,
+    brush: spec.interactions?.brush ?? null,
     xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
     xLabels: xLabelsFull,
+    xValues: xCol.values,
+    xHeader: xCol.label ?? spec.encoding.x.column,
     plot: { left: layout.plotLeft, top: layout.plotTop, right: layout.plotRight, bottom: layout.plotBottom },
     width: layout.W,
     height: layout.H,

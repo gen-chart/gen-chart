@@ -23,7 +23,8 @@ diagnostic catalog, or repair rules.
   `string`. All columns share one length. Max 5000 rows, 12 columns.
 - `meta.width` 640–1600, `meta.height` 360–1200 (default 960×520).
 - `interactions`: `tooltip: "auto" | "off"`, `legend_toggle: boolean`
-  (default true). Omit the whole object normally.
+  (default true), `brush: "x"` (opt-in zoom; line marks over time/linear x
+  only). Omit the whole object normally.
 
 ## Diagnostic catalog
 
@@ -35,6 +36,7 @@ diagnostic catalog, or repair rules.
 | `data/all-null` | error | nothing to draw |
 | `semantic/unknown-column`, `semantic/duplicate-series-id`, `semantic/series-not-numeric` | error | reference integrity |
 | `semantic/scale-type-mismatch`, `semantic/mark-scale-mismatch` | error | scale/column/mark compatibility |
+| `semantic/brush-unsupported` | error | brush needs line marks over time/linear x |
 | `semantic/annotation-out-of-range` | warning | annotation dropped |
 | `honesty/bar-zero-baseline` | error | bars must include zero |
 | `honesty/mixed-units` | error | one y axis, one unit |
