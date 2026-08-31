@@ -2,7 +2,7 @@
 
 > **Pitch:** *Turn data, a description, or a pasted table into a polished, interactive chart — directly in chat.*
 >
-> Sibling of Archify: same philosophy (typed JSON IR → deterministic renderer → validated single-file HTML), same tech stack (plain JavaScript + HTML, Node.js ≥18, zero runtime dependencies), but focused on **data visualization** instead of system diagrams.
+> Sibling of Archify: same philosophy (typed JSON IR → deterministic renderer → validated single-file HTML), same tech stack (plain JavaScript + HTML, Node.js ≥22 LTS, zero runtime dependencies), but focused on **data visualization** instead of system diagrams.
 
 ## 1. Goals and non-goals
 

@@ -29,7 +29,7 @@ gen-chart/        the skill package (what gets installed to ~/.claude/skills/gen
 
 ## Development
 
-Requires Node.js ≥ 18. No runtime dependencies.
+Requires Node.js ≥ 22 (LTS). No runtime dependencies.
 
 ```bash
 cd gen-chart

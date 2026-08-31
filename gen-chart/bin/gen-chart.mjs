@@ -25,8 +25,8 @@ Chart types: cartesian | distribution | proportion | matrix
 
 function doctor() {
   const [major] = process.versions.node.split('.').map(Number);
-  const ok = major >= 18;
-  console.log(`node ${process.versions.node} ${ok ? 'OK (>=18)' : 'FAIL (need >=18)'}`);
+  const ok = major >= 22;
+  console.log(`node ${process.versions.node} ${ok ? 'OK (>=22)' : 'FAIL (need >=22)'}`);
   console.log('renderers: not implemented (skeleton)');
   process.exit(ok ? 0 : 1);
 }

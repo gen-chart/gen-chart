@@ -9,7 +9,7 @@
     "gen-chart": "./bin/gen-chart.mjs"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "scripts": {
     "generate:validators": "node scripts/generate-validators.mjs",

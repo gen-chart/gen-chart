@@ -14,7 +14,7 @@ test('help prints the command surface', () => {
 
 test('doctor exits 0 on a supported Node version', () => {
   const out = execFileSync(process.execPath, [cli, 'doctor'], { encoding: 'utf8' });
-  assert.match(out, /OK \(>=18\)/);
+  assert.match(out, /OK \(>=22\)/);
 });
 
 test('unimplemented commands exit 2, unknown commands exit 1', () => {
