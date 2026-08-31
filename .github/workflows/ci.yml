@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: gen-chart/package-lock.json
+
+      # ajv is a dev dependency only: it compiles the committed standalone
+      # validators. Nothing here is needed at runtime.
+      - name: Install dev dependencies
+        working-directory: gen-chart
+        run: npm ci
+
+      # ubuntu-latest ships Chrome; the browser suites drive real artifacts
+      # rather than asserting on markup. They skip if it ever disappears.
+      - name: Report browser availability
+        run: |
+          if [ -x /usr/bin/google-chrome ]; then
+            echo "chrome: $(/usr/bin/google-chrome --version)"
+          else
+            echo "::warning::No Chrome found — browser smoke tests will skip"
+          fi
+
+      # Covers: committed-validator drift, golden example HTML drift,
+      # honesty rules, palette contrast, and the headless browser suites.
+      - name: Test
+        working-directory: gen-chart
+        run: npm test
+
+      - name: Verify the skill package builds deterministically
+        working-directory: gen-chart
+        run: |
+          node scripts/build-zip.mjs /tmp/a.zip
+          node scripts/build-zip.mjs /tmp/b.zip
+          cmp /tmp/a.zip /tmp/b.zip && echo "package is byte-identical across builds"
+
+      - name: Verify the packaged skill runs standalone
+        run: |
+          mkdir -p /tmp/skills
+          unzip -q /tmp/a.zip -d /tmp/skills
+          cd /tmp/skills/gen-chart
+          node bin/gen-chart.mjs doctor
+          node bin/gen-chart.mjs deliver cartesian examples/mau-trend.cartesian.json /tmp/out.html --quality showcase
