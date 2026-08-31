@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.DS_Store
+dist/
+*.zip
+agen-chart/examples/*.html.tmp*
+/tmp/
+.claude/settings.local.json
