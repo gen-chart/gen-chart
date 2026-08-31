@@ -7,6 +7,7 @@ import { checkData } from '../shared/data.mjs';
 import { diag } from '../shared/diagnostics.mjs';
 import { fmtValue, escapeXml } from '../shared/format.mjs';
 import { categoricalColor } from '../shared/palette.mjs';
+import { t } from '../shared/i18n.mjs';
 
 const MAX_SLICES = 7;
 
@@ -150,8 +151,8 @@ export function renderSvg(spec, analysis) {
   for (const a of arcs) {
     const pct = (a.share * 100).toFixed(1) + '%';
     const rows = [
-      { label: 'value', value: fmtValue(a.value) + (unit ? ' ' + unit : '') },
-      { label: 'share', value: pct }
+      { label: t(spec.meta.locale, 'stat.value'), value: fmtValue(a.value) + (unit ? ' ' + unit : '') },
+      { label: t(spec.meta.locale, 'stat.share'), value: pct }
     ];
     const tip = escapeXml(JSON.stringify({ title: a.label, rows }));
     out.push(`<path class="gc-slice" data-tip="${tip}" style="--sc:${a.color}" d="${arcPath(cx, cy, radius, inner, a.start, a.end)}"/>`);

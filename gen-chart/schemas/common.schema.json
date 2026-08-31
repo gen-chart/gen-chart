@@ -15,31 +15,70 @@
       "pattern": "^.{1,400}$"
     },
     "colorRole": {
-      "enum": ["primary", "comparison", "positive", "negative", "neutral", "highlight"]
+      "enum": [
+        "primary",
+        "comparison",
+        "positive",
+        "negative",
+        "neutral",
+        "highlight"
+      ]
     },
     "locale": {
-      "enum": ["en", "zh-CN"]
+      "enum": [
+        "en",
+        "zh-CN"
+      ]
     },
     "qualityProfile": {
-      "enum": ["standard", "showcase"]
+      "enum": [
+        "standard",
+        "showcase"
+      ]
     },
     "theme": {
-      "enum": ["auto", "light", "dark"]
+      "enum": [
+        "auto",
+        "light",
+        "dark"
+      ]
     },
     "column": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "type", "values"],
+      "required": [
+        "id",
+        "type",
+        "values"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "type": { "enum": ["number", "date", "string"] },
-        "unit": { "$ref": "#/$defs/shortText" },
-        "label": { "$ref": "#/$defs/shortText" },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "enum": [
+            "number",
+            "date",
+            "string"
+          ]
+        },
+        "unit": {
+          "$ref": "#/$defs/shortText"
+        },
+        "label": {
+          "$ref": "#/$defs/shortText"
+        },
         "values": {
           "type": "array",
           "minItems": 1,
           "maxItems": 5000,
-          "items": { "type": ["number", "string", "null"] }
+          "items": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          }
         }
       }
     },
@@ -49,14 +88,61 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["title", "items"],
+        "required": [
+          "title",
+          "items"
+        ],
         "properties": {
-          "title": { "$ref": "#/$defs/shortText" },
+          "title": {
+            "$ref": "#/$defs/shortText"
+          },
           "items": {
             "type": "array",
             "minItems": 1,
             "maxItems": 5,
-            "items": { "$ref": "#/$defs/longText" }
+            "items": {
+              "$ref": "#/$defs/longText"
+            }
+          }
+        }
+      }
+    },
+    "guidedViews": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "$ref": "#/$defs/shortText"
+          },
+          "note": {
+            "$ref": "#/$defs/longText"
+          },
+          "focus": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "brush": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         }
       }

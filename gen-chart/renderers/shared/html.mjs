@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
+import { t, templateStrings, resolveLocale } from './i18n.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
@@ -13,7 +14,7 @@ const templatePath = fileURLToPath(new URL('../../assets/template.html', import.
 //   { kind: 'series', toggleable, items: [{id, label, color, mark}] }
 //   { kind: 'note', text }
 //   null
-function legendHtml(legend) {
+function legendHtml(legend, locale) {
   if (!legend) return '';
   if (legend.kind === 'note') {
     return `<p class="gc-legend-note">${escapeXml(legend.text)}</p>`;
@@ -22,7 +23,7 @@ function legendHtml(legend) {
     `<button type="button" data-series="${escapeXml(it.id)}" aria-pressed="true"${legend.toggleable ? '' : ' disabled'}>` +
     `<span class="gc-swatch" data-mark="${escapeXml(it.mark)}" style="--sw:${it.color}"></span>${escapeXml(it.label)}</button>`
   ).join('');
-  return `<div class="gc-legend"${legend.toggleable ? '' : ' data-static'} role="group" aria-label="Series">${items}</div>`;
+  return `<div class="gc-legend"${legend.toggleable ? '' : ' data-static'} role="group" aria-label="${escapeXml(t(locale, 'ui.series'))}">${items}</div>`;
 }
 
 function cardsHtml(spec) {
@@ -35,20 +36,57 @@ function cardsHtml(spec) {
   return `<div class="gc-cards">${cards}</div>`;
 }
 
+// The chart's numbers as a real table, visually hidden but exposed to screen
+// readers. An SVG alone cannot convey values; this is the accessible
+// equivalent of the chart, not a summary of it.
+function tableHtml(payload, locale) {
+  const { headers, rows } = payload.table;
+  const head = headers.map((h) => `<th scope="col">${escapeXml(h)}</th>`).join('');
+  const body = rows.map((r) =>
+    '<tr>' + r.map((cell, i) => {
+      const value = cell === null || cell === undefined ? '' : escapeXml(cell);
+      return i === 0 ? `<th scope="row">${value}</th>` : `<td>${value}</td>`;
+    }).join('') + '</tr>'
+  ).join('');
+  return `<table class="gc-sr-only gc-data-table"><caption>${escapeXml(t(locale, 'ui.table.caption'))}</caption>` +
+    `<thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function viewsHtml(payload, locale) {
+  const views = payload.views ?? [];
+  if (views.length === 0) return '';
+  const buttons = views.map((v, i) =>
+    `<button type="button" data-view="${escapeXml(v.id)}" aria-pressed="${i === 0 ? 'false' : 'false'}">${escapeXml(v.label)}</button>`
+  ).join('');
+  return `<div class="gc-views" role="group" aria-label="${escapeXml(t(locale, 'ui.chapters'))}">${buttons}` +
+    `<button type="button" class="gc-view-clear" data-view="">${escapeXml(t(locale, 'ui.views.clear'))}</button></div>` +
+    '<p class="gc-view-note" id="gc-view-note" aria-live="polite"></p>';
+}
+
 export function assembleHtml(spec, svg, payload, legend = null) {
   const template = readFileSync(templatePath, 'utf8');
+  const locale = resolveLocale(spec.meta.locale);
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
+  // The viewer builds some strings itself; ship them with the payload.
+  const withStrings = { ...payload, locale, i18n: templateStrings(locale) };
   // `</` must not appear un-escaped inside the JSON script block.
-  const payloadJson = JSON.stringify(payload).replaceAll('</', '<\\/');
-  return template
-    .replaceAll('{{LANG}}', spec.meta.locale === 'zh-CN' ? 'zh-CN' : 'en')
+  const payloadJson = JSON.stringify(withStrings).replaceAll('</', '<\\/');
+
+  let html = template
+    .replaceAll('{{LANG}}', locale)
     .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('{{SUBTITLE_BLOCK}}', subtitle)
+    .replace('{{VIEWS}}', viewsHtml(payload, locale))
     .replace('{{SVG}}', svg)
-    .replace('{{LEGEND}}', legendHtml(legend))
+    .replace('{{LEGEND}}', legendHtml(legend, locale))
+    .replace('{{DATA_TABLE}}', tableHtml(payload, locale))
     .replace('{{CARDS_BLOCK}}', cardsHtml(spec))
     .replace('{{PAYLOAD}}', payloadJson);
+
+  // Fixed viewer chrome: {{i18n:key}} placeholders resolve from the locale.
+  html = html.replaceAll(/\{\{i18n:([a-z0-9.]+)\}\}/g, (_, key) => escapeXml(t(locale, key)));
+  return html;
 }

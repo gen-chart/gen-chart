@@ -191,7 +191,7 @@ North star: **"The Honest Ledger"** — a chart is a claim about numbers; every 
 
 ## 11. Build order (milestones)
 
-> **Progress:** M1–M4 complete as of 2026-08-31. M5 remains.
+> **Progress:** M1–M5 complete as of 2026-08-31. The skill is feature complete against this plan.
 
 1. **M1 — Cartesian core**: common+cartesian schemas, generated validators, scales/format/text-fit, line+bar renderer, minimal template (tooltip, legend toggle, theme), `validate`/`render`/`deliver`/`doctor`, 3 examples, golden tests.
 2. **M2 — Honesty engine + SKILL.md**: honesty rule codes with repair receipts, quality profiles, `guide`, `inspect-data`, first full SKILL.md, `demo`.
