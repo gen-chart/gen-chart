@@ -53,7 +53,18 @@ Chart families and their marks:
 | `proportion` | pie, donut (max 7 slices) |
 | `matrix` | heatmap (long-format cells) |
 
+## Gallery
+
+**[Browse every chart type →](https://sses79.github.io/gen-chart/)** — each card
+links to the live interactive artifact and its typed JSON source.
+
 ## Install as a skill
+
+```bash
+npx skills add sses79/gen-chart -g
+```
+
+Or build and extract the package yourself:
 
 ```bash
 cd gen-chart && npm run build:zip
@@ -66,4 +77,4 @@ across builds) and carries no test or build files.
 
 ## License
 
-MIT
+[MIT](LICENSE)

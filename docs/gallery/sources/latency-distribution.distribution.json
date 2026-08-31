@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "chart_type": "distribution",
+  "mark": "histogram",
+  "meta": {
+    "title": "API Response Time Distribution",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "latency", "type": "number", "unit": "ms", "label": "Response time",
+        "values": [42, 48, 51, 55, 58, 59, 61, 62, 63, 64, 65, 66, 67, 68, 68, 69, 70, 71, 71, 72, 73, 74, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 85, 86, 88, 90, 92, 95, 98, 101, 104, 108, 112, 118, 125, 134, 148, 167, 195, 240] }
+    ]
+  },
+  "encoding": {
+    "value": { "column": "latency", "label": "Response time" }
+  },
+  "cards": [
+    { "title": "Takeaway", "items": ["Most requests land between 60 and 90 ms, but a right tail stretches past 200 ms.", "The tail, not the median, is what users notice — track p95 rather than the average."] }
+  ]
+}
