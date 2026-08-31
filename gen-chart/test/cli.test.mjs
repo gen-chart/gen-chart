@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const cli = fileURLToPath(new URL('../bin/agen-chart.mjs', import.meta.url));
+const cli = fileURLToPath(new URL('../bin/gen-chart.mjs', import.meta.url));
 
 test('help prints the command surface', () => {
   const out = execFileSync(process.execPath, [cli, 'help'], { encoding: 'utf8' });

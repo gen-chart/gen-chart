@@ -3,6 +3,6 @@ node_modules/
 .DS_Store
 dist/
 *.zip
-agen-chart/examples/*.html.tmp*
+gen-chart/examples/*.html.tmp*
 /tmp/
 .claude/settings.local.json
