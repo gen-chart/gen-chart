@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="{{LANG}}" data-theme="{{THEME}}">
+<html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}}</title>
+<title>Storage grew 3.7× in five quarters, four-fifths of it cold archive</title>
 <style>
 :root {
   --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
@@ -185,36 +185,36 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 <div class="gc-wrap">
   <header>
     <div>
-      <h1>{{TITLE}}</h1>
-      {{SUBTITLE_BLOCK}}
+      <h1>Storage grew 3.7× in five quarters, four-fifths of it cold archive</h1>
+      
     </div>
     <div class="gc-toolbar">
-      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">{{i18n:ui.export}}</button>
-      <button class="gc-btn" id="gc-theme" type="button" aria-label="{{i18n:ui.theme.toggle}}">{{i18n:ui.theme}}</button>
+      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
       <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">{{i18n:ui.export.png}}</button>
-        <button type="button" data-export="svg" role="menuitem">{{i18n:ui.export.svg}}</button>
-        <button type="button" data-export="csv" role="menuitem">{{i18n:ui.export.csv}}</button>
-        <button type="button" data-export="card" role="menuitem">{{i18n:ui.export.card}}</button>
+        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
       </div>
     </div>
   </header>
-  {{VIEWS}}
+  
   <div class="gc-panel">
-    <button class="gc-btn gc-reset" id="gc-reset" type="button">{{i18n:ui.reset}}</button>
-    <div class="gc-figure" id="gc-figure" role="application" aria-label="{{i18n:ui.chart}}">
-      {{SVG}}
+    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Storage grew 3.7× in five quarters, four-fifths of it cold archive" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="490" x2="940" y2="490"/><line x1="38" y1="399.2" x2="940" y2="399.2"/><line x1="38" y1="308.4" x2="940" y2="308.4"/><line x1="38" y1="217.6" x2="940" y2="217.6"/><line x1="38" y1="126.8" x2="940" y2="126.8"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="493.5" text-anchor="end">0</text><text x="30" y="402.7" text-anchor="end">100</text><text x="30" y="311.9" text-anchor="end">200</text><text x="30" y="221.1" text-anchor="end">300</text><text x="30" y="130.3" text-anchor="end">400</text><text x="30" y="39.5" text-anchor="end">500</text></g><line class="gc-axis" x1="38" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="127.5" y="506" text-anchor="middle">2025 Q3</text><text x="308.2" y="506" text-anchor="middle">2025 Q4</text><text x="489" y="506" text-anchor="middle">2026 Q1</text><text x="669.8" y="506" text-anchor="middle">2026 Q2</text><text x="850.5" y="506" text-anchor="middle">2026 Q3</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Stored data (TB)</text><g class="gc-series" data-series="hot" style="--sc:var(--cat-0)"><rect x="59.7" y="451.9" width="135.6" height="38.1" rx="1.5"/><rect x="240.5" y="446.4" width="135.6" height="43.6" rx="1.5"/><rect x="421.2" y="443.7" width="135.6" height="46.3" rx="1.5"/><rect x="602" y="440.1" width="135.6" height="49.9" rx="1.5"/><rect x="782.7" y="437.3" width="135.6" height="52.7" rx="1.5"/></g><g class="gc-series" data-series="warm" style="--sc:var(--cat-1)"><rect x="59.7" y="417.4" width="135.6" height="34.5" rx="1.5"/><rect x="240.5" y="403.7" width="135.6" height="42.7" rx="1.5"/><rect x="421.2" y="388.3" width="135.6" height="55.4" rx="1.5"/><rect x="602" y="372.9" width="135.6" height="67.2" rx="1.5"/><rect x="782.7" y="359.2" width="135.6" height="78.1" rx="1.5"/></g><g class="gc-series" data-series="cold" style="--sc:var(--cat-2)"><rect x="59.7" y="390.1" width="135.6" height="27.2" rx="1.5"/><rect x="240.5" y="347.4" width="135.6" height="56.3" rx="1.5"/><rect x="421.2" y="281.2" width="135.6" height="107.1" rx="1.5"/><rect x="602" y="200.3" width="135.6" height="172.5" rx="1.5"/><rect x="782.7" y="119.5" width="135.6" height="239.7" rx="1.5"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><rect class="gc-hit" x="38" y="36" width="902" height="454" fill="none" pointer-events="all"/></g></svg>
     </div>
-    <p class="gc-sr-only" id="gc-kbd-hint">{{i18n:ui.keyboard.hint}}</p>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
     <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
-    {{DATA_TABLE}}
-    {{LEGEND}}
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">quarter</th><th scope="col">Hot</th><th scope="col">Warm</th><th scope="col">Cold archive</th></tr></thead><tbody><tr><th scope="row">2025 Q3</th><td>42</td><td>38</td><td>30</td></tr><tr><th scope="row">2025 Q4</th><td>48</td><td>47</td><td>62</td></tr><tr><th scope="row">2026 Q1</th><td>51</td><td>61</td><td>118</td></tr><tr><th scope="row">2026 Q2</th><td>55</td><td>74</td><td>190</td></tr><tr><th scope="row">2026 Q3</th><td>58</td><td>86</td><td>264</td></tr></tbody></table>
+    <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="hot" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-0)"></span>Hot</button><button type="button" data-series="warm" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-1)"></span>Warm</button><button type="button" data-series="cold" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-2)"></span>Cold archive</button></div>
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
-  {{CARDS_BLOCK}}
+  <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Total storage rose from 110 TB to 408 TB — 3.7× in five quarters.</li><li>Cold archive accounts for 234 TB of the 298 TB added, or 79% of all growth.</li><li>Hot storage grew only 16 TB over the same period, from 42 to 58 TB.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{{PAYLOAD}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Storage grew 3.7× in five quarters, four-fifths of it cold archive","unit":"TB","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[127.5,308.2,489,669.8,850.5],"xLabels":["2025 Q3","2025 Q4","2026 Q1","2026 Q2","2026 Q3"],"table":{"headers":["quarter","Hot","Warm","Cold archive"],"rows":[["2025 Q3",42,38,30],["2025 Q4",48,47,62],["2026 Q1",51,61,118],["2026 Q2",55,74,190],["2026 Q3",58,86,264]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"hot","label":"Hot","mark":"bar","color":"var(--cat-0)","values":[42,48,51,55,58],"formatted":["42","48","51","55","58"],"pixels":[451.9,446.4,443.7,440.1,437.3],"stats":{"min":42,"max":58,"mean":50.8,"last":58,"count":5}},{"id":"warm","label":"Warm","mark":"bar","color":"var(--cat-1)","values":[38,47,61,74,86],"formatted":["38","47","61","74","86"],"pixels":[455.5,447.3,434.6,422.8,411.9],"stats":{"min":38,"max":86,"mean":61.2,"last":86,"count":5}},{"id":"cold","label":"Cold archive","mark":"bar","color":"var(--cat-2)","values":[30,62,118,190,264],"formatted":["30","62","118","190","264"],"pixels":[462.8,433.7,382.9,317.5,250.3],"stats":{"min":30,"max":264,"mean":132.8,"last":264,"count":5}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -248,7 +248,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   function writeHash() {
     var parts = [];
     var theme = root.getAttribute('data-theme');
-    if (theme !== '{{THEME}}') parts.push('theme=' + theme);
+    if (theme !== 'auto') parts.push('theme=' + theme);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));

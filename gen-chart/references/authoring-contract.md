@@ -13,9 +13,14 @@ diagnostic catalog, or repair rules.
   and `zero: true`, and appends "(log scale)" to its own caption so the
   reader never has to infer it. Reach for it only when the data spans
   multiple orders of magnitude.
-- `series[].mark`: `line` | `bar` | `scatter`. `point: true` draws circles on
-  line vertices — use it when the reader should see individual observations
-  (≤ ~30 points). `scatter` needs a linear or time x, never `band`.
+- `series[].mark`: `line` | `bar` | `scatter` | `area`. `point: true` draws
+  circles on line vertices — use it when the reader should see individual
+  observations (≤ ~30 points). `scatter` needs a linear or time x, never
+  `band`. `area` fills to the baseline, so like `bar` it requires a zero y.
+- `stack` (boolean, top level): parts adding to a total. Requires at least
+  two series, one shared mark (`bar` or `area`), non-negative values, and
+  adjacent segments distinguishable by colour. The y domain becomes the
+  stacked total, not the largest single series.
 - `series[].role`: `primary`, `comparison`, `positive`, `negative`,
   `neutral`, `highlight`. `positive`/`negative` are for signed semantics
   (gain/loss), not decoration, and validation enforces it: a directional
@@ -93,6 +98,13 @@ diagnostic catalog, or repair rules.
 | `honesty/log-nonpositive` | error | a log axis is undefined at or below zero |
 | `honesty/log-zero` | error | a log axis cannot be asked to include zero |
 | `composition/annotation-overlap` | warning | annotation labels would collide |
+| `honesty/area-zero-baseline` | error | area fills only mean something from zero |
+| `honesty/stack-negative` | error | a negative segment would subtract from the stack |
+| `semantic/stack-mixed-marks` | error | stacking needs one shared mark |
+| `semantic/stack-unsupported-mark` | error | only bar and area stack |
+| `semantic/stack-single-series` | error | a stack needs at least two parts |
+| `composition/stack-depth` | warning | more than 6 stacked segments |
+| `composition/adjacent-color` | error | touching segments are perceptually confusable (CIEDE2000) |
 | `composition/series-count` | warning | more than 5 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |
 | `composition/x-tick-overflow` | error | labels cannot fit at all |

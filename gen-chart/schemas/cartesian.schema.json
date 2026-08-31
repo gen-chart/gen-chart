@@ -144,7 +144,8 @@
             "enum": [
               "line",
               "bar",
-              "scatter"
+              "scatter",
+              "area"
             ]
           },
           "y": {
@@ -217,6 +218,9 @@
     },
     "cards": {
       "$ref": "common.schema.json#/$defs/cards"
+    },
+    "stack": {
+      "type": "boolean"
     }
   }
 }
