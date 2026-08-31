@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.6"
+  version: "0.7"
   author: sses79
   inspired_by: tt-a1i/archify (MIT)
 ---
@@ -80,7 +80,7 @@ the family you routed to.
 
 | chart_type | Marks | Use for |
 |---|---|---|
-| `cartesian` | line, bar, grouped bar, bar+line, scatter | trends, comparisons, actual-vs-target, correlation |
+| `cartesian` | line, bar, grouped bar, stacked bar, area, stacked area, bar+line, scatter | trends, comparisons, composition over time, actual-vs-target, correlation |
 | `distribution` | histogram, boxplot | spread, outliers, shape of raw observations |
 | `proportion` | pie, donut | parts of a whole (max 7 slices) |
 | `matrix` | heatmap | two categorical dimensions × intensity |
@@ -88,6 +88,11 @@ the family you routed to.
 `distribution` takes **raw observations**, not pre-computed summaries: the
 renderer derives bins, quartiles, and Tukey fences itself. `matrix` takes
 long-format `(row, column, value)` triples.
+
+Set `"stack": true` for composition — parts adding to a total. Every series
+must then use the same mark (`bar` or `area`), values must be non-negative,
+and adjacent segments must be visually distinguishable, so prefer omitting
+`role` on stacked series and letting the categorical palette separate them.
 
 ## Authoring invariants
 

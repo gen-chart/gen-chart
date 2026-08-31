@@ -9,7 +9,8 @@ import { diag } from '../shared/diagnostics.mjs';
 import { niceLinearTicks, linearScale, bandScale, timeTicks, parseDateValue, logTicks, logScale } from '../shared/scales.mjs';
 import { fmtTick, fmtValue, fmtDate, escapeXml } from '../shared/format.mjs';
 import { estimateWidth } from '../shared/text-fit.mjs';
-import { resolveSeriesColors } from '../shared/palette.mjs';
+import { resolveSeriesColors, resolveTokenHex } from '../shared/palette.mjs';
+import { deltaE00, MIN_ADJACENT_DELTA_E } from '../shared/contrast.mjs';
 
 const TICK_FONT = 11;
 const LABEL_FONT = 11.5;
@@ -54,6 +55,7 @@ export function analyzeCartesian(spec) {
 
   const seenSeries = new Set();
   let hasBar = false;
+  let hasArea = false;
   let unit;
   for (let i = 0; i < spec.series.length; i++) {
     const s = spec.series[i];
@@ -121,6 +123,7 @@ export function analyzeCartesian(spec) {
           }));
       }
     }
+    if (s.mark === 'area') hasArea = true;
     if (s.mark === 'scatter' && enc.x.scale === 'band') {
       diagnostics.push(diag('semantic/mark-scale-mismatch', 'error', `${subject}/mark`,
         'scatter marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading', {
@@ -179,6 +182,93 @@ export function analyzeCartesian(spec) {
     return { diagnostics };
   }
 
+  if (hasArea && enc.y.zero === false) {
+    diagnostics.push(diag('honesty/area-zero-baseline', 'error', '/encoding/y/zero',
+      'an area mark fills the space between the line and the baseline, so its filled quantity only means something when that baseline is zero', {
+        supportedFixes: ['remove "zero": false', 'change the area series to a line mark, which encodes position rather than filled area']
+      }));
+    return { diagnostics };
+  }
+
+  const stacked = spec.stack === true;
+  if (stacked) {
+    const marks = new Set(spec.series.map((s2) => s2.mark));
+    if (marks.size > 1) {
+      diagnostics.push(diag('semantic/stack-mixed-marks', 'error', '/stack',
+        `stacking sums series into one total, so every series must use the same mark; this chart mixes ${[...marks].join(' and ')}`, {
+          evidence: { marks: [...marks] },
+          supportedFixes: ['use one mark for every series', 'remove "stack" and compare series side by side']
+        }));
+      return { diagnostics };
+    }
+    const mark = [...marks][0];
+    if (mark !== 'bar' && mark !== 'area') {
+      diagnostics.push(diag('semantic/stack-unsupported-mark', 'error', '/stack',
+        `only bar and area marks can stack; "${mark}" encodes position, and positions do not sum`, {
+          supportedFixes: ['use bar or area marks', 'remove "stack"']
+        }));
+      return { diagnostics };
+    }
+    if (spec.series.length < 2) {
+      diagnostics.push(diag('semantic/stack-single-series', 'error', '/stack',
+        'stacking describes how parts add up to a whole, which needs at least two series', {
+          supportedFixes: ['add the remaining series', 'remove "stack"']
+        }));
+      return { diagnostics };
+    }
+    // A stack reads as a running total, so a negative segment would subtract
+    // from the bar below it and the total would stop matching the heights.
+    const negatives = [];
+    for (const s2 of spec.series) {
+      columns.get(s2.y).values.forEach((v, i) => {
+        if (v !== null && v < 0) negatives.push({ series: s2.id, index: i, value: v });
+      });
+    }
+    if (negatives.length > 0) {
+      diagnostics.push(diag('honesty/stack-negative', 'error', '/stack',
+        `a stack shows parts adding to a total, but ${negatives.length} value(s) are negative and would subtract from the segment below`, {
+          evidence: { offending: negatives.slice(0, 5) },
+          supportedFixes: ['remove "stack" and compare series side by side', 'split gains and losses into separate charts']
+        }));
+      return { diagnostics };
+    }
+    // Stacked segments touch, so neighbours must read as different
+    // categories. Luminance contrast is the wrong test here — blue and green
+    // barely differ in lightness yet are obviously distinct — so this uses
+    // perceptual colour difference.
+    const stackColors = resolveSeriesColors(spec.series);
+    for (let i = 1; i < spec.series.length; i++) {
+      const prev = spec.series[i - 1];
+      const cur = spec.series[i];
+      for (const theme of ['light', 'dark']) {
+        const a = resolveTokenHex(stackColors.get(prev.id), theme);
+        const b = resolveTokenHex(stackColors.get(cur.id), theme);
+        if (!a || !b) continue;
+        const dE = deltaE00(a, b);
+        if (dE < MIN_ADJACENT_DELTA_E) {
+          diagnostics.push(diag('composition/adjacent-color', 'error', `/series/${i}/role`,
+            `stacked segments "${prev.label}" and "${cur.label}" are too similar to tell apart where they touch (ΔE00 ${dE.toFixed(1)} in the ${theme} theme, ${MIN_ADJACENT_DELTA_E} needed)`, {
+              evidence: { deltaE00: Number(dE.toFixed(1)), needed: MIN_ADJACENT_DELTA_E, theme, colors: [a, b] },
+              supportedFixes: [
+                'omit "role" on these series so they take distinct categorical colours',
+                'reorder the series so similar colours are not adjacent'
+              ]
+            }));
+          break;
+        }
+      }
+    }
+    if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
+
+    if (spec.series.length > 6) {
+      diagnostics.push(diag('composition/stack-depth', 'warning', '/series',
+        `${spec.series.length} stacked segments are hard to compare: only the bottom band shares a common baseline`, {
+          evidence: { count: spec.series.length },
+          supportedFixes: ['group the smallest series into an "Other" band', 'split into two charts']
+        }));
+    }
+  }
+
   if (spec.series.length > 5) {
     diagnostics.push(diag('composition/series-count', 'warning', '/series',
       `${spec.series.length} series compete for attention; more than 5 usually buries the message`, {
@@ -191,11 +281,24 @@ export function analyzeCartesian(spec) {
   const zero = enc.y.scale === 'log' ? false : (enc.y.zero !== false || hasBar);
   let yMin = zero ? 0 : Infinity;
   let yMax = zero ? 0 : -Infinity;
-  for (const s of spec.series) {
-    for (const v of columns.get(s.y).values) {
-      if (v === null) continue;
-      if (v < yMin) yMin = v;
-      if (v > yMax) yMax = v;
+  if (stacked) {
+    const n0 = columns.get(spec.series[0].y).values.length;
+    for (let i = 0; i < n0; i++) {
+      let total = 0;
+      for (const s of spec.series) {
+        const v = columns.get(s.y).values[i];
+        if (v !== null) total += v;
+      }
+      if (total < yMin) yMin = total;
+      if (total > yMax) yMax = total;
+    }
+  } else {
+    for (const s of spec.series) {
+      for (const v of columns.get(s.y).values) {
+        if (v === null) continue;
+        if (v < yMin) yMin = v;
+        if (v > yMax) yMax = v;
+      }
     }
   }
   if (!Number.isFinite(yMin)) {
@@ -397,7 +500,7 @@ export function analyzeCartesian(spec) {
       W, H, margin, plotLeft, plotRight, plotTop, plotBottom,
       xCenters, xTicks, rotated, thinnedEvery, band,
       yTicks: yNice.ticks, yScale, yMin: yNice.min, yMax: yNice.max,
-      unit: unit ?? null, annotations, isLog
+      unit: unit ?? null, annotations, isLog, stacked
     }
   };
 }
@@ -453,24 +556,69 @@ export function renderSvg(spec, analysis) {
     out.push(`<text class="gc-axis-label" x="${round((plotLeft + plotRight) / 2)}" y="${H - 8}" text-anchor="middle">${escapeXml(enc.x.label)}</text>`);
   }
 
+  // Running baseline per x index; stacked marks sit on the total below them.
+  const stacked = layout.stacked;
+  const baseline = stacked ? new Array(layout.xCenters.length).fill(0) : null;
+
   // bars first (lines draw above bars)
   const barSeries = spec.series.filter((s) => s.mark === 'bar');
   barSeries.forEach((s, bi) => {
     const values = columns.get(s.y).values;
-    const slot = band.bandwidth / barSeries.length;
-    const barW = slot * 0.86;
+    const slot = stacked ? band.bandwidth : band.bandwidth / barSeries.length;
+    const barW = stacked ? band.bandwidth : slot * 0.86;
     const y0 = yScale(Math.max(0, layout.yMin));
     out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
     values.forEach((v, i) => {
       if (v === null) return;
-      const x = round(band.left(i) + bi * slot + (slot - barW) / 2);
-      const yv = yScale(v);
-      const top = Math.min(yv, y0);
-      const h = Math.max(0.5, Math.abs(yv - y0));
-      out.push(`<rect x="${x}" y="${round(top)}" width="${round(barW)}" height="${round(h)}" rx="1.5"/>`);
+      const x = round(stacked ? band.left(i) : band.left(i) + bi * slot + (slot - barW) / 2);
+      if (stacked) {
+        const bottom = yScale(baseline[i]);
+        baseline[i] += v;
+        const top = yScale(baseline[i]);
+        out.push(`<rect x="${x}" y="${round(top)}" width="${round(barW)}" height="${round(Math.max(0.5, bottom - top))}" rx="1.5"/>`);
+      } else {
+        const yv = yScale(v);
+        const top = Math.min(yv, y0);
+        const h = Math.max(0.5, Math.abs(yv - y0));
+        out.push(`<rect x="${x}" y="${round(top)}" width="${round(barW)}" height="${round(h)}" rx="1.5"/>`);
+      }
     });
     out.push('</g>');
   });
+
+  // areas: filled between the series and its baseline (zero, or the stack below)
+  const areaSeries = spec.series.filter((s) => s.mark === 'area');
+  const areaBase = stacked ? new Array(layout.xCenters.length).fill(0) : null;
+  for (const s of areaSeries) {
+    const values = columns.get(s.y).values;
+    const zeroY = yScale(Math.max(0, layout.yMin));
+    let top = '';
+    const bottomPts = [];
+    let pen = false;
+    values.forEach((v, i) => {
+      if (v === null) { pen = false; return; }
+      const upper = stacked ? areaBase[i] + v : v;
+      top += `${pen ? 'L' : 'M'}${round(xCenters[i])} ${round(yScale(upper))}`;
+      bottomPts.push([xCenters[i], stacked ? yScale(areaBase[i]) : zeroY]);
+      pen = true;
+    });
+    if (stacked) values.forEach((v, i) => { if (v !== null) areaBase[i] += v; });
+    let d = top;
+    for (let i = bottomPts.length - 1; i >= 0; i--) {
+      d += `L${round(bottomPts[i][0])} ${round(bottomPts[i][1])}`;
+    }
+    if (bottomPts.length > 0) d += 'Z';
+    out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
+    out.push(`<path class="gc-area" d="${d}"/>`);
+    if (s.point) {
+      values.forEach((v, i) => {
+        if (v === null) return;
+        const upper = stacked ? (areaBase[i] - 0) : v;
+        out.push(`<circle class="gc-point" cx="${round(xCenters[i])}" cy="${round(yScale(stacked ? upper : v))}" r="3"/>`);
+      });
+    }
+    out.push('</g>');
+  }
 
   // scatter points
   for (const s of spec.series) {
