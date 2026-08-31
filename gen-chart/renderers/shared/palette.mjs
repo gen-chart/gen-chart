@@ -47,3 +47,25 @@ export function resolveSeriesColors(series) {
   }
   return map;
 }
+
+// Resolves a series' colour token to the hex it renders as, per theme, so
+// composition checks can reason about what a reader actually sees.
+import { parseThemeTokens } from './contrast.mjs';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+let cachedThemes = null;
+function themes() {
+  if (!cachedThemes) {
+    const css = readFileSync(fileURLToPath(new URL('../../assets/template.html', import.meta.url)), 'utf8');
+    cachedThemes = parseThemeTokens(css);
+  }
+  return cachedThemes;
+}
+
+// `var(--x)` -> the hex that token holds in the named theme.
+export function resolveTokenHex(cssVar, theme) {
+  const name = /var\((--[a-z0-9-]+)\)/.exec(cssVar)?.[1];
+  if (!name) return null;
+  return themes()[theme]?.[name] ?? null;
+}

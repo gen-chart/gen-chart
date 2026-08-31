@@ -197,8 +197,8 @@ North star: **"The Honest Ledger"** — a chart is a claim about numbers; every 
 > covered. Verified gaps below.
 >
 > **Still missing:**
-> - **Marks (§4):** no `area`, no stacked bar, no 100%-stacked bar, no
->   calendar heatmap. `guide` can still route toward these.
+> - **Marks (§4):** no 100%-stacked bar, no calendar heatmap. (`area`,
+>   stacked bar, and stacked area landed in M8.)
 > - **Honesty (§5):** `honesty/dual-axis` exists only as a `guide` caution —
 >   dual axes are unsupported rather than validated.
 > - **Composition (§5.4):** no point-density downsample suggestion (>2k).
@@ -227,6 +227,10 @@ North star: **"The Honest Ledger"** — a chart is a claim about numbers; every 
    `composition/annotation-overlap`, WCAG AA palette verification,
    logarithmic y axis with `log-bar` / `log-nonpositive` / `log-zero` rules
    and axis self-disclosure, GitHub Actions CI.
+8. **M8 — Area and stacking**: `area` mark, `stack: true` for bar and area,
+   their honesty rules (`area-zero-baseline`, `stack-negative`, stack shape
+   checks), and `composition/adjacent-color` — a CIEDE2000 check that
+   touching stacked segments are perceptually distinguishable.
 
 ## 12. Open questions
 
