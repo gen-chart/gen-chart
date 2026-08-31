@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="{{LANG}}" data-theme="{{THEME}}">
+<html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}}</title>
+<title>Accounts grew 52%, and the paid tiers grew fastest</title>
 <style>
 :root {
   --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
@@ -185,36 +185,36 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 <div class="gc-wrap">
   <header>
     <div>
-      <h1>{{TITLE}}</h1>
-      {{SUBTITLE_BLOCK}}
+      <h1>Accounts grew 52%, and the paid tiers grew fastest</h1>
+      
     </div>
     <div class="gc-toolbar">
-      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">{{i18n:ui.export}}</button>
-      <button class="gc-btn" id="gc-theme" type="button" aria-label="{{i18n:ui.theme.toggle}}">{{i18n:ui.theme}}</button>
+      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
       <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">{{i18n:ui.export.png}}</button>
-        <button type="button" data-export="svg" role="menuitem">{{i18n:ui.export.svg}}</button>
-        <button type="button" data-export="csv" role="menuitem">{{i18n:ui.export.csv}}</button>
-        <button type="button" data-export="card" role="menuitem">{{i18n:ui.export.card}}</button>
+        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
       </div>
     </div>
   </header>
-  {{VIEWS}}
+  
   <div class="gc-panel">
-    <button class="gc-btn gc-reset" id="gc-reset" type="button">{{i18n:ui.reset}}</button>
-    <div class="gc-figure" id="gc-figure" role="application" aria-label="{{i18n:ui.chart}}">
-      {{SVG}}
+    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Accounts grew 52%, and the paid tiers grew fastest" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="37" y1="490" x2="940" y2="490"/><line x1="37" y1="338.7" x2="940" y2="338.7"/><line x1="37" y1="187.3" x2="940" y2="187.3"/><line x1="37" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="29" y="493.5" text-anchor="end">0</text><text x="29" y="342.2" text-anchor="end">5k</text><text x="29" y="190.8" text-anchor="end">10k</text><text x="29" y="39.5" text-anchor="end">15k</text></g><line class="gc-axis" x1="37" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="37" y="506" text-anchor="middle">Jan 2026</text><text x="222.4" y="506" text-anchor="middle">Feb</text><text x="389.8" y="506" text-anchor="middle">Mar</text><text x="575.2" y="506" text-anchor="middle">Apr</text><text x="754.6" y="506" text-anchor="middle">May</text><text x="940" y="506" text-anchor="middle">Jun</text></g><text class="gc-axis-label" x="37" y="26" text-anchor="start">Accounts</text><g class="gc-series" data-series="free" style="--sc:var(--cat-0)"><path class="gc-area" d="M37 302.3L222.4 284.2L389.8 275.1L575.2 266L754.6 260L940 250.9L940 490L754.6 490L575.2 490L389.8 490L222.4 490L37 490Z"/></g><g class="gc-series" data-series="pro" style="--sc:var(--cat-1)"><path class="gc-area" d="M37 247.9L222.4 220.6L389.8 199.4L575.2 178.3L754.6 157.1L940 132.9L940 250.9L754.6 260L575.2 266L389.8 275.1L222.4 284.2L37 302.3Z"/></g><g class="gc-series" data-series="enterprise" style="--sc:var(--cat-2)"><path class="gc-area" d="M37 240.6L222.4 211.5L389.8 187.9L575.2 164L754.6 139.2L940 111.1L940 132.9L754.6 157.1L575.2 178.3L389.8 199.4L222.4 220.6L37 247.9Z"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><rect class="gc-hit" x="37" y="36" width="903" height="454" fill="none" pointer-events="all"/></g></svg>
     </div>
-    <p class="gc-sr-only" id="gc-kbd-hint">{{i18n:ui.keyboard.hint}}</p>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
     <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
-    {{DATA_TABLE}}
-    {{LEGEND}}
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">month</th><th scope="col">Free</th><th scope="col">Pro</th><th scope="col">Enterprise</th></tr></thead><tbody><tr><th scope="row">2026-01</th><td>6200</td><td>1800</td><td>240</td></tr><tr><th scope="row">2026-02</th><td>6800</td><td>2100</td><td>300</td></tr><tr><th scope="row">2026-03</th><td>7100</td><td>2500</td><td>380</td></tr><tr><th scope="row">2026-04</th><td>7400</td><td>2900</td><td>470</td></tr><tr><th scope="row">2026-05</th><td>7600</td><td>3400</td><td>590</td></tr><tr><th scope="row">2026-06</th><td>7900</td><td>3900</td><td>720</td></tr></tbody></table>
+    <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="free" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-0)"></span>Free</button><button type="button" data-series="pro" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-1)"></span>Pro</button><button type="button" data-series="enterprise" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-2)"></span>Enterprise</button></div>
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
-  {{CARDS_BLOCK}}
+  <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Total accounts rose 52%, from 8,240 to 12,520 over six months.</li><li>Enterprise tripled and Pro more than doubled, while Free grew 27%.</li><li>Free therefore fell from 75% of accounts to 63%, even though it never shrank in absolute terms.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{{PAYLOAD}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Accounts grew 52%, and the paid tiers grew fastest","unit":"accounts","xType":"time","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[37,222.4,389.8,575.2,754.6,940],"xLabels":["Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026"],"table":{"headers":["month","Free","Pro","Enterprise"],"rows":[["2026-01",6200,1800,240],["2026-02",6800,2100,300],["2026-03",7100,2500,380],["2026-04",7400,2900,470],["2026-05",7600,3400,590],["2026-06",7900,3900,720]]},"plot":{"left":37,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"free","label":"Free","mark":"area","color":"var(--cat-0)","values":[6200,6800,7100,7400,7600,7900],"formatted":["6,200","6,800","7,100","7,400","7,600","7,900"],"pixels":[302.3,284.2,275.1,266,260,250.9],"stats":{"min":6200,"max":7900,"mean":7166.666666666667,"last":7900,"count":6}},{"id":"pro","label":"Pro","mark":"area","color":"var(--cat-1)","values":[1800,2100,2500,2900,3400,3900],"formatted":["1,800","2,100","2,500","2,900","3,400","3,900"],"pixels":[435.5,426.4,414.3,402.2,387.1,372],"stats":{"min":1800,"max":3900,"mean":2766.6666666666665,"last":3900,"count":6}},{"id":"enterprise","label":"Enterprise","mark":"area","color":"var(--cat-2)","values":[240,300,380,470,590,720],"formatted":["240","300","380","470","590","720"],"pixels":[482.7,480.9,478.5,475.8,472.1,468.2],"stats":{"min":240,"max":720,"mean":450,"last":720,"count":6}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -248,7 +248,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   function writeHash() {
     var parts = [];
     var theme = root.getAttribute('data-theme');
-    if (theme !== '{{THEME}}') parts.push('theme=' + theme);
+    if (theme !== 'auto') parts.push('theme=' + theme);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));

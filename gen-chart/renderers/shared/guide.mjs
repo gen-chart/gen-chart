@@ -19,12 +19,14 @@ const RULES = [
   { re: /\b(distribution|histogram|spread|outlier|boxplot|box plot|percentile|frequency|binned)\b/, family: 'distribution', marks: ['histogram', 'boxplot'], w: 4 },
   { re: /\b(share|proportion|percentage of|percent of|breakdown|composition|parts? of (a |the )?whole|pie|donut)\b/, family: 'proportion', marks: ['pie', 'donut'], w: 4 },
   { re: /\b(heatmap|heat map|matrix|by hour and day|day of week|calendar|intensity grid|correlation matrix)\b/, family: 'matrix', marks: ['heatmap'], w: 4 },
+  { re: /\b(composition|mix|make ?up|breakdown over time|stacked?|by (tier|plan|segment|channel) over)\b/, family: 'cartesian', marks: ['area', 'bar'], w: 3 },
+  { re: /\b(area chart|filled (line|chart)|cumulative(ly)? over time)\b/, family: 'cartesian', marks: ['area'], w: 3 },
   { re: /\b(funnel|stage conversion)\b/, family: 'cartesian', marks: ['bar'], w: 2 },
   { re: /\b(bar chart|bar graph)\b/, family: 'cartesian', marks: ['bar'], w: 2 },
   { re: /\b(line chart|line graph)\b/, family: 'cartesian', marks: ['line'], w: 2 }
 ];
 
-const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
+const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'area', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
 
 export function guide(scenario) {
   const s = String(scenario).toLowerCase();
@@ -52,6 +54,9 @@ export function guide(scenario) {
   }
   if (/\b(dual|second(ary)? axis|two axes|twin axis)\b/.test(s)) {
     cautions.push('a second y axis requires distinct units and per-axis legend labels (honesty/dual-axis); consider two stacked charts instead');
+  }
+  if (/\bstacked?\b/.test(s) && /\b(negative|loss|deficit|drawdown)\b/.test(s)) {
+    cautions.push('stacked marks show parts adding to a total, so negative values are rejected (honesty/stack-negative); compare series side by side instead');
   }
   if (/\b(3d|three.dimensional)\b/.test(s)) {
     cautions.push('3D charts distort value perception and are out of scope; use a flat mark');
