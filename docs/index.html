@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gen-chart — gallery</title>
+<meta name="description" content="Every chart gen-chart can produce, rendered from a typed JSON spec and validated before delivery.">
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f8fafc;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --grid: #e2e8f0;
+  --border: #e2e8f0;
+  --axis: #94a3b8;
+  --tooltip-bg: #0f172a;
+  --tooltip-ink: #f8fafc;
+  --cat-0: #2563eb;
+  --cat-1: #059669;
+  --cat-2: #d97706;
+  --cat-3: #7c3aed;
+  --cat-4: #db2777;
+  --cat-5: #0891b2;
+  --role-primary: #2563eb;
+  --role-comparison: #64748b;
+  --role-positive: #059669;
+  --role-negative: #e11d48;
+  --role-neutral: #748296;
+  --role-highlight: #d97706;
+  --seq-0: #dbeafe;
+  --seq-1: #bfdbfe;
+  --seq-2: #93c5fd;
+  --seq-3: #60a5fa;
+  --seq-4: #3b82f6;
+  --seq-5: #1d4ed8;
+  --seq-ink-0: #0f172a;
+  --seq-ink-1: #0f172a;
+  --seq-ink-2: #0f172a;
+  --seq-ink-3: #0f172a;
+  --seq-ink-4: #0f172a;
+  --seq-ink-5: #f8fafc;
+  --div-0: #be123c;
+  --div-1: #fb7185;
+  --div-2: #fecdd3;
+  --div-3: #a7f3d0;
+  --div-4: #34d399;
+  --div-5: #047857;
+  --div-ink-0: #fff1f2;
+  --div-ink-1: #0f172a;
+  --div-ink-2: #0f172a;
+  --div-ink-3: #0f172a;
+  --div-ink-4: #0f172a;
+  --div-ink-5: #ecfdf5;
+}
+:root[data-theme="dark"] {
+  --bg: #020617;
+  --panel: #0f172a;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --grid: #1e293b;
+  --border: #1e293b;
+  --axis: #475569;
+  --tooltip-bg: #f8fafc;
+  --tooltip-ink: #0f172a;
+  --cat-0: #60a5fa;
+  --cat-1: #34d399;
+  --cat-2: #fbbf24;
+  --cat-3: #a78bfa;
+  --cat-4: #f472b6;
+  --cat-5: #22d3ee;
+  --role-primary: #60a5fa;
+  --role-comparison: #94a3b8;
+  --role-positive: #34d399;
+  --role-negative: #fb7185;
+  --role-neutral: #64748b;
+  --role-highlight: #fbbf24;
+  --seq-0: #0b2545;
+  --seq-1: #123a63;
+  --seq-2: #1b5183;
+  --seq-3: #2a6ea8;
+  --seq-4: #3f92cf;
+  --seq-5: #60b8f2;
+  --seq-ink-0: #e2e8f0;
+  --seq-ink-1: #e2e8f0;
+  --seq-ink-2: #e2e8f0;
+  --seq-ink-3: #ffffff;
+  --seq-ink-4: #04121f;
+  --seq-ink-5: #04121f;
+  --div-0: #9f1239;
+  --div-1: #e11d48;
+  --div-2: #fda4af;
+  --div-3: #6ee7b7;
+  --div-4: #10b981;
+  --div-5: #065f46;
+  --div-ink-0: #fff1f2;
+  --div-ink-1: #ffffff;
+  --div-ink-2: #0f172a;
+  --div-ink-3: #0f172a;
+  --div-ink-4: #0f172a;
+  --div-ink-5: #ecfdf5;
+}
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+    --bg: #020617;
+    --panel: #0f172a;
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --grid: #1e293b;
+    --border: #1e293b;
+    --axis: #475569;
+    --tooltip-bg: #f8fafc;
+    --tooltip-ink: #0f172a;
+    --cat-0: #60a5fa;
+    --cat-1: #34d399;
+    --cat-2: #fbbf24;
+    --cat-3: #a78bfa;
+    --cat-4: #f472b6;
+    --cat-5: #22d3ee;
+    --role-primary: #60a5fa;
+    --role-comparison: #94a3b8;
+    --role-positive: #34d399;
+    --role-negative: #fb7185;
+    --role-neutral: #64748b;
+    --role-highlight: #fbbf24;
+    --seq-0: #0b2545;
+    --seq-1: #123a63;
+    --seq-2: #1b5183;
+    --seq-3: #2a6ea8;
+    --seq-4: #3f92cf;
+    --seq-5: #60b8f2;
+    --seq-ink-0: #e2e8f0;
+    --seq-ink-1: #e2e8f0;
+    --seq-ink-2: #e2e8f0;
+    --seq-ink-3: #ffffff;
+    --seq-ink-4: #04121f;
+    --seq-ink-5: #04121f;
+    --div-0: #9f1239;
+    --div-1: #e11d48;
+    --div-2: #fda4af;
+    --div-3: #6ee7b7;
+    --div-4: #10b981;
+    --div-5: #065f46;
+    --div-ink-0: #fff1f2;
+    --div-ink-1: #ffffff;
+    --div-ink-2: #0f172a;
+    --div-ink-3: #0f172a;
+    --div-ink-4: #0f172a;
+    --div-ink-5: #ecfdf5;
+  }
+}
+svg.gc-chart { display: block; width: 100%; height: auto; }
+.gc-grid line { stroke: var(--grid); stroke-width: 1; }
+.gc-axis { stroke: var(--axis); stroke-width: 1; }
+.gc-yticks text, .gc-xticks text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-axis-label { fill: var(--muted); font-size: 11.5px; font-weight: 600; font-family: inherit; }
+.gc-series rect { fill: var(--sc); }
+.gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.gc-point { fill: var(--sc); }
+.gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
+.gc-bin { fill: var(--sc); }
+.gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-whisker, .gc-box .gc-cap { stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-median { stroke: var(--sc); stroke-width: 2.5; }
+.gc-box .gc-outlier { fill: var(--sc); fill-opacity: 0.7; }
+.gc-slice { fill: var(--sc); stroke: var(--panel); stroke-width: 1.5; }
+.gc-slice-label { fill: #f8fafc; font-size: 11px; font-weight: 700; font-family: inherit; paint-order: stroke; stroke: rgba(2, 6, 23, 0.35); stroke-width: 2.5px; }
+.gc-donut-total { fill: var(--ink); font-size: 20px; font-weight: 700; font-family: inherit; }
+.gc-donut-unit { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-cell { fill: var(--sc); }
+.gc-cell-empty { fill: var(--grid); }
+.gc-cell-label { fill: var(--ci); font-size: 10.5px; font-weight: 600; font-family: inherit; }
+.gc-row-label { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-ramp rect { fill: var(--sc); }
+.gc-ramp text { fill: var(--muted); font-size: 10px; font-family: inherit; }
+.gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-series.gc-off { display: none; }
+.gc-series.gc-dim { opacity: 0.22; }
+.gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.gc-annotations text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-annotations [data-gone] { display: none; }
+svg.gc-chart { min-width: 560px; }
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 3rem 1.25rem 4rem;
+}
+.wrap { max-width: 1100px; margin: 0 auto; }
+header { margin-bottom: 2.5rem; max-width: 46rem; }
+h1 { font-size: 2rem; letter-spacing: -0.02em; margin-bottom: 0.6rem; }
+.lede { color: var(--muted); font-size: 1.02rem; }
+.lede code { background: var(--panel); border: 1px solid var(--border); border-radius: 0.3rem; padding: 0.05rem 0.3rem; font-size: 0.9em; }
+.rules { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.1rem; }
+.rules li { list-style: none; font-size: 0.76rem; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0.2rem 0.7rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 1.5rem; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 1rem; overflow: hidden; display: flex; flex-direction: column; }
+.preview { display: block; padding: 0.9rem 0.9rem 0; background: var(--panel); }
+.preview svg { display: block; width: 100%; height: auto; border-radius: 0.5rem; }
+.meta { padding: 1rem 1.15rem 1.15rem; }
+.family { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.meta h2 { font-size: 1rem; line-height: 1.35; margin: 0.3rem 0 0.45rem; }
+.meta h2 a { color: var(--ink); text-decoration: none; }
+.meta h2 a:hover { text-decoration: underline; }
+.meta p { font-size: 0.85rem; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.75rem 0 0.6rem; padding: 0; }
+.tags li { list-style: none; font-size: 0.72rem; color: var(--muted); background: var(--grid); border-radius: 0.35rem; padding: 0.12rem 0.45rem; }
+.src { font-size: 0.78rem; color: var(--role-primary); text-decoration: none; }
+.src:hover { text-decoration: underline; }
+a:focus-visible, .preview:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 3px; border-radius: 0.4rem; }
+footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }
+footer a { color: var(--role-primary); }
+@media (max-width: 560px) { .grid { grid-template-columns: 1fr; } body { padding: 2rem 0.9rem 3rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>gen-chart gallery</h1>
+    <p class="lede">Every chart below was authored as a typed JSON spec, validated at
+    <code>showcase</code> quality, and delivered as one self-contained HTML file. The previews are
+    the charts' own SVG — not screenshots. Open any card for the interactive version:
+    hover for values, walk the data with arrow keys, switch themes, export PNG, SVG, or the
+    underlying CSV.</p>
+    <ul class="rules">
+      <li>bars keep a zero baseline</li>
+      <li>one unit per axis</li>
+      <li>pie capped at 7 slices</li>
+      <li>bins disclosed on the chart</li>
+      <li>log axes label themselves</li>
+      <li>stacked segments must be distinguishable</li>
+    </ul>
+  </header>
+  <main class="grid">
+    <article class="card">
+      <a class="preview" href="gallery/build-times.html" aria-label="Open CI Build Duration by Pipeline">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="CI Build Duration by Pipeline" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="486" x2="936" y2="486"/><line x1="38" y1="344.4" x2="936" y2="344.4"/><line x1="38" y1="202.8" x2="936" y2="202.8"/><line x1="38" y1="61.2" x2="936" y2="61.2"/></g><g class="gc-yticks"><text x="30" y="489.5" text-anchor="end">0</text><text x="30" y="347.9" text-anchor="end">200</text><text x="30" y="206.3" text-anchor="end">400</text><text x="30" y="64.7" text-anchor="end">600</text></g><line class="gc-axis" x1="38" y1="486" x2="936" y2="486"/><text class="gc-axis-label" x="38" y="14" text-anchor="start">Duration (s)</text><g class="gc-box" data-tip="{&quot;title&quot;:&quot;unit&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;max&quot;,&quot;value&quot;:&quot;71 s&quot;},{&quot;label&quot;:&quot;q3&quot;,&quot;value&quot;:&quot;54.5 s&quot;},{&quot;label&quot;:&quot;median&quot;,&quot;value&quot;:&quot;50.5 s&quot;},{&quot;label&quot;:&quot;q1&quot;,&quot;value&quot;:&quot;47.25 s&quot;},{&quot;label&quot;:&quot;min&quot;,&quot;value&quot;:&quot;42 s&quot;},{&quot;label&quot;:&quot;n&quot;,&quot;value&quot;:&quot;10&quot;}]}" style="--sc:var(--cat-0)"><line class="gc-whisker" x1="192.6" y1="444.9" x2="192.6" y2="456.3"/><line class="gc-cap" x1="168.6" y1="444.9" x2="216.6" y2="444.9"/><line class="gc-cap" x1="168.6" y1="456.3" x2="216.6" y2="456.3"/><rect class="gc-box-body" x="144.6" y="447.4" width="96" height="5.1" rx="2"/><line class="gc-median" x1="144.6" y1="450.2" x2="240.6" y2="450.2"/><circle class="gc-outlier" cx="192.6" cy="435.7" r="2.6"/></g><g class="gc-box" data-tip="{&quot;title&quot;:&quot;integration&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;max&quot;,&quot;value&quot;:&quot;210 s&quot;},{&quot;label&quot;:&quot;q3&quot;,&quot;value&quot;:&quot;156.5 s&quot;},{&quot;label&quot;:&quot;median&quot;,&quot;value&quot;:&quot;142.5 s&quot;},{&quot;label&quot;:&quot;q1&quot;,&quot;value&quot;:&quot;132.25 s&quot;},{&quot;label&quot;:&quot;min&quot;,&quot;value&quot;:&quot;118 s&quot;},{&quot;label&quot;:&quot;n&quot;,&quot;value&quot;:&quot;10&quot;}]}" style="--sc:var(--cat-1)"><line class="gc-whisker" x1="487" y1="368.5" x2="487" y2="402.5"/><line class="gc-cap" x1="463" y1="368.5" x2="511" y2="368.5"/><line class="gc-cap" x1="463" y1="402.5" x2="511" y2="402.5"/><rect class="gc-box-body" x="439" y="375.2" width="96" height="17.2" rx="2"/><line class="gc-median" x1="439" y1="385.1" x2="535" y2="385.1"/><circle class="gc-outlier" cx="487" cy="337.3" r="2.6"/></g><g class="gc-box" data-tip="{&quot;title&quot;:&quot;e2e&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;max&quot;,&quot;value&quot;:&quot;610 s&quot;},{&quot;label&quot;:&quot;q3&quot;,&quot;value&quot;:&quot;398.5 s&quot;},{&quot;label&quot;:&quot;median&quot;,&quot;value&quot;:&quot;362.5 s&quot;},{&quot;label&quot;:&quot;q1&quot;,&quot;value&quot;:&quot;331.25 s&quot;},{&quot;label&quot;:&quot;min&quot;,&quot;value&quot;:&quot;295 s&quot;},{&quot;label&quot;:&quot;n&quot;,&quot;value&quot;:&quot;10&quot;}]}" style="--sc:var(--cat-2)"><line class="gc-whisker" x1="781.4" y1="185.1" x2="781.4" y2="277.2"/><line class="gc-cap" x1="757.4" y1="185.1" x2="805.4" y2="185.1"/><line class="gc-cap" x1="757.4" y1="277.2" x2="805.4" y2="277.2"/><rect class="gc-box-body" x="733.4" y="203.9" width="96" height="47.6" rx="2"/><line class="gc-median" x1="733.4" y1="229.4" x2="829.4" y2="229.4"/><circle class="gc-outlier" cx="781.4" cy="54.2" r="2.6"/></g><g class="gc-xticks"><text x="192.6" y="502" text-anchor="middle">unit</text><text x="487" y="502" text-anchor="middle">integration</text><text x="781.4" y="502" text-anchor="middle">e2e</text></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Distribution</span>
+        <h2><a href="gallery/build-times.html">CI Build Duration by Pipeline</a></h2>
+        <p>End-to-end runs dominate total CI time and vary the most.</p>
+        <ul class="tags"><li>boxplot</li></ul>
+        <a class="src" href="gallery/sources/build-times.distribution.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/latency-distribution.html" aria-label="Open API Response Time Distribution">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="API Response Time Distribution" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="32" y1="466" x2="936" y2="466"/><line x1="32" y1="377.2" x2="936" y2="377.2"/><line x1="32" y1="288.4" x2="936" y2="288.4"/><line x1="32" y1="199.6" x2="936" y2="199.6"/><line x1="32" y1="110.8" x2="936" y2="110.8"/><line x1="32" y1="22" x2="936" y2="22"/></g><g class="gc-yticks"><text x="24" y="469.5" text-anchor="end">0</text><text x="24" y="380.7" text-anchor="end">5</text><text x="24" y="291.9" text-anchor="end">10</text><text x="24" y="203.1" text-anchor="end">15</text><text x="24" y="114.3" text-anchor="end">20</text><text x="24" y="25.5" text-anchor="end">25</text></g><line class="gc-axis" x1="32" y1="466" x2="936" y2="466"/><text class="gc-axis-label" x="32" y="14" text-anchor="start">Count</text><g class="gc-series" data-series="dist" style="--sc:var(--cat-0)"><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;40 – 60 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;6&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;12.0%&quot;}]}" x="32" y="359.4" width="88.9" height="106.6" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;60 – 80 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;22&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;44.0%&quot;}]}" x="122.4" y="75.3" width="88.9" height="390.7" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;80 – 100 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;11&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;22.0%&quot;}]}" x="212.8" y="270.6" width="88.9" height="195.4" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;100 – 120 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;5&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;10.0%&quot;}]}" x="303.2" y="377.2" width="88.9" height="88.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;120 – 140 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;2&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;4.0%&quot;}]}" x="393.6" y="430.5" width="88.9" height="35.5" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;140 – 160 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="484" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;160 – 180 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="574.4" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;180 – 200 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="664.8" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;200 – 220 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;0&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;0.0%&quot;}]}" x="755.2" y="466" width="88.9" height="0" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;220 – 240 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="845.6" y="448.2" width="88.9" height="17.8" rx="1.5"/></g><g class="gc-xticks"><text x="32" y="482" text-anchor="middle">40</text><text x="122.4" y="482" text-anchor="middle">60</text><text x="212.8" y="482" text-anchor="middle">80</text><text x="303.2" y="482" text-anchor="middle">100</text><text x="393.6" y="482" text-anchor="middle">120</text><text x="484" y="482" text-anchor="middle">140</text><text x="574.4" y="482" text-anchor="middle">160</text><text x="664.8" y="482" text-anchor="middle">180</text><text x="755.2" y="482" text-anchor="middle">200</text><text x="845.6" y="482" text-anchor="middle">220</text><text x="936" y="482" text-anchor="middle">240</text></g><text class="gc-axis-label" x="484" y="512" text-anchor="middle">Response time (ms)</text></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Distribution</span>
+        <h2><a href="gallery/latency-distribution.html">API Response Time Distribution</a></h2>
+        <p>Most requests land between 60 and 90 ms, but a right tail stretches past 200 ms.</p>
+        <ul class="tags"><li>histogram</li></ul>
+        <a class="src" href="gallery/sources/latency-distribution.distribution.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/mau-trend.html" aria-label="Open Monthly Active Users">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Monthly Active Users" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="37" y1="490" x2="940" y2="490"/><line x1="37" y1="376.5" x2="940" y2="376.5"/><line x1="37" y1="263" x2="940" y2="263"/><line x1="37" y1="149.5" x2="940" y2="149.5"/><line x1="37" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="29" y="493.5" text-anchor="end">0</text><text x="29" y="380" text-anchor="end">5k</text><text x="29" y="266.5" text-anchor="end">10k</text><text x="29" y="153" text-anchor="end">15k</text><text x="29" y="39.5" text-anchor="end">20k</text></g><line class="gc-axis" x1="37" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="37" y="506" text-anchor="middle">Sep 2025</text><text x="201.9" y="506" text-anchor="middle">Nov</text><text x="366.8" y="506" text-anchor="middle">Jan 2026</text><text x="526.4" y="506" text-anchor="middle">Mar</text><text x="691.3" y="506" text-anchor="middle">May</text><text x="856.2" y="506" text-anchor="middle">Jul</text></g><text class="gc-axis-label" x="37" y="26" text-anchor="start">Users</text><g class="gc-series" data-series="mau" style="--sc:var(--role-primary)"><path class="gc-line" d="M37 303.9L118.1 288L201.9 276.6L283 283.4L366.8 251.6L450.6 210.8L526.4 176.7L610.2 158.6L691.3 129.1L775.1 95L856.2 79.1L940 42.8"/><circle class="gc-point" cx="37" cy="303.9" r="3"/><circle class="gc-point" cx="118.1" cy="288" r="3"/><circle class="gc-point" cx="201.9" cy="276.6" r="3"/><circle class="gc-point" cx="283" cy="283.4" r="3"/><circle class="gc-point" cx="366.8" cy="251.6" r="3"/><circle class="gc-point" cx="450.6" cy="210.8" r="3"/><circle class="gc-point" cx="526.4" cy="176.7" r="3"/><circle class="gc-point" cx="610.2" cy="158.6" r="3"/><circle class="gc-point" cx="691.3" cy="129.1" r="3"/><circle class="gc-point" cx="775.1" cy="95" r="3"/><circle class="gc-point" cx="856.2" cy="79.1" r="3"/><circle class="gc-point" cx="940" cy="42.8" r="3"/></g><g class="gc-series" data-series="paying" style="--sc:var(--role-positive)"><path class="gc-line" d="M37 476.2L118.1 474.1L201.9 472.3L283 472.7L366.8 468.7L450.6 463.2L526.4 457.8L610.2 454.6L691.3 448.9L775.1 443.5L856.2 439.4L940 432.3"/><circle class="gc-point" cx="37" cy="476.2" r="3"/><circle class="gc-point" cx="118.1" cy="474.1" r="3"/><circle class="gc-point" cx="201.9" cy="472.3" r="3"/><circle class="gc-point" cx="283" cy="472.7" r="3"/><circle class="gc-point" cx="366.8" cy="468.7" r="3"/><circle class="gc-point" cx="450.6" cy="463.2" r="3"/><circle class="gc-point" cx="526.4" cy="457.8" r="3"/><circle class="gc-point" cx="610.2" cy="454.6" r="3"/><circle class="gc-point" cx="691.3" cy="448.9" r="3"/><circle class="gc-point" cx="775.1" cy="443.5" r="3"/><circle class="gc-point" cx="856.2" cy="439.4" r="3"/><circle class="gc-point" cx="940" cy="432.3" r="3"/></g><g class="gc-annotations"><line data-ox="450.6" x1="450.6" y1="36" x2="450.6" y2="490"/><text data-ox="450.6" x="455.6" y="47" text-anchor="start">v2 launch</text></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/mau-trend.html">Monthly Active Users</a></h2>
+        <p>MAU grew 2.4× over twelve months, with growth accelerating after the v2 launch in February.</p>
+        <ul class="tags"><li>line</li><li>3 guided views</li><li>brush zoom</li></ul>
+        <a class="src" href="gallery/sources/mau-trend.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/plan-mix.html" aria-label="Open Accounts grew 52%, and the paid tiers grew fastest">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Accounts grew 52%, and the paid tiers grew fastest" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="37" y1="490" x2="940" y2="490"/><line x1="37" y1="338.7" x2="940" y2="338.7"/><line x1="37" y1="187.3" x2="940" y2="187.3"/><line x1="37" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="29" y="493.5" text-anchor="end">0</text><text x="29" y="342.2" text-anchor="end">5k</text><text x="29" y="190.8" text-anchor="end">10k</text><text x="29" y="39.5" text-anchor="end">15k</text></g><line class="gc-axis" x1="37" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="37" y="506" text-anchor="middle">Jan 2026</text><text x="222.4" y="506" text-anchor="middle">Feb</text><text x="389.8" y="506" text-anchor="middle">Mar</text><text x="575.2" y="506" text-anchor="middle">Apr</text><text x="754.6" y="506" text-anchor="middle">May</text><text x="940" y="506" text-anchor="middle">Jun</text></g><text class="gc-axis-label" x="37" y="26" text-anchor="start">Accounts</text><g class="gc-series" data-series="free" style="--sc:var(--cat-0)"><path class="gc-area" d="M37 302.3L222.4 284.2L389.8 275.1L575.2 266L754.6 260L940 250.9L940 490L754.6 490L575.2 490L389.8 490L222.4 490L37 490Z"/></g><g class="gc-series" data-series="pro" style="--sc:var(--cat-1)"><path class="gc-area" d="M37 247.9L222.4 220.6L389.8 199.4L575.2 178.3L754.6 157.1L940 132.9L940 250.9L754.6 260L575.2 266L389.8 275.1L222.4 284.2L37 302.3Z"/></g><g class="gc-series" data-series="enterprise" style="--sc:var(--cat-2)"><path class="gc-area" d="M37 240.6L222.4 211.5L389.8 187.9L575.2 164L754.6 139.2L940 111.1L940 132.9L754.6 157.1L575.2 178.3L389.8 199.4L222.4 220.6L37 247.9Z"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/plan-mix.html">Accounts grew 52%, and the paid tiers grew fastest</a></h2>
+        <p>Total accounts rose 52%, from 8,240 to 12,520 over six months.</p>
+        <ul class="tags"><li>area</li><li>stacked</li></ul>
+        <a class="src" href="gallery/sources/plan-mix.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/request-growth.html" aria-label="Open Requests rose 34,000× in six years, but yearly growth is easing">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Requests rose 34,000× in six years, but yearly growth is easing" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="48" y1="397.8" x2="940" y2="397.8"/><line x1="48" y1="297.6" x2="940" y2="297.6"/><line x1="48" y1="197.5" x2="940" y2="197.5"/><line x1="48" y1="97.4" x2="940" y2="97.4"/></g><g class="gc-yticks"><text x="40" y="401.3" text-anchor="end">100k</text><text x="40" y="301.1" text-anchor="end">1M</text><text x="40" y="201" text-anchor="end">10M</text><text x="40" y="100.9" text-anchor="end">100M</text></g><line class="gc-axis" x1="48" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="48" y="506" text-anchor="middle">2020</text><text x="226.7" y="506" text-anchor="middle">2021</text><text x="404.9" y="506" text-anchor="middle">2022</text><text x="583.1" y="506" text-anchor="middle">2023</text><text x="761.3" y="506" text-anchor="middle">2024</text><text x="940" y="506" text-anchor="middle">2025</text></g><text class="gc-axis-label" x="48" y="26" text-anchor="start">Requests per month (log scale)</text><g class="gc-series" data-series="requests" style="--sc:var(--role-primary)"><path class="gc-line" d="M48 490L226.7 383.2L404.9 280L583.1 198.4L761.3 116.8L940 36"/><circle class="gc-point" cx="48" cy="490" r="3"/><circle class="gc-point" cx="226.7" cy="383.2" r="3"/><circle class="gc-point" cx="404.9" cy="280" r="3"/><circle class="gc-point" cx="583.1" cy="198.4" r="3"/><circle class="gc-point" cx="761.3" cy="116.8" r="3"/><circle class="gc-point" cx="940" cy="36" r="3"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/request-growth.html">Requests rose 34,000× in six years, but yearly growth is easing</a></h2>
+        <p>Volume runs from 12 thousand to 410 million requests a month — a factor of about 34,000.</p>
+        <ul class="tags"><li>line</li><li>log axis</li></ul>
+        <a class="src" href="gallery/sources/request-growth.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/revenue-by-region.html" aria-label="Open Q2 Revenue by Region">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Q2 Revenue by Region" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="41" y1="490" x2="940" y2="490"/><line x1="41" y1="376.5" x2="940" y2="376.5"/><line x1="41" y1="263" x2="940" y2="263"/><line x1="41" y1="149.5" x2="940" y2="149.5"/><line x1="41" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="33" y="493.5" text-anchor="end">0</text><text x="33" y="380" text-anchor="end">500</text><text x="33" y="266.5" text-anchor="end">1k</text><text x="33" y="153" text-anchor="end">1.5k</text><text x="33" y="39.5" text-anchor="end">2k</text></g><line class="gc-axis" x1="41" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="130.2" y="506" text-anchor="middle">North America</text><text x="310.3" y="506" text-anchor="middle">Europe</text><text x="490.5" y="506" text-anchor="middle">Asia-Pacific</text><text x="670.7" y="506" text-anchor="middle">Latin America</text><text x="850.8" y="506" text-anchor="middle">Middle East &amp; Africa</text></g><text class="gc-axis-label" x="41" y="26" text-anchor="start">Revenue (USD k)</text><g class="gc-series" data-series="q1" style="--sc:var(--role-comparison)"><rect x="67.3" y="115.5" width="58.1" height="374.5" rx="1.5"/><rect x="247.5" y="176.7" width="58.1" height="313.3" rx="1.5"/><rect x="427.7" y="303.9" width="58.1" height="186.1" rx="1.5"/><rect x="607.8" y="403.7" width="58.1" height="86.3" rx="1.5"/><rect x="788" y="433.3" width="58.1" height="56.8" rx="1.5"/></g><g class="gc-series" data-series="q2" style="--sc:var(--role-primary)"><rect x="134.9" y="72.3" width="58.1" height="417.7" rx="1.5"/><rect x="315.1" y="167.7" width="58.1" height="322.3" rx="1.5"/><rect x="495.2" y="265.3" width="58.1" height="224.7" rx="1.5"/><rect x="675.4" y="396.9" width="58.1" height="93.1" rx="1.5"/><rect x="855.5" y="431" width="58.1" height="59" rx="1.5"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/revenue-by-region.html">Q2 Revenue by Region</a></h2>
+        <p>Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.</p>
+        <ul class="tags"><li>bar</li></ul>
+        <a class="src" href="gallery/sources/revenue-by-region.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/signups-vs-target.html" aria-label="Open Weekly Signups vs Target">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Weekly Signups vs Target" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="470" x2="940" y2="470"/><line x1="38" y1="383.2" x2="940" y2="383.2"/><line x1="38" y1="296.4" x2="940" y2="296.4"/><line x1="38" y1="209.6" x2="940" y2="209.6"/><line x1="38" y1="122.8" x2="940" y2="122.8"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="473.5" text-anchor="end">0</text><text x="30" y="386.7" text-anchor="end">100</text><text x="30" y="299.9" text-anchor="end">200</text><text x="30" y="213.1" text-anchor="end">300</text><text x="30" y="126.3" text-anchor="end">400</text><text x="30" y="39.5" text-anchor="end">500</text></g><line class="gc-axis" x1="38" y1="470" x2="940" y2="470"/><g class="gc-xticks"><text x="93.9" y="486" text-anchor="middle">W27</text><text x="206.8" y="486" text-anchor="middle">W28</text><text x="319.7" y="486" text-anchor="middle">W29</text><text x="432.6" y="486" text-anchor="middle">W30</text><text x="545.4" y="486" text-anchor="middle">W31</text><text x="658.3" y="486" text-anchor="middle">W32</text><text x="771.2" y="486" text-anchor="middle">W33</text><text x="884.1" y="486" text-anchor="middle">W34</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Signups</text><text class="gc-axis-label" x="489" y="512" text-anchor="middle">ISO week</text><g class="gc-series" data-series="signups" style="--sc:var(--role-primary)"><rect x="57.5" y="199.2" width="72.8" height="270.8" rx="1.5"/><rect x="170.4" y="211.3" width="72.8" height="258.7" rx="1.5"/><rect x="283.3" y="165.3" width="72.8" height="304.7" rx="1.5"/><rect x="396.1" y="132.3" width="72.8" height="337.7" rx="1.5"/><rect x="509" y="171.4" width="72.8" height="298.6" rx="1.5"/><rect x="621.9" y="112.4" width="72.8" height="357.6" rx="1.5"/><rect x="734.8" y="72.5" width="72.8" height="397.5" rx="1.5"/><rect x="847.7" y="61.2" width="72.8" height="408.8" rx="1.5"/></g><g class="gc-series" data-series="target" style="--sc:var(--role-comparison)"><path class="gc-line" d="M93.9 192.2L206.8 183.6L319.7 174.9L432.6 166.2L545.4 157.5L658.3 148.8L771.2 140.2L884.1 131.5"/><circle class="gc-point" cx="93.9" cy="192.2" r="3"/><circle class="gc-point" cx="206.8" cy="183.6" r="3"/><circle class="gc-point" cx="319.7" cy="174.9" r="3"/><circle class="gc-point" cx="432.6" cy="166.2" r="3"/><circle class="gc-point" cx="545.4" cy="157.5" r="3"/><circle class="gc-point" cx="658.3" cy="148.8" r="3"/><circle class="gc-point" cx="771.2" cy="140.2" r="3"/><circle class="gc-point" cx="884.1" cy="131.5" r="3"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/signups-vs-target.html">Weekly Signups vs Target</a></h2>
+        <p>Signups beat target in 5 of the last 8 weeks and the gap is widening.</p>
+        <ul class="tags"><li>bar</li><li>line</li></ul>
+        <a class="src" href="gallery/sources/signups-vs-target.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/storage-mix.html" aria-label="Open Storage grew 3.7× in five quarters, four-fifths of it cold archive">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Storage grew 3.7× in five quarters, four-fifths of it cold archive" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="490" x2="940" y2="490"/><line x1="38" y1="399.2" x2="940" y2="399.2"/><line x1="38" y1="308.4" x2="940" y2="308.4"/><line x1="38" y1="217.6" x2="940" y2="217.6"/><line x1="38" y1="126.8" x2="940" y2="126.8"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="493.5" text-anchor="end">0</text><text x="30" y="402.7" text-anchor="end">100</text><text x="30" y="311.9" text-anchor="end">200</text><text x="30" y="221.1" text-anchor="end">300</text><text x="30" y="130.3" text-anchor="end">400</text><text x="30" y="39.5" text-anchor="end">500</text></g><line class="gc-axis" x1="38" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="127.5" y="506" text-anchor="middle">2025 Q3</text><text x="308.2" y="506" text-anchor="middle">2025 Q4</text><text x="489" y="506" text-anchor="middle">2026 Q1</text><text x="669.8" y="506" text-anchor="middle">2026 Q2</text><text x="850.5" y="506" text-anchor="middle">2026 Q3</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Stored data (TB)</text><g class="gc-series" data-series="hot" style="--sc:var(--cat-0)"><rect x="59.7" y="451.9" width="135.6" height="38.1" rx="1.5"/><rect x="240.5" y="446.4" width="135.6" height="43.6" rx="1.5"/><rect x="421.2" y="443.7" width="135.6" height="46.3" rx="1.5"/><rect x="602" y="440.1" width="135.6" height="49.9" rx="1.5"/><rect x="782.7" y="437.3" width="135.6" height="52.7" rx="1.5"/></g><g class="gc-series" data-series="warm" style="--sc:var(--cat-1)"><rect x="59.7" y="417.4" width="135.6" height="34.5" rx="1.5"/><rect x="240.5" y="403.7" width="135.6" height="42.7" rx="1.5"/><rect x="421.2" y="388.3" width="135.6" height="55.4" rx="1.5"/><rect x="602" y="372.9" width="135.6" height="67.2" rx="1.5"/><rect x="782.7" y="359.2" width="135.6" height="78.1" rx="1.5"/></g><g class="gc-series" data-series="cold" style="--sc:var(--cat-2)"><rect x="59.7" y="390.1" width="135.6" height="27.2" rx="1.5"/><rect x="240.5" y="347.4" width="135.6" height="56.3" rx="1.5"/><rect x="421.2" y="281.2" width="135.6" height="107.1" rx="1.5"/><rect x="602" y="200.3" width="135.6" height="172.5" rx="1.5"/><rect x="782.7" y="119.5" width="135.6" height="239.7" rx="1.5"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/storage-mix.html">Storage grew 3.7× in five quarters, four-fifths of it cold archive</a></h2>
+        <p>Total storage rose from 110 TB to 408 TB — 3.7× in five quarters.</p>
+        <ul class="tags"><li>bar</li><li>stacked</li></ul>
+        <a class="src" href="gallery/sources/storage-mix.cartesian.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/support-load.html" aria-label="Open Support Tickets by Day and Shift">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Support Tickets by Day and Shift" xmlns="http://www.w3.org/2000/svg"><text class="gc-row-label" x="54" y="111.2" text-anchor="end">Morning</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Mon&quot;,&quot;value&quot;:&quot;48 tickets&quot;}]}" style="--sc:var(--seq-3)" x="63" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="124.7" y="111.2" text-anchor="middle">48</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Tue&quot;,&quot;value&quot;:&quot;41 tickets&quot;}]}" style="--sc:var(--seq-3)" x="188.4" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="250.1" y="111.2" text-anchor="middle">41</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Wed&quot;,&quot;value&quot;:&quot;39 tickets&quot;}]}" style="--sc:var(--seq-2)" x="313.9" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-2)" x="375.6" y="111.2" text-anchor="middle">39</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Thu&quot;,&quot;value&quot;:&quot;37 tickets&quot;}]}" style="--sc:var(--seq-2)" x="439.3" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-2)" x="501" y="111.2" text-anchor="middle">37</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Fri&quot;,&quot;value&quot;:&quot;44 tickets&quot;}]}" style="--sc:var(--seq-3)" x="564.7" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="626.4" y="111.2" text-anchor="middle">44</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sat&quot;,&quot;value&quot;:&quot;12 tickets&quot;}]}" style="--sc:var(--seq-0)" x="690.1" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="751.9" y="111.2" text-anchor="middle">12</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Morning&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sun&quot;,&quot;value&quot;:&quot;9 tickets&quot;}]}" style="--sc:var(--seq-0)" x="815.6" y="37" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="877.3" y="111.2" text-anchor="middle">9</text><text class="gc-row-label" x="54" y="254.5" text-anchor="end">Afternoon</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Mon&quot;,&quot;value&quot;:&quot;62 tickets&quot;}]}" style="--sc:var(--seq-5)" x="63" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-5)" x="124.7" y="254.5" text-anchor="middle">62</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Tue&quot;,&quot;value&quot;:&quot;55 tickets&quot;}]}" style="--sc:var(--seq-3)" x="188.4" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="250.1" y="254.5" text-anchor="middle">55</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Wed&quot;,&quot;value&quot;:&quot;51 tickets&quot;}]}" style="--sc:var(--seq-3)" x="313.9" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="375.6" y="254.5" text-anchor="middle">51</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Thu&quot;,&quot;value&quot;:&quot;49 tickets&quot;}]}" style="--sc:var(--seq-3)" x="439.3" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="501" y="254.5" text-anchor="middle">49</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Fri&quot;,&quot;value&quot;:&quot;58 tickets&quot;}]}" style="--sc:var(--seq-3)" x="564.7" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-3)" x="626.4" y="254.5" text-anchor="middle">58</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sat&quot;,&quot;value&quot;:&quot;18 tickets&quot;}]}" style="--sc:var(--seq-0)" x="690.1" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="751.9" y="254.5" text-anchor="middle">18</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Afternoon&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sun&quot;,&quot;value&quot;:&quot;14 tickets&quot;}]}" style="--sc:var(--seq-0)" x="815.6" y="180.3" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="877.3" y="254.5" text-anchor="middle">14</text><text class="gc-row-label" x="54" y="397.8" text-anchor="end">Night</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Mon&quot;,&quot;value&quot;:&quot;21 tickets&quot;}]}" style="--sc:var(--seq-2)" x="63" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-2)" x="124.7" y="397.8" text-anchor="middle">21</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Tue&quot;,&quot;value&quot;:&quot;17 tickets&quot;}]}" style="--sc:var(--seq-0)" x="188.4" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="250.1" y="397.8" text-anchor="middle">17</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Wed&quot;,&quot;value&quot;:&quot;15 tickets&quot;}]}" style="--sc:var(--seq-0)" x="313.9" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="375.6" y="397.8" text-anchor="middle">15</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Thu&quot;,&quot;value&quot;:&quot;16 tickets&quot;}]}" style="--sc:var(--seq-0)" x="439.3" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="501" y="397.8" text-anchor="middle">16</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Fri&quot;,&quot;value&quot;:&quot;24 tickets&quot;}]}" style="--sc:var(--seq-2)" x="564.7" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-2)" x="626.4" y="397.8" text-anchor="middle">24</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sat&quot;,&quot;value&quot;:&quot;8 tickets&quot;}]}" style="--sc:var(--seq-0)" x="690.1" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="751.9" y="397.8" text-anchor="middle">8</text><rect class="gc-cell" data-tip="{&quot;title&quot;:&quot;Night&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Sun&quot;,&quot;value&quot;:&quot;6 tickets&quot;}]}" style="--sc:var(--seq-0)" x="815.6" y="323.7" width="123.4" height="141.3" rx="2"/><text class="gc-cell-label" style="--ci:var(--seq-ink-0)" x="877.3" y="397.8" text-anchor="middle">6</text><g class="gc-xticks"><text x="124.7" y="28" text-anchor="middle">Mon</text><text x="250.1" y="28" text-anchor="middle">Tue</text><text x="375.6" y="28" text-anchor="middle">Wed</text><text x="501" y="28" text-anchor="middle">Thu</text><text x="626.4" y="28" text-anchor="middle">Fri</text><text x="751.9" y="28" text-anchor="middle">Sat</text><text x="877.3" y="28" text-anchor="middle">Sun</text></g><g class="gc-ramp"><rect style="--sc:var(--seq-0)" x="404" y="486" width="37" height="12" rx="2"/><rect style="--sc:var(--seq-2)" x="442" y="486" width="37" height="12" rx="2"/><rect style="--sc:var(--seq-3)" x="480" y="486" width="37" height="12" rx="2"/><rect style="--sc:var(--seq-5)" x="518" y="486" width="37" height="12" rx="2"/><text x="403.5" y="512" text-anchor="middle">0</text><text x="441.5" y="512" text-anchor="middle">20</text><text x="479.5" y="512" text-anchor="middle">40</text><text x="517.5" y="512" text-anchor="middle">60</text><text x="555.5" y="512" text-anchor="middle">80</text></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Matrix</span>
+        <h2><a href="gallery/support-load.html">Support Tickets by Day and Shift</a></h2>
+        <p>Afternoon shifts carry the heaviest load every weekday, peaking Monday.</p>
+        <ul class="tags"><li>heatmap</li><li>sequential scale</li></ul>
+        <a class="src" href="gallery/sources/support-load.matrix.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/traffic-sources.html" aria-label="Open Signup Traffic by Source">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Signup Traffic by Source" xmlns="http://www.w3.org/2000/svg"><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Organic search&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;4,820 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;45.0%&quot;}]}" style="--sc:var(--cat-0)" d="M480 52A214 214 0 0 1 545.5 469.7L518 384.2A124.1 124.1 0 0 0 480 141.9Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Direct&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;2,310 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;21.6%&quot;}]}" style="--sc:var(--cat-1)" d="M545.5 469.7A214 214 0 0 1 294.9 373.4L372.6 328.3A124.1 124.1 0 0 0 518 384.2Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Referral&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;1,640 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;15.3%&quot;}]}" style="--sc:var(--cat-2)" d="M294.9 373.4A214 214 0 0 1 286.2 175.3L367.6 213.4A124.1 124.1 0 0 0 372.6 328.3Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Paid social&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;980 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;9.2%&quot;}]}" style="--sc:var(--cat-3)" d="M286.2 175.3A214 214 0 0 1 366.7 84.4L414.3 160.7A124.1 124.1 0 0 0 367.6 213.4Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Email&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;610 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;5.7%&quot;}]}" style="--sc:var(--cat-4)" d="M366.7 84.4A214 214 0 0 1 437.6 56.3L455.4 144.3A124.1 124.1 0 0 0 414.3 160.7Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Other&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;340 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;3.2%&quot;}]}" style="--sc:var(--cat-5)" d="M437.6 56.3A214 214 0 0 1 480 52L480 141.9A124.1 124.1 0 0 0 455.4 144.3Z"/><text class="gc-slice-label" x="647" y="243.8" text-anchor="middle">45%</text><text class="gc-slice-label" x="419.3" y="427.8" text-anchor="middle">22%</text><text class="gc-slice-label" x="311.1" y="277.4" text-anchor="middle">15%</text><text class="gc-slice-label" x="353.5" y="157.9" text-anchor="middle">9%</text><text class="gc-donut-total" x="480" y="264" text-anchor="middle">10,700</text><text class="gc-donut-unit" x="480" y="282" text-anchor="middle">signups</text></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Proportion</span>
+        <h2><a href="gallery/traffic-sources.html">Signup Traffic by Source</a></h2>
+        <p>Organic search brings 44% of signups — more than paid social, email, and referral combined.</p>
+        <ul class="tags"><li>donut</li></ul>
+        <a class="src" href="gallery/sources/traffic-sources.proportion.json">typed source →</a>
+      </div>
+    </article>
+    <article class="card">
+      <a class="preview" href="gallery/zh-revenue.html" aria-label="Open 各渠道季度营收">
+        <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="各渠道季度营收" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="41" y1="490" x2="940" y2="490"/><line x1="41" y1="376.5" x2="940" y2="376.5"/><line x1="41" y1="263" x2="940" y2="263"/><line x1="41" y1="149.5" x2="940" y2="149.5"/><line x1="41" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="33" y="493.5" text-anchor="end">0</text><text x="33" y="380" text-anchor="end">500</text><text x="33" y="266.5" text-anchor="end">1k</text><text x="33" y="153" text-anchor="end">1.5k</text><text x="33" y="39.5" text-anchor="end">2k</text></g><line class="gc-axis" x1="41" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="152.5" y="506" text-anchor="middle">第一季度</text><text x="377.8" y="506" text-anchor="middle">第二季度</text><text x="603.2" y="506" text-anchor="middle">第三季度</text><text x="828.5" y="506" text-anchor="middle">第四季度</text></g><text class="gc-axis-label" x="41" y="26" text-anchor="start">营收（万元）</text><g class="gc-series" data-series="direct" style="--sc:var(--role-primary)"><rect x="74" y="208.5" width="72.7" height="281.5" rx="1.5"/><rect x="299.3" y="176.7" width="72.7" height="313.3" rx="1.5"/><rect x="524.6" y="147.2" width="72.7" height="342.8" rx="1.5"/><rect x="749.9" y="99.6" width="72.7" height="390.4" rx="1.5"/></g><g class="gc-series" data-series="partner" style="--sc:var(--role-comparison)"><rect x="158.4" y="294.8" width="72.7" height="195.2" rx="1.5"/><rect x="383.8" y="283.4" width="72.7" height="206.6" rx="1.5"/><rect x="609.1" y="253.9" width="72.7" height="236.1" rx="1.5"/><rect x="834.4" y="222.1" width="72.7" height="267.9" rx="1.5"/></g></svg>
+      </a>
+      <div class="meta">
+        <span class="family">Cartesian</span>
+        <h2><a href="gallery/zh-revenue.html">各渠道季度营收</a></h2>
+        <p>直销与渠道伙伴营收均逐季增长，第四季度合计达 2,900 万元。</p>
+        <ul class="tags"><li>bar</li></ul>
+        <a class="src" href="gallery/sources/zh-revenue.cartesian.json">typed source →</a>
+      </div>
+    </article>
+  </main>
+  <footer>
+    <p>Built from <code>gen-chart/examples/</code> — see the
+    <a href="https://github.com/sses79/gen-chart">repository</a> for the skill itself.</p>
+  </footer>
+</div>
+</body>
+</html>
