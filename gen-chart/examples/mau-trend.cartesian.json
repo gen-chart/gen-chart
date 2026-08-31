@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Monthly Active Users",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "month", "type": "date", "values": ["2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"] },
+      { "id": "mau", "type": "number", "unit": "users", "values": [8200, 8900, 9400, 9100, 10500, 12300, 13800, 14600, 15900, 17400, 18100, 19700] },
+      { "id": "paying", "type": "number", "unit": "users", "values": [610, 700, 780, 760, 940, 1180, 1420, 1560, 1810, 2050, 2230, 2540] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "month", "scale": "time" },
+    "y": { "label": "Users", "zero": true }
+  },
+  "series": [
+    { "id": "mau", "mark": "line", "y": "mau", "label": "All active users", "role": "primary", "point": true },
+    { "id": "paying", "mark": "line", "y": "paying", "label": "Paying users", "role": "positive", "point": true }
+  ],
+  "annotations": [
+    { "id": "v2-launch", "kind": "x-line", "at": "2026-02", "label": "v2 launch" }
+  ],
+  "cards": [
+    { "title": "Takeaway", "items": ["MAU grew 2.4× over twelve months, with growth accelerating after the v2 launch in February.", "Paying users grew faster than the base: 4.2× over the same period."] }
+  ]
+}

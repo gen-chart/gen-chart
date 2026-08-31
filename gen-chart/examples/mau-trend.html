@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monthly Active Users</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
+  --grid: #e2e8f0; --border: #e2e8f0; --axis: #94a3b8; --tooltip-bg: #0f172a; --tooltip-ink: #f8fafc;
+  --cat-0: #2563eb; --cat-1: #059669; --cat-2: #d97706; --cat-3: #7c3aed; --cat-4: #db2777; --cat-5: #0891b2;
+  --role-primary: #2563eb; --role-comparison: #64748b; --role-positive: #059669;
+  --role-negative: #e11d48; --role-neutral: #94a3b8; --role-highlight: #d97706;
+}
+:root[data-theme="dark"] {
+  --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+  --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+  --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+  --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+  --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+    --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+    --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+    --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+    --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+  }
+}
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 2rem 1.25rem; display: flex; justify-content: center;
+  transition: background 150ms, color 150ms;
+}
+.gc-wrap { width: 100%; max-width: 1040px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
+.gc-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.2rem; }
+.gc-theme-btn {
+  flex: none; background: var(--panel); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 0.5rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8rem; cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+}
+.gc-theme-btn:hover { border-color: var(--axis); }
+.gc-theme-btn:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; }
+svg.gc-chart { display: block; width: 100%; height: auto; }
+.gc-grid line { stroke: var(--grid); stroke-width: 1; }
+.gc-axis { stroke: var(--axis); stroke-width: 1; }
+.gc-yticks text, .gc-xticks text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-axis-label { fill: var(--muted); font-size: 11.5px; font-weight: 600; font-family: inherit; }
+.gc-series rect { fill: var(--sc); }
+.gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.gc-point { fill: var(--sc); }
+.gc-series.gc-off { display: none; }
+.gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.gc-annotations text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
+.gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
+.gc-legend button {
+  display: inline-flex; align-items: center; gap: 0.45rem; background: none; border: none;
+  color: var(--ink); font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.15rem 0.2rem; border-radius: 0.3rem;
+}
+.gc-legend button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-legend button[aria-pressed="false"] { color: var(--muted); text-decoration: line-through; }
+.gc-legend button[aria-pressed="false"] .gc-swatch { opacity: 0.35; }
+.gc-legend[data-static] button { cursor: default; }
+.gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
+.gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-tooltip {
+  position: fixed; z-index: 10; pointer-events: none; display: none;
+  background: var(--tooltip-bg); color: var(--tooltip-ink);
+  border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+}
+.gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
+.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+.gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
+.gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
+.gc-card ul { padding-left: 1.1rem; font-size: 0.85rem; }
+.gc-card li { margin: 0.2rem 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+  <header>
+    <div>
+      <h1>Monthly Active Users</h1>
+      
+    </div>
+    <button class="gc-theme-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
+  </header>
+  <div class="gc-panel">
+    <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Monthly Active Users" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="45" y1="490" x2="940" y2="490"/><line x1="45" y1="376.5" x2="940" y2="376.5"/><line x1="45" y1="263" x2="940" y2="263"/><line x1="45" y1="149.5" x2="940" y2="149.5"/><line x1="45" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="37" y="493.5" text-anchor="end">0</text><text x="37" y="380" text-anchor="end">5000</text><text x="37" y="266.5" text-anchor="end">10k</text><text x="37" y="153" text-anchor="end">15k</text><text x="37" y="39.5" text-anchor="end">20k</text></g><line class="gc-axis" x1="45" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="45" y="506" text-anchor="middle">Sep 2025</text><text x="208.5" y="506" text-anchor="middle">Nov</text><text x="371.9" y="506" text-anchor="middle">Jan 2026</text><text x="530" y="506" text-anchor="middle">Mar</text><text x="693.5" y="506" text-anchor="middle">May</text><text x="856.9" y="506" text-anchor="middle">Jul</text></g><text class="gc-axis-label" x="45" y="26" text-anchor="start">Users</text><g class="gc-series" data-series="mau" style="--sc:var(--role-primary)"><path class="gc-line" d="M45 303.9L125.4 288L208.5 276.6L288.8 283.4L371.9 251.6L455 210.8L530 176.7L613.1 158.6L693.5 129.1L776.5 95L856.9 79.1L940 42.8"/><circle class="gc-point" cx="45" cy="303.9" r="3"/><circle class="gc-point" cx="125.4" cy="288" r="3"/><circle class="gc-point" cx="208.5" cy="276.6" r="3"/><circle class="gc-point" cx="288.8" cy="283.4" r="3"/><circle class="gc-point" cx="371.9" cy="251.6" r="3"/><circle class="gc-point" cx="455" cy="210.8" r="3"/><circle class="gc-point" cx="530" cy="176.7" r="3"/><circle class="gc-point" cx="613.1" cy="158.6" r="3"/><circle class="gc-point" cx="693.5" cy="129.1" r="3"/><circle class="gc-point" cx="776.5" cy="95" r="3"/><circle class="gc-point" cx="856.9" cy="79.1" r="3"/><circle class="gc-point" cx="940" cy="42.8" r="3"/></g><g class="gc-series" data-series="paying" style="--sc:var(--role-positive)"><path class="gc-line" d="M45 476.2L125.4 474.1L208.5 472.3L288.8 472.7L371.9 468.7L455 463.2L530 457.8L613.1 454.6L693.5 448.9L776.5 443.5L856.9 439.4L940 432.3"/><circle class="gc-point" cx="45" cy="476.2" r="3"/><circle class="gc-point" cx="125.4" cy="474.1" r="3"/><circle class="gc-point" cx="208.5" cy="472.3" r="3"/><circle class="gc-point" cx="288.8" cy="472.7" r="3"/><circle class="gc-point" cx="371.9" cy="468.7" r="3"/><circle class="gc-point" cx="455" cy="463.2" r="3"/><circle class="gc-point" cx="530" cy="457.8" r="3"/><circle class="gc-point" cx="613.1" cy="454.6" r="3"/><circle class="gc-point" cx="693.5" cy="448.9" r="3"/><circle class="gc-point" cx="776.5" cy="443.5" r="3"/><circle class="gc-point" cx="856.9" cy="439.4" r="3"/><circle class="gc-point" cx="940" cy="432.3" r="3"/></g><g class="gc-annotations"><line x1="455" y1="36" x2="455" y2="490"/><text x="460" y="47" text-anchor="start">v2 launch</text></g><g class="gc-hover" aria-hidden="true"><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><circle class="gc-hover-dot" data-for="mau" r="4" style="display:none;--sc:var(--role-primary)"/><circle class="gc-hover-dot" data-for="paying" r="4" style="display:none;--sc:var(--role-positive)"/><rect class="gc-hit" x="45" y="36" width="895" height="454" fill="none" pointer-events="all"/></g></svg>
+    <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="mau" aria-pressed="true"><span class="gc-swatch" data-mark="line" style="--sw:var(--role-primary)"></span>All active users</button><button type="button" data-series="paying" aria-pressed="true"><span class="gc-swatch" data-mark="line" style="--sw:var(--role-positive)"></span>Paying users</button></div>
+  </div>
+  <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>MAU grew 2.4× over twelve months, with growth accelerating after the v2 launch in February.</li><li>Paying users grew faster than the base: 4.2× over the same period.</li></ul></section></div>
+</div>
+<div class="gc-tooltip" id="gc-tooltip" role="status"></div>
+<script id="gc-payload" type="application/json">{"unit":"users","tooltip":"auto","legendToggle":true,"xPixels":[45,125.4,208.5,288.8,371.9,455,530,613.1,693.5,776.5,856.9,940],"xLabels":["Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"],"plot":{"left":45,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"mau","label":"All active users","mark":"line","color":"var(--role-primary)","values":[8200,8900,9400,9100,10500,12300,13800,14600,15900,17400,18100,19700],"formatted":["8,200","8,900","9,400","9,100","10,500","12,300","13,800","14,600","15,900","17,400","18,100","19,700"],"pixels":[303.9,288,276.6,283.4,251.6,210.8,176.7,158.6,129.1,95,79.1,42.8],"stats":{"min":8200,"max":19700,"mean":13158.333333333334,"last":19700,"count":12}},{"id":"paying","label":"Paying users","mark":"line","color":"var(--role-positive)","values":[610,700,780,760,940,1180,1420,1560,1810,2050,2230,2540],"formatted":["610","700","780","760","940","1,180","1,420","1,560","1,810","2,050","2,230","2,540"],"pixels":[476.2,474.1,472.3,472.7,468.7,463.2,457.8,454.6,448.9,443.5,439.4,432.3],"stats":{"min":610,"max":2540,"mean":1381.6666666666667,"last":2540,"count":12}}]}</script>
+<script>
+(function () {
+  'use strict';
+  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
+  var root = document.documentElement;
+  var svg = document.querySelector('svg.gc-chart');
+
+  // Theme: cycle explicit light/dark from whatever "auto" currently shows.
+  document.getElementById('gc-theme').addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    if (current === 'auto') {
+      current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  });
+
+  // Legend toggling.
+  var legend = document.querySelector('.gc-legend');
+  var hidden = {};
+  if (legend && payload.legendToggle) {
+    legend.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-series]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-series');
+      hidden[id] = !hidden[id];
+      btn.setAttribute('aria-pressed', hidden[id] ? 'false' : 'true');
+      var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(id) + '"]');
+      if (g) g.classList.toggle('gc-off', hidden[id]);
+      hide();
+    });
+  } else if (legend) {
+    legend.setAttribute('data-static', '');
+  }
+
+  // Tooltip + crosshair.
+  var tooltip = document.getElementById('gc-tooltip');
+  var crosshair = svg.querySelector('.gc-crosshair');
+  var hit = svg.querySelector('.gc-hit');
+  var dots = {};
+  svg.querySelectorAll('.gc-hover-dot').forEach(function (d) { dots[d.getAttribute('data-for')] = d; });
+
+  function svgX(evt) {
+    var rect = svg.getBoundingClientRect();
+    return (evt.clientX - rect.left) * (payload.width / rect.width);
+  }
+  function nearest(x) {
+    var best = 0;
+    var bd = Infinity;
+    for (var i = 0; i < payload.xPixels.length; i++) {
+      var d = Math.abs(payload.xPixels[i] - x);
+      if (d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
+  function hide() {
+    tooltip.style.display = 'none';
+    crosshair.style.display = 'none';
+    Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
+  }
+  function show(evt) {
+    var i = nearest(svgX(evt));
+    var px = payload.xPixels[i];
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var html = '<div class="gc-tt-x">' + esc(payload.xLabels[i]) + '</div>';
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      var v = s.formatted[i];
+      html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+        + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
+        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = evt.clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = evt.clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  if (payload.tooltip !== 'off' && hit) {
+    hit.addEventListener('pointermove', show);
+    hit.addEventListener('pointerleave', hide);
+  }
+})();
+</script>
+</body>
+</html>

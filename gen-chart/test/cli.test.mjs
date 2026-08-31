@@ -1,29 +1,102 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const cli = fileURLToPath(new URL('../bin/gen-chart.mjs', import.meta.url));
+const example = fileURLToPath(new URL('../examples/mau-trend.cartesian.json', import.meta.url));
+
+function run(args) {
+  return execFileSync(process.execPath, [cli, ...args], { encoding: 'utf8' });
+}
+function runFail(args) {
+  try {
+    execFileSync(process.execPath, [cli, ...args], { encoding: 'utf8', stdio: 'pipe' });
+    assert.fail('expected non-zero exit');
+  } catch (err) {
+    return err;
+  }
+}
 
 test('help prints the command surface', () => {
-  const out = execFileSync(process.execPath, [cli, 'help'], { encoding: 'utf8' });
-  for (const cmd of ['guide', 'inspect-data', 'validate', 'deliver', 'visual-check', 'doctor']) {
+  const out = run(['help']);
+  for (const cmd of ['validate', 'render', 'deliver', 'doctor', 'guide', 'inspect-data']) {
     assert.match(out, new RegExp(cmd));
   }
 });
 
-test('doctor exits 0 on a supported Node version', () => {
-  const out = execFileSync(process.execPath, [cli, 'doctor'], { encoding: 'utf8' });
+test('doctor exits 0 and reports assets', () => {
+  const out = run(['doctor']);
   assert.match(out, /OK \(>=22\)/);
+  assert.match(out, /template\.html OK/);
+});
+
+test('validate --json emits a machine-readable receipt', () => {
+  const r = JSON.parse(run(['validate', 'cartesian', example, '--quality', 'showcase', '--json']));
+  assert.equal(r.ok, true);
+  assert.equal(r.command, 'validate');
+  assert.equal(r.errors, 0);
+  assert.deepEqual(r.diagnostics, []);
+});
+
+test('validate fails non-zero with diagnostics for a broken spec', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const spec = JSON.parse(readFileSync(example, 'utf8'));
+  spec.encoding.y.zero = false;
+  spec.series[0].mark = 'bar';
+  spec.encoding.x = { column: 'month', scale: 'band' };
+  const bad = join(dir, 'bad.json');
+  writeFileSync(bad, JSON.stringify(spec));
+  const err = runFail(['validate', 'cartesian', bad, '--json']);
+  assert.equal(err.status, 1);
+  const r = JSON.parse(err.stdout);
+  assert.equal(r.ok, false);
+  assert.ok(r.diagnostics.length > 0);
+  assert.ok(r.diagnostics.every((d) => d.code && d.subject && d.supportedFixes));
+});
+
+test('deliver writes the artifact atomically with hashes in the receipt', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  const r = JSON.parse(run(['deliver', 'cartesian', example, out, '--quality', 'showcase', '--json']));
+  assert.equal(r.ok, true);
+  assert.ok(existsSync(out));
+  assert.match(r.sha256.html, /^[0-9a-f]{64}$/);
+  assert.equal(r.bytes.html, readFileSync(out).byteLength);
+});
+
+test('a failed deliver preserves the previous artifact', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  run(['deliver', 'cartesian', example, out, '--json']);
+  const good = readFileSync(out, 'utf8');
+  const spec = JSON.parse(readFileSync(example, 'utf8'));
+  spec.series[0].y = 'nope';
+  const bad = join(dir, 'bad.json');
+  writeFileSync(bad, JSON.stringify(spec));
+  const err = runFail(['deliver', 'cartesian', bad, out, '--json']);
+  assert.equal(err.status, 1);
+  assert.equal(readFileSync(out, 'utf8'), good, 'failed delivery must not disturb last-good output');
+});
+
+test('showcase quality turns warnings into failure; standard passes them', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const spec = JSON.parse(readFileSync(example, 'utf8'));
+  delete spec.meta.quality_profile;
+  spec.annotations = [{ id: 'ghost', kind: 'x-line', at: '2030-01' }];
+  const p = join(dir, 'warn.json');
+  writeFileSync(p, JSON.stringify(spec));
+  const std = JSON.parse(run(['validate', 'cartesian', p, '--quality', 'standard', '--json']));
+  assert.equal(std.ok, true);
+  assert.equal(std.warnings, 1);
+  const err = runFail(['validate', 'cartesian', p, '--quality', 'showcase', '--json']);
+  assert.equal(JSON.parse(err.stdout).ok, false);
 });
 
 test('unimplemented commands exit 2, unknown commands exit 1', () => {
-  assert.throws(
-    () => execFileSync(process.execPath, [cli, 'validate'], { encoding: 'utf8' }),
-    (err) => err.status === 2
-  );
-  assert.throws(
-    () => execFileSync(process.execPath, [cli, 'nonsense'], { encoding: 'utf8' }),
-    (err) => err.status === 1
-  );
+  assert.equal(runFail(['guide', 'x']).status, 2);
+  assert.equal(runFail(['nonsense']).status, 1);
 });
