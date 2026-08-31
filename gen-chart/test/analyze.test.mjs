@@ -65,6 +65,20 @@ test('data: mixed date granularities are rejected', () => {
   assert.ok(codes(spec).includes('data/date-granularity-mixed'));
 });
 
+test('brush is rejected on band scales and bar marks', () => {
+  const spec = baseSpec();
+  spec.interactions = { brush: 'x' };
+  const diags = analyzeCartesian(spec).diagnostics;
+  assert.equal(diags[0].code, 'semantic/brush-unsupported');
+  assert.equal(diags[0].severity, 'error');
+});
+
+test('brush is accepted on a time x scale with line marks', () => {
+  const spec = JSON.parse(readFileSync(new URL('../examples/mau-trend.cartesian.json', import.meta.url), 'utf8'));
+  spec.interactions = { brush: 'x' };
+  assert.deepEqual(codes(spec), []);
+});
+
 test('annotations outside the domain degrade to a warning, not an error', () => {
   const spec = baseSpec();
   spec.annotations = [{ id: 'ghost', kind: 'x-line', at: 'W99' }];

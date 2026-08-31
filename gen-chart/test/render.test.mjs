@@ -70,6 +70,20 @@ test('null values break lines instead of drawing to zero', () => {
   assert.equal((path.match(/M/g) ?? []).length, 2, 'a null gap should restart the path');
 });
 
+test('M3 viewer features are present: brush plumbing, exports, deep links', () => {
+  const { spec, svg, html } = renderExample('mau-trend.cartesian.json');
+  assert.ok(svg.includes('gc-brush-rect'));
+  assert.ok(svg.includes('data-ox='), 'annotations carry original-x for zoom re-projection');
+  assert.ok(html.includes('gc-export-menu'));
+  assert.ok(html.includes('data-export="csv"'));
+  assert.ok(html.includes('gc-passport'));
+  const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
+  assert.equal(payload.brush, 'x');
+  assert.equal(payload.title, spec.meta.title);
+  assert.deepEqual(payload.xValues, spec.data.columns[0].values);
+  assert.equal(payload.xHeader, spec.encoding.x.column);
+});
+
 test('payload JSON in the artifact parses and mirrors the data', () => {
   const { spec, html } = renderExample('mau-trend.cartesian.json');
   const m = /<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html);

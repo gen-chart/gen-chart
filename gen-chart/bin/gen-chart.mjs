@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// gen-chart CLI. Implemented: validate, render, deliver, guide,
-// inspect-data, demo, doctor. Pending (M3): visual-check.
+// gen-chart CLI: validate, render, deliver, guide, inspect-data, demo,
+// visual-check, doctor.
 
 import { readFileSync, writeFileSync, renameSync, existsSync, unlinkSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -13,8 +13,9 @@ import { receipt, accepted } from '../renderers/shared/diagnostics.mjs';
 import { supportedChartTypes } from '../renderers/shared/validator.mjs';
 import { guide } from '../renderers/shared/guide.mjs';
 import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
+import { runVisualCheck } from '../renderers/shared/visual-check.mjs';
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 const ANALYZERS = { cartesian: analyzeCartesian };
 
 function usage() {
@@ -27,8 +28,8 @@ Usage:
   gen-chart guide "<scenario>" [--json]
   gen-chart inspect-data <file.csv|.tsv|.json> [--spec-out <draft.json>] [--json]
   gen-chart demo <output-directory>
+  gen-chart visual-check <out.html> [--json]
   gen-chart doctor
-  gen-chart visual-check <out.html> [--json]         (not yet implemented, M3)
 
 Chart types: ${supportedChartTypes().join(' | ')} (distribution, proportion, matrix planned)
 `;
@@ -243,6 +244,28 @@ function cmdDemo(argv) {
   console.log(`open any of the ${specs.length} files above in a browser`);
 }
 
+function cmdVisualCheck(argv) {
+  const { positional, options } = parseArgs(argv);
+  if (positional.length !== 1) fail(usage());
+  const path = resolve(positional[0]);
+  if (!existsSync(path)) fail(`artifact not found: ${path}`);
+  const r = runVisualCheck(path);
+  if (options.json) {
+    console.log(JSON.stringify(r, null, 2));
+  } else if (r.status === 'skipped') {
+    console.log(`SKIPPED visual-check: ${r.note}`);
+  } else {
+    console.log(`${r.ok ? 'PASS' : 'FAIL'} visual-check (${r.status})`);
+    for (const s of r.sizes) {
+      const m = s.metrics;
+      console.log(`  ${s.width}x${s.height}: ${s.contained ? 'contained' : 'OVERFLOW'}${m ? ` (scrollWidth ${m.sw} / innerWidth ${m.iw})` : ' (no metrics)'}`);
+    }
+    for (const p of r.screenshots) console.log(`  screenshot: ${p}`);
+    console.log('  visualReview: pending — inspect the screenshots before claiming polish');
+  }
+  process.exit(r.exitCode);
+}
+
 function doctor() {
   const [major] = process.versions.node.split('.').map(Number);
   const nodeOk = major >= 22;
@@ -287,8 +310,8 @@ switch (command) {
     cmdDemo(rest);
     break;
   case 'visual-check':
-    console.error(`gen-chart: '${command}' is not implemented yet (planned for M3).`);
-    process.exit(2);
+    cmdVisualCheck(rest);
+    break;
   default:
     console.error(`gen-chart: unknown command '${command}'\n`);
     console.error(usage());
