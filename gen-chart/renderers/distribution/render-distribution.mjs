@@ -10,6 +10,7 @@ import { fmtTick, fmtValue, escapeXml } from '../shared/format.mjs';
 import { estimateWidth } from '../shared/text-fit.mjs';
 import { roleColor, categoricalColor } from '../shared/palette.mjs';
 import { fiveNumber, histogram, suggestBins, mean } from '../shared/stats.mjs';
+import { t } from '../shared/i18n.mjs';
 
 const TICK_FONT = 11;
 const MIN_OBSERVATIONS = 5;
@@ -239,7 +240,7 @@ function axisFrame(out, layout, spec) {
   for (const t of yTicks) out.push(`<text x="${plotLeft - 8}" y="${r1(yScale(t)) + 3.5}" text-anchor="end">${escapeXml(fmtTick(t))}</text>`);
   out.push('</g>');
   out.push(`<line class="gc-axis" x1="${plotLeft}" y1="${plotBottom}" x2="${plotRight}" y2="${plotBottom}"/>`);
-  const yLabel = layout.mode === 'histogram' ? 'Count' : layout.valueLabel;
+  const yLabel = layout.mode === 'histogram' ? t(spec.meta.locale, 'axis.count') : layout.valueLabel;
   out.push(`<text class="gc-axis-label" x="${plotLeft}" y="${plotTop - 8}" text-anchor="start">${escapeXml(yLabel)}</text>`);
 }
 
@@ -262,8 +263,8 @@ export function renderSvg(spec, analysis) {
       const y = yScale(c);
       const w = Math.max(1, x1 - x0 - 1.5);
       const rows = [
-        { label: 'count', value: String(c) },
-        { label: 'share', value: `${((c / layout.stats.n) * 100).toFixed(1)}%` }
+        { label: t(spec.meta.locale, 'stat.count'), value: String(c) },
+        { label: t(spec.meta.locale, 'stat.share'), value: `${((c / layout.stats.n) * 100).toFixed(1)}%` }
       ];
       out.push(`<rect class="gc-bin" data-tip="${tip(`${fmtValue(hist.edges[i])} – ${fmtValue(hist.edges[i + 1])}${unit ? ' ' + unit : ''}`, rows)}" x="${r1(x0)}" y="${r1(y)}" width="${r1(w)}" height="${r1(plotBottom - y)}" rx="1.5"/>`);
     });
@@ -281,13 +282,14 @@ export function renderSvg(spec, analysis) {
       const cx = band.center(i);
       const left = cx - w / 2;
       const u = unit ? ' ' + unit : '';
+      const L = (k) => t(spec.meta.locale, k);
       const rows = [
-        { label: 'max', value: fmtValue(b.max) + u },
-        { label: 'q3', value: fmtValue(b.q3) + u },
-        { label: 'median', value: fmtValue(b.median) + u },
-        { label: 'q1', value: fmtValue(b.q1) + u },
-        { label: 'min', value: fmtValue(b.min) + u },
-        { label: 'n', value: String(b.n) }
+        { label: L('stat.max'), value: fmtValue(b.max) + u },
+        { label: L('stat.q3'), value: fmtValue(b.q3) + u },
+        { label: L('stat.median'), value: fmtValue(b.median) + u },
+        { label: L('stat.q1'), value: fmtValue(b.q1) + u },
+        { label: L('stat.min'), value: fmtValue(b.min) + u },
+        { label: L('stat.n'), value: String(b.n) }
       ];
       out.push(`<g class="gc-box" data-tip="${tip(b.label, rows)}" style="--sc:${b.color}">`);
       // whisker line then caps
@@ -344,8 +346,10 @@ export function buildLegend(spec, analysis) {
   if (layout.mode === 'histogram') {
     return {
       kind: 'note',
-      text: `${layout.stats.n} observations in ${layout.stats.bins} bins (Freedman-Diaconis suggested ${layout.stats.suggestedBins})`
+      text: t(spec.meta.locale, 'note.histogram', {
+        n: layout.stats.n, bins: layout.stats.bins, suggested: layout.stats.suggestedBins
+      })
     };
   }
-  return { kind: 'note', text: 'Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.' };
+  return { kind: 'note', text: t(spec.meta.locale, 'note.boxplot') };
 }

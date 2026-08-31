@@ -1,9 +1,9 @@
 {
   "name": "gen-chart",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
-  "description": "Typed JSON chart spec → deterministic, validated, self-contained interactive HTML charts.",
+  "description": "Typed JSON chart spec \u2192 deterministic, validated, self-contained interactive HTML charts.",
   "license": "MIT",
   "bin": {
     "gen-chart": "./bin/gen-chart.mjs"
@@ -15,7 +15,8 @@
     "generate:validators": "node scripts/generate-validators.mjs",
     "check:validators": "node scripts/generate-validators.mjs --check",
     "render:examples": "node scripts/render-examples.mjs",
-    "test": "npm run check:validators && node --test"
+    "test": "npm run check:validators && node --test",
+    "build:zip": "node scripts/build-zip.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1"

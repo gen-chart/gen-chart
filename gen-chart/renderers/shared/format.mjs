@@ -1,7 +1,8 @@
-// Deterministic number and date formatting. English-only in M1; the i18n
-// hook point for zh-CN is MONTHS and fmtDate.
+// Deterministic number and date formatting. Month names and date order come
+// from the resolved locale; digits and grouping stay identical so numbers
+// remain comparable across locales.
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+import { months } from './i18n.mjs';
 
 function trimZeros(s) {
   return s.includes('.') ? s.replace(/\.?0+$/, '') : s;
@@ -31,14 +32,20 @@ export function fmtValue(v) {
 
 // ms is a UTC timestamp; granularity is "year" | "month" | "day".
 // withYear forces the year onto month/day labels (first tick, or January).
-export function fmtDate(ms, granularity, { withYear = false } = {}) {
+export function fmtDate(ms, granularity, { withYear = false, locale = 'en' } = {}) {
   const d = new Date(ms);
   const y = d.getUTCFullYear();
   const m = d.getUTCMonth();
   const day = d.getUTCDate();
+  const names = months(locale);
+  if (locale === 'zh-CN') {
+    if (granularity === 'year') return `${y}年`;
+    if (granularity === 'month') return withYear ? `${y}年${names[m]}` : names[m];
+    return withYear ? `${y}年${names[m]}${day}日` : `${names[m]}${day}日`;
+  }
   if (granularity === 'year') return String(y);
-  if (granularity === 'month') return withYear ? `${MONTHS[m]} ${y}` : MONTHS[m];
-  return withYear ? `${MONTHS[m]} ${day}, ${y}` : `${MONTHS[m]} ${day}`;
+  if (granularity === 'month') return withYear ? `${names[m]} ${y}` : names[m];
+  return withYear ? `${names[m]} ${day}, ${y}` : `${names[m]} ${day}`;
 }
 
 export function escapeXml(s) {
