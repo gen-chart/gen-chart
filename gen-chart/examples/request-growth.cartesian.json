@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Requests rose 34,000× in six years, but yearly growth is easing",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "year", "type": "date", "values": ["2020", "2021", "2022", "2023", "2024", "2025"] },
+      { "id": "requests", "type": "number", "unit": "requests/month", "values": [12000, 140000, 1500000, 9800000, 64000000, 410000000] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "year", "scale": "time" },
+    "y": { "scale": "log", "label": "Requests per month" }
+  },
+  "series": [
+    { "id": "requests", "mark": "line", "y": "requests", "label": "Requests per month", "role": "primary", "point": true }
+  ],
+  "cards": [
+    {
+      "title": "Why a log axis",
+      "items": [
+        "Volume runs from 12 thousand to 410 million requests a month — a factor of about 34,000.",
+        "On a linear axis the first four years would sit flat against the baseline, indistinguishable from zero.",
+        "Year-over-year growth eased from 11.7× to 6.4×. On a log axis a constant rate is a straight line, so that slowdown shows as the gentle bend."
+      ]
+    }
+  ]
+}

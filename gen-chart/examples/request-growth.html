@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="{{LANG}}" data-theme="{{THEME}}">
+<html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{TITLE}}</title>
+<title>Requests rose 34,000× in six years, but yearly growth is easing</title>
 <style>
 :root {
   --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
@@ -184,36 +184,36 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 <div class="gc-wrap">
   <header>
     <div>
-      <h1>{{TITLE}}</h1>
-      {{SUBTITLE_BLOCK}}
+      <h1>Requests rose 34,000× in six years, but yearly growth is easing</h1>
+      
     </div>
     <div class="gc-toolbar">
-      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">{{i18n:ui.export}}</button>
-      <button class="gc-btn" id="gc-theme" type="button" aria-label="{{i18n:ui.theme.toggle}}">{{i18n:ui.theme}}</button>
+      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
       <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">{{i18n:ui.export.png}}</button>
-        <button type="button" data-export="svg" role="menuitem">{{i18n:ui.export.svg}}</button>
-        <button type="button" data-export="csv" role="menuitem">{{i18n:ui.export.csv}}</button>
-        <button type="button" data-export="card" role="menuitem">{{i18n:ui.export.card}}</button>
+        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
       </div>
     </div>
   </header>
-  {{VIEWS}}
+  
   <div class="gc-panel">
-    <button class="gc-btn gc-reset" id="gc-reset" type="button">{{i18n:ui.reset}}</button>
-    <div class="gc-figure" id="gc-figure" role="application" aria-label="{{i18n:ui.chart}}">
-      {{SVG}}
+    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Requests rose 34,000× in six years, but yearly growth is easing" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="48" y1="397.8" x2="940" y2="397.8"/><line x1="48" y1="297.6" x2="940" y2="297.6"/><line x1="48" y1="197.5" x2="940" y2="197.5"/><line x1="48" y1="97.4" x2="940" y2="97.4"/></g><g class="gc-yticks"><text x="40" y="401.3" text-anchor="end">100k</text><text x="40" y="301.1" text-anchor="end">1M</text><text x="40" y="201" text-anchor="end">10M</text><text x="40" y="100.9" text-anchor="end">100M</text></g><line class="gc-axis" x1="48" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="48" y="506" text-anchor="middle">2020</text><text x="226.7" y="506" text-anchor="middle">2021</text><text x="404.9" y="506" text-anchor="middle">2022</text><text x="583.1" y="506" text-anchor="middle">2023</text><text x="761.3" y="506" text-anchor="middle">2024</text><text x="940" y="506" text-anchor="middle">2025</text></g><text class="gc-axis-label" x="48" y="26" text-anchor="start">Requests per month (log scale)</text><g class="gc-series" data-series="requests" style="--sc:var(--role-primary)"><path class="gc-line" d="M48 490L226.7 383.2L404.9 280L583.1 198.4L761.3 116.8L940 36"/><circle class="gc-point" cx="48" cy="490" r="3"/><circle class="gc-point" cx="226.7" cy="383.2" r="3"/><circle class="gc-point" cx="404.9" cy="280" r="3"/><circle class="gc-point" cx="583.1" cy="198.4" r="3"/><circle class="gc-point" cx="761.3" cy="116.8" r="3"/><circle class="gc-point" cx="940" cy="36" r="3"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><circle class="gc-hover-dot" data-for="requests" r="4" style="display:none;--sc:var(--role-primary)"/><rect class="gc-hit" x="48" y="36" width="892" height="454" fill="none" pointer-events="all"/></g></svg>
     </div>
-    <p class="gc-sr-only" id="gc-kbd-hint">{{i18n:ui.keyboard.hint}}</p>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
     <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
-    {{DATA_TABLE}}
-    {{LEGEND}}
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">year</th><th scope="col">Requests per month</th></tr></thead><tbody><tr><th scope="row">2020</th><td>12000</td></tr><tr><th scope="row">2021</th><td>140000</td></tr><tr><th scope="row">2022</th><td>1500000</td></tr><tr><th scope="row">2023</th><td>9800000</td></tr><tr><th scope="row">2024</th><td>64000000</td></tr><tr><th scope="row">2025</th><td>410000000</td></tr></tbody></table>
+    
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
-  {{CARDS_BLOCK}}
+  <div class="gc-cards"><section class="gc-card"><h2>Why a log axis</h2><ul><li>Volume runs from 12 thousand to 410 million requests a month — a factor of about 34,000.</li><li>On a linear axis the first four years would sit flat against the baseline, indistinguishable from zero.</li><li>Year-over-year growth eased from 11.7× to 6.4×. On a log axis a constant rate is a straight line, so that slowdown shows as the gentle bend.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{{PAYLOAD}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Requests rose 34,000× in six years, but yearly growth is easing","unit":"requests/month","xType":"time","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[48,226.7,404.9,583.1,761.3,940],"xLabels":["2020","2021","2022","2023","2024","2025"],"table":{"headers":["year","Requests per month"],"rows":[["2020",12000],["2021",140000],["2022",1500000],["2023",9800000],["2024",64000000],["2025",410000000]]},"plot":{"left":48,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"requests","label":"Requests per month","mark":"line","color":"var(--role-primary)","values":[12000,140000,1500000,9800000,64000000,410000000],"formatted":["12,000","140,000","1,500,000","9,800,000","64,000,000","410,000,000"],"pixels":[490,383.2,280,198.4,116.8,36],"stats":{"min":12000,"max":410000000,"mean":80908666.66666667,"last":410000000,"count":6}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -247,7 +247,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   function writeHash() {
     var parts = [];
     var theme = root.getAttribute('data-theme');
-    if (theme !== '{{THEME}}') parts.push('theme=' + theme);
+    if (theme !== 'auto') parts.push('theme=' + theme);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
