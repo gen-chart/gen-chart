@@ -4,9 +4,9 @@
 
 const FAMILIES = {
   cartesian: { implemented: true },
-  distribution: { implemented: false, planned: 'M4' },
-  proportion: { implemented: false, planned: 'M4' },
-  matrix: { implemented: false, planned: 'M4' }
+  distribution: { implemented: true },
+  proportion: { implemented: true },
+  matrix: { implemented: true }
 };
 
 // Each rule: regex over the lowercased scenario, target family/marks, weight.
@@ -24,7 +24,7 @@ const RULES = [
   { re: /\b(line chart|line graph)\b/, family: 'cartesian', marks: ['line'], w: 2 }
 ];
 
-const IMPLEMENTED_MARKS = new Set(['line', 'bar']);
+const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
 
 export function guide(scenario) {
   const s = String(scenario).toLowerCase();
@@ -48,7 +48,7 @@ export function guide(scenario) {
 
   const cautions = [];
   if (/\b(pie|donut)\b/.test(s) && /\b(\d{2,}|many|dozens?|lots of)\b.*\b(categor|slice|segment|group)/.test(s)) {
-    cautions.push('a pie with many slices is unreadable; use a cartesian bar chart sorted by value instead');
+    cautions.push('validation caps a pie at 7 slices (honesty/proportion-slice-count); above that use a cartesian bar chart sorted by value');
   }
   if (/\b(dual|second(ary)? axis|two axes|twin axis)\b/.test(s)) {
     cautions.push('a second y axis requires distinct units and per-axis legend labels (honesty/dual-axis); consider two stacked charts instead');
@@ -61,13 +61,9 @@ export function guide(scenario) {
   const unimplementedMarks = familyMarks.filter((m) => !IMPLEMENTED_MARKS.has(m));
   let workaround = null;
   if (!info.implemented) {
-    workaround = {
-      distribution: 'bin the values yourself and plot counts as a cartesian bar chart',
-      proportion: 'plot the parts as a cartesian bar chart sorted by value (also the honest choice above 7 slices)',
-      matrix: 'pivot to one row per category and plot a grouped cartesian bar chart'
-    }[family];
+    workaround = 'author the nearest cartesian equivalent instead';
   } else if (unimplementedMarks.length > 0) {
-    workaround = `mark(s) ${unimplementedMarks.join(', ')} land in M4; nearest supported today: ${familyMarks.includes('scatter') ? 'a line with "point": true over a linear x' : 'line or bar'}`;
+    workaround = `mark(s) ${unimplementedMarks.join(', ')} are not implemented; use the family's supported marks`;
   }
 
   return {

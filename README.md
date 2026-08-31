@@ -8,7 +8,12 @@ Sibling project in spirit to [Archify](https://github.com/tt-a1i/archify) (syste
 
 ## Status
 
-Pre-build. See the working documents:
+**M4 complete** — all four chart families are implemented (cartesian,
+distribution, proportion, matrix) with validation, an interactive
+single-file viewer, and headless visual checks. Remaining: M5 (guided
+views, i18n, a11y pass, packaging).
+
+See the working documents:
 
 - [gen-chart-plan.md](gen-chart-plan.md) — full skill plan (IR design, honesty engine, viewer runtime, milestones)
 - [archify-analysis.md](archify-analysis.md) — analysis of Archify's architecture and the lessons carried over
@@ -35,7 +40,17 @@ Requires Node.js ≥ 22 (LTS). No runtime dependencies.
 cd gen-chart
 node bin/gen-chart.mjs doctor
 npm test
+node bin/gen-chart.mjs demo /tmp/gen-chart-demo
 ```
+
+Chart families and their marks:
+
+| chart_type | Marks |
+|---|---|
+| `cartesian` | line, bar, grouped bar, bar+line, scatter |
+| `distribution` | histogram, boxplot (from raw observations) |
+| `proportion` | pie, donut (max 7 slices) |
+| `matrix` | heatmap (long-format cells) |
 
 ## License
 

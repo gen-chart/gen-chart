@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.3"
+  version: "0.4"
   author: sses79
   inspired_by: tt-a1i/archify (MIT)
 ---
@@ -23,10 +23,9 @@ specification. You author semantics and data; the deterministic renderer owns
 scales, ticks, layout, and honesty checks. Never emit chart SVG or HTML by
 hand while the CLI is available.
 
-Implemented today: `cartesian` (line, bar, grouped bar, bar+line combo)
-with the full interactive viewer and `visual-check`. `distribution`,
-`proportion`, and `matrix` are planned; the `guide` command states honest
-workarounds until they land.
+All four chart families are implemented, with the full interactive viewer
+and `visual-check`. Substitute `<chart_type>` in the commands below with
+the family you routed to.
 
 ## Fast authoring path
 
@@ -48,7 +47,7 @@ workarounds until they land.
 5. Validate after every edit:
 
    ```bash
-   node bin/gen-chart.mjs validate cartesian <candidate.json> --quality showcase --json
+   node bin/gen-chart.mjs validate <chart_type> <candidate.json> --quality showcase --json
    ```
 
    On failure, change only each diagnostic's `subject` and choose only from
@@ -58,7 +57,7 @@ workarounds until they land.
 6. Deliver once for final acceptance:
 
    ```bash
-   node bin/gen-chart.mjs deliver cartesian <candidate.json> <output.html> --quality showcase --json
+   node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --json
    ```
 
    A non-zero exit is never success. A failed delivery preserves the previous
@@ -79,12 +78,16 @@ workarounds until they land.
 
 ## Type router
 
-| chart_type | Marks | Use for | Status |
-|---|---|---|---|
-| `cartesian` | line, bar, grouped bar, bar+line | trends, comparisons, actual-vs-target | implemented |
-| `distribution` | histogram, boxplot | spread, outliers | planned — workaround: binned bar |
-| `proportion` | pie, donut | parts of a whole | planned — workaround: sorted bar (honest above 7 slices anyway) |
-| `matrix` | heatmap | two categorical dims × intensity | planned — workaround: grouped bar |
+| chart_type | Marks | Use for |
+|---|---|---|
+| `cartesian` | line, bar, grouped bar, bar+line, scatter | trends, comparisons, actual-vs-target, correlation |
+| `distribution` | histogram, boxplot | spread, outliers, shape of raw observations |
+| `proportion` | pie, donut | parts of a whole (max 7 slices) |
+| `matrix` | heatmap | two categorical dimensions × intensity |
+
+`distribution` takes **raw observations**, not pre-computed summaries: the
+renderer derives bins, quartiles, and Tukey fences itself. `matrix` takes
+long-format `(row, column, value)` triples.
 
 ## Authoring invariants
 
@@ -95,9 +98,12 @@ workarounds until they land.
   `neutral`, `highlight`); never raw hex. Unassigned series cycle the
   categorical palette automatically — omitting `role` is fine.
 - Honesty rules are non-negotiable and enforced by validation: bars keep a
-  zero baseline, one y axis carries one unit, out-of-domain annotations are
-  dropped with a warning. Do not restructure data to dodge a diagnostic;
-  fix the chart choice instead.
+  zero baseline; one y axis carries one unit; pie parts are non-negative,
+  capped at 7 slices, and must match any declared total; histogram bin
+  counts stay near the Freedman-Diaconis suggestion; a sequential heatmap
+  ramp rejects negative values and a diverging one requires a stated
+  midpoint. Do not restructure data to dodge a diagnostic; fix the chart
+  choice instead — the `supportedFixes` name the honest alternative.
 - Defaults are omissions: no `subtitle`, no `theme`, no `interactions`
   overrides unless the user asks. `meta.quality_profile: "showcase"` is the
   default for delivered work; use `standard` only when the user explicitly
