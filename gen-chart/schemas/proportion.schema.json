@@ -1,0 +1,66 @@
+{
+  "$id": "https://gen-chart.dev/schemas/proportion.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "chart_type", "meta", "data", "mark", "encoding"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "chart_type": { "const": "proportion" },
+    "mark": { "enum": ["pie", "donut"] },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "$ref": "common.schema.json#/$defs/shortText" },
+        "subtitle": { "$ref": "common.schema.json#/$defs/shortText" },
+        "quality_profile": { "$ref": "common.schema.json#/$defs/qualityProfile" },
+        "theme": { "$ref": "common.schema.json#/$defs/theme" },
+        "locale": { "$ref": "common.schema.json#/$defs/locale" },
+        "width": { "type": "integer", "minimum": 640, "maximum": 1600 },
+        "height": { "type": "integer", "minimum": 360, "maximum": 1200 }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["columns"],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 12,
+          "items": { "$ref": "common.schema.json#/$defs/column" }
+        }
+      }
+    },
+    "encoding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "value"],
+      "properties": {
+        "category": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["column"],
+          "properties": {
+            "column": { "$ref": "common.schema.json#/$defs/id" },
+            "label": { "$ref": "common.schema.json#/$defs/shortText" }
+          }
+        },
+        "value": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["column"],
+          "properties": {
+            "column": { "$ref": "common.schema.json#/$defs/id" },
+            "label": { "$ref": "common.schema.json#/$defs/shortText" }
+          }
+        }
+      }
+    },
+    "total": { "type": "number", "exclusiveMinimum": 0 },
+    "cards": { "$ref": "common.schema.json#/$defs/cards" }
+  }
+}

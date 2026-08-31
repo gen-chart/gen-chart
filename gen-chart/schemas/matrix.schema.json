@@ -1,12 +1,13 @@
 {
-  "$id": "https://gen-chart.dev/schemas/cartesian.schema.json",
+  "$id": "https://gen-chart.dev/schemas/matrix.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "chart_type", "meta", "data", "encoding", "series"],
+  "required": ["schema_version", "chart_type", "meta", "data", "mark", "encoding"],
   "properties": {
     "schema_version": { "const": 1 },
-    "chart_type": { "const": "cartesian" },
+    "chart_type": { "const": "matrix" },
+    "mark": { "const": "heatmap" },
     "meta": {
       "type": "object",
       "additionalProperties": false,
@@ -28,7 +29,7 @@
       "properties": {
         "columns": {
           "type": "array",
-          "minItems": 1,
+          "minItems": 3,
           "maxItems": 12,
           "items": { "$ref": "common.schema.json#/$defs/column" }
         }
@@ -37,69 +38,44 @@
     "encoding": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y"],
+      "required": ["row", "column", "value"],
       "properties": {
-        "x": {
+        "row": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["column", "scale"],
+          "required": ["column"],
           "properties": {
             "column": { "$ref": "common.schema.json#/$defs/id" },
-            "scale": { "enum": ["linear", "time", "band"] },
             "label": { "$ref": "common.schema.json#/$defs/shortText" }
           }
         },
-        "y": {
+        "column": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["column"],
           "properties": {
-            "scale": { "const": "linear" },
-            "zero": { "type": "boolean" },
+            "column": { "$ref": "common.schema.json#/$defs/id" },
+            "label": { "$ref": "common.schema.json#/$defs/shortText" }
+          }
+        },
+        "value": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["column"],
+          "properties": {
+            "column": { "$ref": "common.schema.json#/$defs/id" },
             "label": { "$ref": "common.schema.json#/$defs/shortText" }
           }
         }
       }
     },
-    "series": {
-      "type": "array",
-      "minItems": 1,
-      "maxItems": 8,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["id", "mark", "y", "label"],
-        "properties": {
-          "id": { "$ref": "common.schema.json#/$defs/id" },
-          "mark": { "enum": ["line", "bar", "scatter"] },
-          "y": { "$ref": "common.schema.json#/$defs/id" },
-          "label": { "$ref": "common.schema.json#/$defs/shortText" },
-          "role": { "$ref": "common.schema.json#/$defs/colorRole" },
-          "point": { "type": "boolean" }
-        }
-      }
-    },
-    "annotations": {
-      "type": "array",
-      "maxItems": 6,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["id", "kind", "at"],
-        "properties": {
-          "id": { "$ref": "common.schema.json#/$defs/id" },
-          "kind": { "enum": ["x-line", "y-line"] },
-          "at": { "type": ["number", "string"] },
-          "label": { "$ref": "common.schema.json#/$defs/shortText" }
-        }
-      }
-    },
-    "interactions": {
+    "scale": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["kind"],
       "properties": {
-        "tooltip": { "enum": ["auto", "off"] },
-        "legend_toggle": { "type": "boolean" },
-        "brush": { "enum": ["x"] }
+        "kind": { "enum": ["sequential", "diverging"] },
+        "midpoint": { "type": "number" }
       }
     },
     "cards": { "$ref": "common.schema.json#/$defs/cards" }

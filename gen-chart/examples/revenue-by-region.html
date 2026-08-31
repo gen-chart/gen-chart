@@ -11,6 +11,10 @@
   --cat-0: #2563eb; --cat-1: #059669; --cat-2: #d97706; --cat-3: #7c3aed; --cat-4: #db2777; --cat-5: #0891b2;
   --role-primary: #2563eb; --role-comparison: #64748b; --role-positive: #059669;
   --role-negative: #e11d48; --role-neutral: #94a3b8; --role-highlight: #d97706;
+  --seq-0: #dbeafe; --seq-1: #bfdbfe; --seq-2: #93c5fd; --seq-3: #60a5fa; --seq-4: #3b82f6; --seq-5: #1d4ed8;
+  --seq-ink-0: #0f172a; --seq-ink-1: #0f172a; --seq-ink-2: #0f172a; --seq-ink-3: #0f172a; --seq-ink-4: #f8fafc; --seq-ink-5: #f8fafc;
+  --div-0: #be123c; --div-1: #fb7185; --div-2: #fecdd3; --div-3: #a7f3d0; --div-4: #34d399; --div-5: #047857;
+  --div-ink-0: #fff1f2; --div-ink-1: #0f172a; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
 }
 :root[data-theme="dark"] {
   --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
@@ -18,6 +22,10 @@
   --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
   --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
   --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+  --seq-0: #0b2545; --seq-1: #123a63; --seq-2: #1b5183; --seq-3: #2a6ea8; --seq-4: #3f92cf; --seq-5: #60b8f2;
+  --seq-ink-0: #e2e8f0; --seq-ink-1: #e2e8f0; --seq-ink-2: #e2e8f0; --seq-ink-3: #e2e8f0; --seq-ink-4: #04121f; --seq-ink-5: #04121f;
+  --div-0: #9f1239; --div-1: #e11d48; --div-2: #fda4af; --div-3: #6ee7b7; --div-4: #10b981; --div-5: #065f46;
+  --div-ink-0: #fff1f2; --div-ink-1: #fff1f2; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-theme="auto"] {
@@ -26,6 +34,10 @@
     --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
     --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
     --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+    --seq-0: #0b2545; --seq-1: #123a63; --seq-2: #1b5183; --seq-3: #2a6ea8; --seq-4: #3f92cf; --seq-5: #60b8f2;
+    --seq-ink-0: #e2e8f0; --seq-ink-1: #e2e8f0; --seq-ink-2: #e2e8f0; --seq-ink-3: #e2e8f0; --seq-ink-4: #04121f; --seq-ink-5: #04121f;
+    --div-0: #9f1239; --div-1: #e11d48; --div-2: #fda4af; --div-3: #6ee7b7; --div-4: #10b981; --div-5: #065f46;
+    --div-ink-0: #fff1f2; --div-ink-1: #fff1f2; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
   }
 }
 * { box-sizing: border-box; margin: 0; }
@@ -71,6 +83,28 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-series rect { fill: var(--sc); }
 .gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 .gc-point { fill: var(--sc); }
+.gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-bin { fill: var(--sc); }
+.gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-whisker, .gc-box .gc-cap { stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-median { stroke: var(--sc); stroke-width: 2.5; }
+.gc-box .gc-outlier { fill: var(--sc); fill-opacity: 0.7; }
+.gc-slice { fill: var(--sc); stroke: var(--panel); stroke-width: 1.5; }
+.gc-slice-label { fill: #f8fafc; font-size: 11px; font-weight: 700; font-family: inherit; paint-order: stroke; stroke: rgba(2, 6, 23, 0.35); stroke-width: 2.5px; }
+.gc-donut-total { fill: var(--ink); font-size: 20px; font-weight: 700; font-family: inherit; }
+.gc-donut-unit { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-cell { fill: var(--sc); }
+.gc-cell-empty { fill: var(--grid); }
+.gc-cell-label { fill: var(--ci); font-size: 10.5px; font-weight: 600; font-family: inherit; }
+.gc-row-label { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-ramp rect { fill: var(--sc); }
+.gc-ramp text { fill: var(--muted); font-size: 10px; font-family: inherit; }
+[data-tip] { cursor: default; }
+.gc-hot { filter: brightness(1.12); }
+.gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
+.gc-legend button[disabled] { cursor: default; opacity: 1; }
 .gc-series.gc-off { display: none; }
 .gc-series.gc-dim { opacity: 0.22; }
 .gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
@@ -147,7 +181,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.</li><li>North America still contributes 37% of total revenue.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"title":"Q2 Revenue by Region","unit":"USD k","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"xPixels":[130.2,310.3,490.5,670.7,850.8],"xLabels":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"xValues":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"xHeader":"region","plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"q1","label":"Q1","mark":"bar","color":"var(--role-comparison)","values":[1650,1380,820,380,250],"formatted":["1,650","1,380","820","380","250"],"pixels":[115.5,176.7,303.9,403.7,433.3],"stats":{"min":250,"max":1650,"mean":896,"last":250,"count":5}},{"id":"q2","label":"Q2","mark":"bar","color":"var(--role-primary)","values":[1840,1420,990,410,260],"formatted":["1,840","1,420","990","410","260"],"pixels":[72.3,167.7,265.3,396.9,431],"stats":{"min":260,"max":1840,"mean":984,"last":260,"count":5}}]}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Q2 Revenue by Region","unit":"USD k","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"xPixels":[130.2,310.3,490.5,670.7,850.8],"xLabels":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"table":{"headers":["region","Q1","Q2"],"rows":[["North America",1650,1840],["Europe",1380,1420],["Asia-Pacific",820,990],["Latin America",380,410],["Middle East & Africa",250,260]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"q1","label":"Q1","mark":"bar","color":"var(--role-comparison)","values":[1650,1380,820,380,250],"formatted":["1,650","1,380","820","380","250"],"pixels":[115.5,176.7,303.9,403.7,433.3],"stats":{"min":250,"max":1650,"mean":896,"last":250,"count":5}},{"id":"q2","label":"Q2","mark":"bar","color":"var(--role-primary)","values":[1840,1420,990,410,260],"formatted":["1,840","1,420","990","410","260"],"pixels":[72.3,167.7,265.3,396.9,431],"stats":{"min":260,"max":1840,"mean":984,"last":260,"count":5}}]}</script>
 <script>
 (function () {
   'use strict';
@@ -198,6 +232,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     writeHash();
   });
 
+  var isAxis = payload.hover === 'axis';
+
   // ------------------------------------------------------------- legend
   var legend = document.querySelector('.gc-legend');
   function applyHidden(id) {
@@ -208,7 +244,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (btn) btn.setAttribute('aria-pressed', hidden[id] ? 'false' : 'true');
     }
   }
-  if (legend && payload.legendToggle) {
+  if (legend && payload.legendToggle && isAxis) {
     legend.addEventListener('click', function (e) {
       var btn = e.target.closest('button[data-series]');
       if (!btn) return;
@@ -230,6 +266,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // ------------------------------------------------------ data passport
+  // Passport, zoom, and crosshair are axis-family features. Element-hover
+  // families (distribution, proportion, matrix) read per-mark instead.
   var passport = document.getElementById('gc-passport');
   function setFocus(id) {
     focusId = id && !hidden[id] ? id : null;
@@ -265,6 +303,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     return String(r).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   svg.addEventListener('click', function (e) {
+    if (!isAxis) return;
     var g = e.target.closest('.gc-series');
     if (g) {
       var id = g.getAttribute('data-series');
@@ -326,7 +365,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     resetBtn.toggleAttribute('data-on', !!zoom);
   }
   function rebuildXTicks() {
-    var g = svg.querySelector('.gc-xticks');
+    var g = xtickGroup;
+    if (!g) return;
     if (!zoom) { g.innerHTML = originalTicks; return; }
     var r = visibleRange();
     var count = Math.min(7, r[1] - r[0] + 1);
@@ -338,7 +378,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
     g.innerHTML = html;
   }
-  var originalTicks = svg.querySelector('.gc-xticks').innerHTML;
+  var xtickGroup = svg.querySelector('.gc-xticks');
+  var originalTicks = xtickGroup ? xtickGroup.innerHTML : '';
   function setZoom(i0, i1) {
     zoom = (i0 !== null && i1 - i0 >= 1) ? [i0, i1] : null;
     applyZoom();
@@ -372,6 +413,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
   function hideTip() {
     tooltip.style.display = 'none';
+    if (!crosshair) return;
     crosshair.style.display = 'none';
     Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
   }
@@ -406,9 +448,43 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     tooltip.style.left = x + 'px';
     tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
   }
-  if (payload.tooltip !== 'off' && hit) {
+  if (isAxis && payload.tooltip !== 'off' && hit) {
     hit.addEventListener('pointermove', function (evt) { if (!brushing) showTip(evt); });
     hit.addEventListener('pointerleave', hideTip);
+  }
+
+  // Element hover: any mark carrying data-tip describes itself.
+  if (!isAxis) {
+    svg.addEventListener('pointerover', function (evt) {
+      var el = evt.target.closest('[data-tip]');
+      if (!el) return;
+      var spec = JSON.parse(el.getAttribute('data-tip'));
+      var html = '<div class="gc-tt-x">' + esc(spec.title) + '</div>';
+      spec.rows.forEach(function (r) {
+        html += '<div class="gc-tt-row">' + esc(r.label) +
+          '<span class="gc-tt-val">' + esc(r.value) + '</span></div>';
+      });
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      moveTip(evt);
+      el.classList.add('gc-hot');
+    });
+    svg.addEventListener('pointermove', function (evt) {
+      if (tooltip.style.display === 'block') moveTip(evt);
+    });
+    svg.addEventListener('pointerout', function (evt) {
+      var el = evt.target.closest('[data-tip]');
+      if (el) el.classList.remove('gc-hot');
+      tooltip.style.display = 'none';
+    });
+  }
+  function moveTip(evt) {
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = evt.clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = evt.clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
   }
 
   // Brush drag on the hit rect.
@@ -460,7 +536,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 
   var TOKENS = ['--bg', '--panel', '--ink', '--muted', '--grid', '--border', '--axis',
     '--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--cat-5',
-    '--role-primary', '--role-comparison', '--role-positive', '--role-negative', '--role-neutral', '--role-highlight'];
+    '--role-primary', '--role-comparison', '--role-positive', '--role-negative', '--role-neutral', '--role-highlight',
+    '--seq-0', '--seq-1', '--seq-2', '--seq-3', '--seq-4', '--seq-5',
+    '--seq-ink-0', '--seq-ink-1', '--seq-ink-2', '--seq-ink-3', '--seq-ink-4', '--seq-ink-5',
+    '--div-0', '--div-1', '--div-2', '--div-3', '--div-4', '--div-5',
+    '--div-ink-0', '--div-ink-1', '--div-ink-2', '--div-ink-3', '--div-ink-4', '--div-ink-5'];
   var SVG_CSS = 'text{font-family:system-ui,-apple-system,sans-serif}' +
     '.gc-grid line{stroke:var(--grid)}.gc-axis{stroke:var(--axis)}' +
     '.gc-yticks text,.gc-xticks text{fill:var(--muted);font-size:11px}' +
@@ -469,7 +549,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-line{fill:none;stroke:var(--sc);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}' +
     '.gc-point{fill:var(--sc)}' +
     '.gc-annotations line{stroke:var(--muted);stroke-dasharray:4 3}' +
-    '.gc-annotations text{fill:var(--muted);font-size:10.5px}';
+    '.gc-annotations text{fill:var(--muted);font-size:10.5px}' +
+    '.gc-dot{fill:var(--sc);fill-opacity:.78}.gc-bin{fill:var(--sc)}' +
+    '.gc-box .gc-box-body{fill:var(--sc);fill-opacity:.45;stroke:var(--sc);stroke-width:1.5}' +
+    '.gc-box .gc-whisker,.gc-box .gc-cap{stroke:var(--sc);stroke-width:1.5}' +
+    '.gc-box .gc-median{stroke:var(--sc);stroke-width:2.5}.gc-box .gc-outlier{fill:var(--sc);fill-opacity:.7}' +
+    '.gc-slice{fill:var(--sc);stroke:var(--panel);stroke-width:1.5}' +
+    '.gc-slice-label{fill:#f8fafc;font-size:11px;font-weight:700}' +
+    '.gc-donut-total{fill:var(--ink);font-size:20px;font-weight:700}.gc-donut-unit{fill:var(--muted);font-size:11px}' +
+    '.gc-cell{fill:var(--sc)}.gc-cell-empty{fill:var(--grid)}' +
+    '.gc-cell-label{fill:var(--ci);font-size:10.5px;font-weight:600}' +
+    '.gc-row-label{fill:var(--muted);font-size:11px}' +
+    '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
 
   // Canonical export: full authored chart at rest — no hover layer, no
   // hidden/dimmed series, no zoom remap.
@@ -481,7 +572,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       el.classList.remove('gc-off', 'gc-dim');
     });
     if (zoom) {
-      clone.querySelector('.gc-xticks').innerHTML = originalTicks;
+      var ct = clone.querySelector('.gc-xticks');
+      if (ct) ct.innerHTML = originalTicks;
       // Re-render marks at rest by rebuilding from payload.
       payload.series.forEach(function (s) {
         if (s.mark !== 'line') return;
@@ -549,10 +641,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       var s = String(v);
       return /[",\n]/.test(s) ? '"' + s.replaceAll('"', '""') + '"' : s;
     };
-    var lines = [[payload.xHeader].concat(payload.series.map(function (s) { return s.label; })).map(esc2).join(',')];
-    for (var i = 0; i < payload.xValues.length; i++) {
-      lines.push([payload.xValues[i]].concat(payload.series.map(function (s) { return s.values[i]; })).map(esc2).join(','));
-    }
+    var lines = [payload.table.headers.map(esc2).join(',')];
+    payload.table.rows.forEach(function (row) { lines.push(row.map(esc2).join(',')); });
     return lines.join('\n') + '\n';
   }
   exportMenu.addEventListener('click', function (e) {
@@ -594,7 +684,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // -------------------------------------------------- restore deep link
   var h = readHash();
   if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
-  if (h.hidden) {
+  if (h.hidden && isAxis) {
     h.hidden.split(',').forEach(function (id) {
       if (payload.series.some(function (s) { return s.id === id; })) {
         hidden[id] = true;
@@ -602,7 +692,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       }
     });
   }
-  if (h.focus && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);
     if (m) {

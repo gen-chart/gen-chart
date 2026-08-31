@@ -2,18 +2,21 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { analyzeCartesian, renderSvg, buildPayload } from '../renderers/cartesian/render-cartesian.mjs';
+import { rendererFor } from '../renderers/shared/registry.mjs';
 import { assembleHtml } from '../renderers/shared/html.mjs';
 
 const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
-const specs = readdirSync(examplesDir).filter((f) => f.endsWith('.cartesian.json'));
+const SPEC_RE = /\.(cartesian|distribution|proportion|matrix)\.json$/;
+const specs = readdirSync(examplesDir).filter((f) => SPEC_RE.test(f));
 
 function renderExample(name) {
   const spec = JSON.parse(readFileSync(examplesDir + name, 'utf8'));
-  const analysis = analyzeCartesian(spec);
+  const r = rendererFor(spec.chart_type);
+  const analysis = r.analyze(spec);
   assert.deepEqual(analysis.diagnostics, [], `${name} should analyze clean`);
-  const svg = renderSvg(spec, analysis);
-  return { spec, svg, html: assembleHtml(spec, svg, buildPayload(spec, analysis)) };
+  const svg = r.renderSvg(spec, analysis);
+  const html = assembleHtml(spec, svg, r.buildPayload(spec, analysis), r.buildLegend(spec, analysis));
+  return { spec, svg, html };
 }
 
 test('rendering is deterministic: two runs are byte-identical', () => {
@@ -24,7 +27,7 @@ test('rendering is deterministic: two runs are byte-identical', () => {
 
 test('golden: committed example HTML matches a fresh render', () => {
   for (const name of specs) {
-    const htmlPath = examplesDir + name.replace('.cartesian.json', '.html');
+    const htmlPath = examplesDir + name.replace(SPEC_RE, '.html');
     const committed = readFileSync(htmlPath, 'utf8');
     assert.equal(renderExample(name).html, committed,
       `${name} drifts from its committed HTML; re-run: npm run render:examples`);
@@ -63,9 +66,10 @@ test('null values break lines instead of drawing to zero', () => {
   const spec = JSON.parse(readFileSync(examplesDir + 'mau-trend.cartesian.json', 'utf8'));
   spec.data.columns[1].values[5] = null;
   spec.data.columns[2].values[5] = null;
-  const analysis = analyzeCartesian(spec);
+  const r = rendererFor('cartesian');
+  const analysis = r.analyze(spec);
   assert.deepEqual(analysis.diagnostics, []);
-  const svg = renderSvg(spec, analysis);
+  const svg = r.renderSvg(spec, analysis);
   const path = /class="gc-line" d="([^"]+)"/.exec(svg)[1];
   assert.equal((path.match(/M/g) ?? []).length, 2, 'a null gap should restart the path');
 });
@@ -80,8 +84,8 @@ test('M3 viewer features are present: brush plumbing, exports, deep links', () =
   const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
   assert.equal(payload.brush, 'x');
   assert.equal(payload.title, spec.meta.title);
-  assert.deepEqual(payload.xValues, spec.data.columns[0].values);
-  assert.equal(payload.xHeader, spec.encoding.x.column);
+  assert.deepEqual(payload.table.rows.map((r) => r[0]), spec.data.columns[0].values);
+  assert.equal(payload.table.headers[0], spec.encoding.x.column);
 });
 
 test('payload JSON in the artifact parses and mirrors the data', () => {
