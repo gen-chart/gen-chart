@@ -1,4 +1,4 @@
-# agen-chart — Skill Plan
+# gen-chart — Skill Plan
 
 > **Pitch:** *Turn data, a description, or a pasted table into a polished, interactive chart — directly in chat.*
 >
@@ -22,11 +22,11 @@
 ## 2. Skill package layout (mirrors Archify)
 
 ```
-agen-chart/                        ← skill package (installed to ~/.claude/skills/agen-chart)
+gen-chart/                        ← skill package (installed to ~/.claude/skills/gen-chart)
 ├── SKILL.md                     ← agent contract (short, bounded, imperative)
 ├── assets/template.html         ← viewer runtime template ({{placeholders}})
 ├── bin/
-│   └── agen-chart.mjs             ← CLI: validate | render | deliver | guide |
+│   └── gen-chart.mjs             ← CLI: validate | render | deliver | guide |
 │                                   inspect-data | doctor | demo | visual-check
 ├── schemas/
 │   ├── common.schema.json       ← $defs: id, seriesRef, color roles, formats,
@@ -112,13 +112,13 @@ Design choices, copied from Archify's lessons:
 | `proportion` | pie, donut, 100%-stacked bar | parts of a whole (≤7 slices enforced) |
 | `matrix` | heatmap, calendar heatmap | two categorical dims × intensity |
 
-`node bin/agen-chart.mjs guide "<scenario>" --json` routes ambiguous requests — and *recommends against* bad fits (e.g. suggests bar over pie for >7 categories), mirroring Archify's `guide`.
+`node bin/gen-chart.mjs guide "<scenario>" --json` routes ambiguous requests — and *recommends against* bad fits (e.g. suggests bar over pie for >7 categories), mirroring Archify's `guide`.
 
 ## 5. Validation layers (the honesty engine)
 
 1. **Schema** — precompiled ajv standalone validators, committed, zero runtime deps.
 2. **Data integrity** — column lengths match; types parse (dates, numbers); no NaN/mixed types unless declared nullable; referenced columns/series exist; duplicate IDs rejected.
-3. **Chart honesty (the differentiator, agen-chart's "truth boundary")** — stable rule codes such as:
+3. **Chart honesty (the differentiator, gen-chart's "truth boundary")** — stable rule codes such as:
    - `honesty/bar-zero-baseline`: bar/area y-scale must include zero, or the author must set `zero: false` **and** the renderer draws a visible axis-break marker.
    - `honesty/pie-sum`: proportion slices must be non-negative; if they don't represent a whole, validation demands 100%-stacked or bar instead.
    - `honesty/dual-axis`: a second y-axis requires distinct units and forces per-axis series labeling in the legend.
@@ -148,17 +148,17 @@ One `template.html` with placeholders; renderer inlines the spec data, computed 
 ## 7. CLI contract
 
 ```bash
-node bin/agen-chart.mjs guide "<scenario>" --json
-node bin/agen-chart.mjs inspect-data <file.csv|json> --json   # columns, types, ranges, suggested chart_type
-node bin/agen-chart.mjs validate <chart_type> <spec.json> --quality showcase --json
-node bin/agen-chart.mjs deliver  <chart_type> <spec.json> <out.html> --quality showcase --json
-node bin/agen-chart.mjs visual-check <out.html> --json
-node bin/agen-chart.mjs doctor / demo <dir>
+node bin/gen-chart.mjs guide "<scenario>" --json
+node bin/gen-chart.mjs inspect-data <file.csv|json> --json   # columns, types, ranges, suggested chart_type
+node bin/gen-chart.mjs validate <chart_type> <spec.json> --quality showcase --json
+node bin/gen-chart.mjs deliver  <chart_type> <spec.json> <out.html> --quality showcase --json
+node bin/gen-chart.mjs visual-check <out.html> --json
+node bin/gen-chart.mjs doctor / demo <dir>
 ```
 
 Same delivery semantics as Archify: `deliver` freezes spec bytes, renders a same-directory candidate, runs all checks, atomically commits, reports SHA-256 + byte counts; failed delivery preserves last-good output; non-zero exit is never "success".
 
-`inspect-data` is the agen-chart-specific addition: the agent points it at a user's file, gets typed column profiles back, and authors the spec from that receipt instead of re-reading/guessing raw data (keeps big files out of context and prevents transcription errors).
+`inspect-data` is the gen-chart-specific addition: the agent points it at a user's file, gets typed column profiles back, and authors the spec from that receipt instead of re-reading/guessing raw data (keeps big files out of context and prevents transcription errors).
 
 ## 8. SKILL.md sketch (agent contract)
 
@@ -205,4 +205,4 @@ North star: **"The Honest Ledger"** — a chart is a claim about numbers; every 
 
 ## 13. Naming note
 
-The skill was originally planned as `ag-chart`, but "AG Charts" is an existing commercial library (ag-grid.com). Renamed to **`agen-chart`** (agent + chart) to avoid the collision and signal that it is an agent skill. The name appears in three places that must stay in sync: the SKILL.md frontmatter `name`, the package directory (`~/.claude/skills/agen-chart`), and the CLI binary (`bin/agen-chart.mjs`).
+The skill was originally planned as `ag-chart`, but "AG Charts" is an existing commercial library (ag-grid.com). Briefly `agen-chart`, then settled on **`gen-chart`** (generate + chart) — collision-free and shorter. The name appears in three places that must stay in sync: the SKILL.md frontmatter `name`, the package directory (`~/.claude/skills/gen-chart`), and the CLI binary (`bin/gen-chart.mjs`).

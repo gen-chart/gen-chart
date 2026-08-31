@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// agen-chart CLI — skeleton. Command surface matches the plan; only `doctor`
+// gen-chart CLI — skeleton. Command surface matches the plan; only `doctor`
 // and `help` are functional until M1 lands.
 
 import process from 'node:process';
@@ -7,17 +7,17 @@ import process from 'node:process';
 const VERSION = '0.1.0';
 
 function usage() {
-  return `agen-chart v${VERSION}
+  return `gen-chart v${VERSION}
 
 Usage:
-  agen-chart guide "<scenario>" [--json]
-  agen-chart inspect-data <file.csv|json> [--json]
-  agen-chart validate <chart_type> <spec.json> [--quality showcase] [--json]
-  agen-chart render   <chart_type> <spec.json> <out.html> [--json]
-  agen-chart deliver  <chart_type> <spec.json> <out.html> [--quality showcase] [--json]
-  agen-chart visual-check <out.html> [--json]
-  agen-chart doctor
-  agen-chart demo <output-directory>
+  gen-chart guide "<scenario>" [--json]
+  gen-chart inspect-data <file.csv|json> [--json]
+  gen-chart validate <chart_type> <spec.json> [--quality showcase] [--json]
+  gen-chart render   <chart_type> <spec.json> <out.html> [--json]
+  gen-chart deliver  <chart_type> <spec.json> <out.html> [--quality showcase] [--json]
+  gen-chart visual-check <out.html> [--json]
+  gen-chart doctor
+  gen-chart demo <output-directory>
 
 Chart types: cartesian | distribution | proportion | matrix
 `;
@@ -49,10 +49,10 @@ switch (command) {
   case 'deliver':
   case 'visual-check':
   case 'demo':
-    console.error(`agen-chart: '${command}' is not implemented yet (skeleton build).`);
+    console.error(`gen-chart: '${command}' is not implemented yet (skeleton build).`);
     process.exit(2);
   default:
-    console.error(`agen-chart: unknown command '${command}'\n`);
+    console.error(`gen-chart: unknown command '${command}'\n`);
     console.error(usage());
     process.exit(1);
 }

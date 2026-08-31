@@ -1,9 +1,9 @@
-# agen-chart JSON IR Schemas
+# gen-chart JSON IR Schemas
 
 Each chart family consumes a JSON intermediate representation (IR) validated
 against one of the schemas in this folder before any layout work happens.
 
-Planned files (see `../../agen-chart-plan.md` §3):
+Planned files (see `../../gen-chart-plan.md` §3):
 
 | Schema | Governs | Marks |
 |--------|---------|-------|

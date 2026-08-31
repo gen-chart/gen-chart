@@ -1,12 +1,12 @@
 {
-  "name": "agen-chart",
+  "name": "gen-chart",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "description": "Typed JSON chart spec → deterministic, validated, self-contained interactive HTML charts.",
   "license": "MIT",
   "bin": {
-    "agen-chart": "./bin/agen-chart.mjs"
+    "gen-chart": "./bin/gen-chart.mjs"
   },
   "engines": {
     "node": ">=18"

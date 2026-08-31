@@ -1,5 +1,5 @@
 ---
-name: agen-chart
+name: gen-chart
 description: >-
   Create polished, validated, interactive charts as self-contained standalone
   HTML with inline SVG, dark/light themes, tooltips, legend toggling, brush
@@ -15,10 +15,10 @@ metadata:
   inspired_by: tt-a1i/archify (MIT)
 ---
 
-# agen-chart
+# gen-chart
 
 > **Status: skeleton — the fast authoring path below is the target contract.
-> Renderers and validation are not implemented yet; see `../agen-chart-plan.md`.**
+> Renderers and validation are not implemented yet; see `../gen-chart-plan.md`.**
 
 Create a self-contained, interactive HTML chart from a small typed JSON
 specification. The agent authors semantics and data; the deterministic
@@ -27,8 +27,8 @@ renderer owns scales, ticks, layout, and honesty checks.
 ## Fast authoring path (target)
 
 1. Route `cartesian`, `distribution`, `proportion`, or `matrix` from the
-   question, or run `node bin/agen-chart.mjs guide "<scenario>" --json`.
-2. If the data is in a file, run `node bin/agen-chart.mjs inspect-data <file> --json`
+   question, or run `node bin/gen-chart.mjs guide "<scenario>" --json`.
+2. If the data is in a file, run `node bin/gen-chart.mjs inspect-data <file> --json`
    and author from the typed column profile. If pasted, embed values verbatim
    into `data.columns` — never invent, round, or extrapolate values.
 3. Read exactly one matching schema in `schemas/` plus one matching example in
@@ -37,7 +37,7 @@ renderer owns scales, ticks, layout, and honesty checks.
 5. Validate after every edit:
 
    ```bash
-   node bin/agen-chart.mjs validate <chart_type> <spec.json> --quality showcase --json
+   node bin/gen-chart.mjs validate <chart_type> <spec.json> --quality showcase --json
    ```
 
    Apply only each diagnostic subject's `supportedFixes`, one diagnosed repair
@@ -46,7 +46,7 @@ renderer owns scales, ticks, layout, and honesty checks.
 6. Deliver for final acceptance; a non-zero exit is never success:
 
    ```bash
-   node bin/agen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --json
+   node bin/gen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --json
    ```
 
 ## Invariants (target)
