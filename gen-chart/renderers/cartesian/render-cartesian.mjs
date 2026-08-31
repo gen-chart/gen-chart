@@ -180,7 +180,10 @@ export function analyzeCartesian(spec) {
     const tt = timeTicks(xCol.ms[0], xCol.ms[n - 1], xCol.granularity);
     xTicks = tt.ticks.map((ms, i) => ({
       x: scale(ms),
-      label: fmtDate(ms, tt.unit, { withYear: i === 0 || (tt.unit !== 'year' && new Date(ms).getUTCMonth() === 0 && new Date(ms).getUTCDate() === 1) })
+      label: fmtDate(ms, tt.unit, {
+        withYear: i === 0 || (tt.unit !== 'year' && new Date(ms).getUTCMonth() === 0 && new Date(ms).getUTCDate() === 1),
+        locale: spec.meta.locale
+      })
     }));
   } else {
     const nums = xCol.values;
@@ -273,6 +276,39 @@ export function analyzeCartesian(spec) {
     }
     annotations.push({ ...a, x });
   });
+
+  // ---- guided views reference authored series and real row indices
+  const viewIds = new Set();
+  (spec.meta.views ?? []).forEach((v, i) => {
+    const subject = `/meta/views/${i}`;
+    if (viewIds.has(v.id)) {
+      diagnostics.push(diag('semantic/duplicate-view-id', 'error', subject,
+        `view id "${v.id}" is declared more than once`, {
+          supportedFixes: ['rename one of the duplicate views to a unique id']
+        }));
+    }
+    viewIds.add(v.id);
+    for (const id of v.focus ?? []) {
+      if (!seenSeries.has(id)) {
+        diagnostics.push(diag('semantic/unknown-series', 'error', `${subject}/focus`,
+          `view "${v.id}" focuses series "${id}", which this chart does not define`, {
+            evidence: { known: [...seenSeries] },
+            supportedFixes: ['reference an existing series id', 'remove the focus entry']
+          }));
+      }
+    }
+    if (v.brush) {
+      const [i0, i1] = v.brush;
+      if (i1 <= i0 || i1 > n - 1) {
+        diagnostics.push(diag('semantic/view-brush-range', 'error', `${subject}/brush`,
+          `view "${v.id}" brushes [${i0}, ${i1}], which is not an increasing window inside the ${n} plotted rows`, {
+            evidence: { rows: n, brush: v.brush },
+            supportedFixes: [`use two increasing indices between 0 and ${n - 1}`, 'remove the brush window']
+          }));
+      }
+    }
+  });
+  if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
   return {
     diagnostics,
@@ -423,7 +459,7 @@ export function buildPayload(spec, analysis) {
   const xCol = columns.get(spec.encoding.x.column);
   const colors = resolveSeriesColors(spec.series);
   const xLabelsFull = xCol.values.map((v, i) =>
-    xCol.type === 'date' ? fmtDate(xCol.ms[i], xCol.granularity, { withYear: true })
+    xCol.type === 'date' ? fmtDate(xCol.ms[i], xCol.granularity, { withYear: true, locale: spec.meta.locale })
       : xCol.type === 'number' ? fmtValue(v)
         : v);
   return {
@@ -435,6 +471,7 @@ export function buildPayload(spec, analysis) {
     tooltip: spec.interactions?.tooltip ?? 'auto',
     legendToggle: spec.interactions?.legend_toggle ?? true,
     brush: spec.interactions?.brush ?? null,
+    views: spec.meta.views ?? [],
     xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
     xLabels: xLabelsFull,
     table: {

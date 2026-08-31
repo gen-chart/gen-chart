@@ -25,6 +25,10 @@ diagnostic catalog, or repair rules.
 - `interactions`: `tooltip: "auto" | "off"`, `legend_toggle: boolean`
   (default true), `brush: "x"` (opt-in zoom; line marks over time/linear x
   only). Omit the whole object normally.
+- `meta.views`: up to 5 guided readings, each `{id, label, note?, focus?,
+  brush?}`. `focus` lists existing series ids; `brush` is an increasing
+  `[i0, i1]` pair of row indices. Cartesian only.
+- `meta.locale`: `en` | `zh-CN`. Viewer chrome and computed notes only.
 
 ## Distribution field reference
 
@@ -70,6 +74,9 @@ diagnostic catalog, or repair rules.
 | `semantic/unknown-column`, `semantic/duplicate-series-id`, `semantic/series-not-numeric` | error | reference integrity |
 | `semantic/scale-type-mismatch`, `semantic/mark-scale-mismatch` | error | scale/column/mark compatibility |
 | `semantic/brush-unsupported` | error | brush needs line marks over time/linear x |
+| `semantic/unknown-series` | error | a view focuses a series that does not exist |
+| `semantic/view-brush-range` | error | a view's brush window is outside the plotted rows |
+| `semantic/duplicate-view-id` | error | two views share an id |
 | `semantic/annotation-out-of-range` | warning | annotation dropped |
 | `honesty/bar-zero-baseline` | error | bars must include zero |
 | `honesty/mixed-units` | error | one y axis, one unit |

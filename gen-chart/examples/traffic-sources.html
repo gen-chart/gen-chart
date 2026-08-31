@@ -104,6 +104,23 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
+.gc-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.gc-figure:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 4px; border-radius: 0.5rem; }
+.gc-views { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.gc-views button {
+  background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.8rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+  transition: border-color 150ms, color 150ms, background 150ms;
+}
+.gc-views button:hover { border-color: var(--axis); color: var(--ink); }
+.gc-views button[aria-pressed="true"] { background: var(--role-primary); border-color: var(--role-primary); color: #fff; }
+.gc-views button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-view-clear { margin-left: auto; }
+.gc-view-note { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.75rem; min-height: 1.2em; }
+.gc-view-note:empty { display: none; }
 .gc-legend button[disabled] { cursor: default; opacity: 1; }
 .gc-series.gc-off { display: none; }
 .gc-series.gc-dim { opacity: 0.22; }
@@ -172,16 +189,22 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
+  
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
-    <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Signup Traffic by Source" xmlns="http://www.w3.org/2000/svg"><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Organic search&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;4,820 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;45.0%&quot;}]}" style="--sc:var(--cat-0)" d="M480 52A214 214 0 0 1 545.5 469.7L518 384.2A124.1 124.1 0 0 0 480 141.9Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Direct&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;2,310 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;21.6%&quot;}]}" style="--sc:var(--cat-1)" d="M545.5 469.7A214 214 0 0 1 294.9 373.4L372.6 328.3A124.1 124.1 0 0 0 518 384.2Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Referral&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;1,640 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;15.3%&quot;}]}" style="--sc:var(--cat-2)" d="M294.9 373.4A214 214 0 0 1 286.2 175.3L367.6 213.4A124.1 124.1 0 0 0 372.6 328.3Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Paid social&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;980 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;9.2%&quot;}]}" style="--sc:var(--cat-3)" d="M286.2 175.3A214 214 0 0 1 366.7 84.4L414.3 160.7A124.1 124.1 0 0 0 367.6 213.4Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Email&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;610 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;5.7%&quot;}]}" style="--sc:var(--cat-4)" d="M366.7 84.4A214 214 0 0 1 437.6 56.3L455.4 144.3A124.1 124.1 0 0 0 414.3 160.7Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Other&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;340 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;3.2%&quot;}]}" style="--sc:var(--cat-5)" d="M437.6 56.3A214 214 0 0 1 480 52L480 141.9A124.1 124.1 0 0 0 455.4 144.3Z"/><text class="gc-slice-label" x="647" y="243.8" text-anchor="middle">45%</text><text class="gc-slice-label" x="419.3" y="427.8" text-anchor="middle">22%</text><text class="gc-slice-label" x="311.1" y="277.4" text-anchor="middle">15%</text><text class="gc-slice-label" x="353.5" y="157.9" text-anchor="middle">9%</text><text class="gc-donut-total" x="480" y="264" text-anchor="middle">10,700</text><text class="gc-donut-unit" x="480" y="282" text-anchor="middle">signups</text></svg>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Signup Traffic by Source" xmlns="http://www.w3.org/2000/svg"><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Organic search&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;4,820 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;45.0%&quot;}]}" style="--sc:var(--cat-0)" d="M480 52A214 214 0 0 1 545.5 469.7L518 384.2A124.1 124.1 0 0 0 480 141.9Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Direct&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;2,310 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;21.6%&quot;}]}" style="--sc:var(--cat-1)" d="M545.5 469.7A214 214 0 0 1 294.9 373.4L372.6 328.3A124.1 124.1 0 0 0 518 384.2Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Referral&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;1,640 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;15.3%&quot;}]}" style="--sc:var(--cat-2)" d="M294.9 373.4A214 214 0 0 1 286.2 175.3L367.6 213.4A124.1 124.1 0 0 0 372.6 328.3Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Paid social&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;980 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;9.2%&quot;}]}" style="--sc:var(--cat-3)" d="M286.2 175.3A214 214 0 0 1 366.7 84.4L414.3 160.7A124.1 124.1 0 0 0 367.6 213.4Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Email&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;610 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;5.7%&quot;}]}" style="--sc:var(--cat-4)" d="M366.7 84.4A214 214 0 0 1 437.6 56.3L455.4 144.3A124.1 124.1 0 0 0 414.3 160.7Z"/><path class="gc-slice" data-tip="{&quot;title&quot;:&quot;Other&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;value&quot;,&quot;value&quot;:&quot;340 signups&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;3.2%&quot;}]}" style="--sc:var(--cat-5)" d="M437.6 56.3A214 214 0 0 1 480 52L480 141.9A124.1 124.1 0 0 0 455.4 144.3Z"/><text class="gc-slice-label" x="647" y="243.8" text-anchor="middle">45%</text><text class="gc-slice-label" x="419.3" y="427.8" text-anchor="middle">22%</text><text class="gc-slice-label" x="311.1" y="277.4" text-anchor="middle">15%</text><text class="gc-slice-label" x="353.5" y="157.9" text-anchor="middle">9%</text><text class="gc-donut-total" x="480" y="264" text-anchor="middle">10,700</text><text class="gc-donut-unit" x="480" y="282" text-anchor="middle">signups</text></svg>
+    </div>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">category</th><th scope="col">value</th><th scope="col">share</th></tr></thead><tbody><tr><th scope="row">Organic search</th><td>4820</td><td>45.05%</td></tr><tr><th scope="row">Direct</th><td>2310</td><td>21.59%</td></tr><tr><th scope="row">Referral</th><td>1640</td><td>15.33%</td></tr><tr><th scope="row">Paid social</th><td>980</td><td>9.16%</td></tr><tr><th scope="row">Email</th><td>610</td><td>5.70%</td></tr><tr><th scope="row">Other</th><td>340</td><td>3.18%</td></tr></tbody></table>
     <div class="gc-legend" data-static role="group" aria-label="Series"><button type="button" data-series="Organic search" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-0)"></span>Organic search — 45.0%</button><button type="button" data-series="Direct" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-1)"></span>Direct — 21.6%</button><button type="button" data-series="Referral" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-2)"></span>Referral — 15.3%</button><button type="button" data-series="Paid social" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-3)"></span>Paid social — 9.2%</button><button type="button" data-series="Email" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-4)"></span>Email — 5.7%</button><button type="button" data-series="Other" aria-pressed="true" disabled><span class="gc-swatch" data-mark="bar" style="--sw:var(--cat-5)"></span>Other — 3.2%</button></div>
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Organic search brings 44% of signups — more than paid social, email, and referral combined.</li><li>Paid social is the smallest tracked channel outside the Other bucket.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"proportion","hover":"element","title":"Signup Traffic by Source","unit":"signups","width":960,"height":520,"legendToggle":false,"table":{"headers":["category","value","share"],"rows":[["Organic search",4820,"45.05%"],["Direct",2310,"21.59%"],["Referral",1640,"15.33%"],["Paid social",980,"9.16%"],["Email",610,"5.70%"],["Other",340,"3.18%"]]}}</script>
+<script id="gc-payload" type="application/json">{"family":"proportion","hover":"element","title":"Signup Traffic by Source","unit":"signups","width":960,"height":520,"legendToggle":false,"table":{"headers":["category","value","share"],"rows":[["Organic search",4820,"45.05%"],["Direct",2310,"21.59%"],["Referral",1640,"15.33%"],["Paid social",980,"9.16%"],["Email",610,"5.70%"],["Other",340,"3.18%"]]},"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -191,6 +214,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var plot = payload.plot;
   var hidden = {};
   var focusId = null;
+  var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
 
   function esc(s) {
@@ -219,6 +243,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
     if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
+    if (activeView) parts.push('view=' + encodeURIComponent(activeView));
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
   }
 
@@ -283,14 +308,15 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var s = payload.series.find(function (x) { return x.id === focusId; });
     var st = s.stats || {};
     var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var L = payload.i18n;
     passport.innerHTML =
       '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
-      '<dl><div><dt>min</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
-      '<div><dt>max</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
-      '<div><dt>mean</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
-      '<div><dt>last</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
-      '<div><dt>points</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
-      '<button class="gc-btn gc-pp-close" type="button">Close</button>';
+      '<dl><div><dt>' + esc(L['stat.min']) + '</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.max']) + '</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.mean']) + '</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.last']) + '</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.points']) + '</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
+      '<button class="gc-btn gc-pp-close" type="button">' + esc(L['ui.close']) + '</button>';
     passport.setAttribute('data-open', '');
     passport.querySelector('.gc-pp-close').addEventListener('click', function () {
       setFocus(null);
@@ -418,7 +444,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
   }
   function showTip(evt) {
-    var i = nearest(svgX(evt));
+    showTipAt(nearest(svgX(evt)), evt.clientX, evt.clientY);
+  }
+  function showTipAt(i, clientX, clientY) {
     var px = zoomX(payload.xPixels[i]);
     crosshair.setAttribute('x1', px);
     crosshair.setAttribute('x2', px);
@@ -681,6 +709,102 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
   });
 
+  // ------------------------------------------------- keyboard navigation
+  // The chart is focusable and arrow keys walk the data points, so the
+  // reading does not depend on a pointer. Each step announces the value
+  // through the live region for screen readers.
+  var figure = document.getElementById('gc-figure');
+  var live = document.getElementById('gc-live');
+  var cursor = null;
+  if (isAxis && figure) {
+    figure.setAttribute('tabindex', '0');
+    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+    figure.addEventListener('keydown', function (e) {
+      var r = visibleRange();
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (cursor === null) cursor = r[0];
+        else cursor += (e.key === 'ArrowRight' ? 1 : -1);
+        cursor = Math.max(r[0], Math.min(r[1], cursor));
+        showAt(cursor);
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        cursor = e.key === 'Home' ? r[0] : r[1];
+        showAt(cursor);
+      }
+    });
+    figure.addEventListener('blur', function () { cursor = null; hideTip(); });
+  }
+  // Renders the crosshair, markers, and a spoken sentence for one index.
+  function showAt(i) {
+    var px = zoomX(payload.xPixels[i]);
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var parts = [payload.xLabels[i]];
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
+        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    if (live) live.textContent = parts.join(', ');
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / payload.width;
+    showTipAt(i, rect.left + px * scale, rect.top + rect.height / 2);
+  }
+
+  // ----------------------------------------------------- guided views
+  var viewStrip = document.querySelector('.gc-views');
+  var viewNote = document.getElementById('gc-view-note');
+  function applyView(id) {
+    var v = (payload.views || []).find(function (x) { return x.id === id; });
+    if (viewStrip) {
+      viewStrip.querySelectorAll('button[data-view]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-view') === id && id ? 'true' : 'false');
+      });
+    }
+    if (!v) {
+      if (viewNote) viewNote.textContent = '';
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+      setZoom(null);
+      activeView = null;
+      writeHash();
+      return;
+    }
+    activeView = id;
+    if (viewNote) viewNote.textContent = v.note || '';
+    if (v.focus && v.focus.length) {
+      payload.series.forEach(function (s) {
+        hidden[s.id] = v.focus.indexOf(s.id) === -1;
+        applyHidden(s.id);
+      });
+      setFocus(v.focus.length === 1 ? v.focus[0] : null);
+    } else {
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+    }
+    if (v.brush) setZoom(v.brush[0], v.brush[1]);
+    else setZoom(null);
+    writeHash();
+  }
+  if (viewStrip) {
+    viewStrip.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-view]');
+      if (!b) return;
+      var id = b.getAttribute('data-view');
+      applyView(id === activeView ? '' : id);
+    });
+  }
+
   // -------------------------------------------------- restore deep link
   var h = readHash();
   if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
@@ -693,6 +817,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     });
   }
   if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);
     if (m) {
