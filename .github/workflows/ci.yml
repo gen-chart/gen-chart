@@ -41,7 +41,7 @@ jobs:
       # honesty rules, palette contrast, and the headless browser suites.
       - name: Test
         working-directory: gen-chart
-        run: npm test
+        run: npm run test:ci
 
       - name: Verify the skill package builds deterministically
         working-directory: gen-chart

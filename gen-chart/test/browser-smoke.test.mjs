@@ -10,7 +10,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, readdirSync, openSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -40,16 +40,25 @@ window.addEventListener('load', function () {
 });
 </script>`;
   writeFileSync(probePath, readFileSync(htmlPath, 'utf8').replace('</body>', wrapper + '</body>'));
-  const dom = execFileSync(chrome, [
-    '--headless=new', '--disable-gpu', '--hide-scrollbars',
-    '--no-sandbox', '--disable-dev-shm-usage', 
-    `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
-    '--dump-dom', `file://${probePath}`
-  ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 40000 });
+  const stderrPath = join(dir, 'chrome.err');
+  let dom = '';
+  let crash = '';
+  try {
+    dom = execFileSync(chrome, [
+      '--headless=new', '--disable-gpu', '--hide-scrollbars',
+      '--no-sandbox', '--disable-dev-shm-usage',
+      `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
+      '--dump-dom', `file://${probePath}`
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', openSync(stderrPath, 'w')], timeout: 60000 });
+  } catch (e) {
+    crash = `chrome exited: ${e.message}`;
+  }
   const m = /data-probe="([^"]+)"/.exec(dom);
   if (!m) {
     if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true });
-    assert.fail(`probe never ran for ${htmlPath} (budget ${budget}ms)`);
+    let err = '';
+    try { err = readFileSync(stderrPath, 'utf8').trim().split('\n').slice(-6).join(' | '); } catch {}
+    assert.fail(`probe never ran for ${htmlPath} (budget ${budget}ms). ${crash} chrome stderr: ${err || '(empty)'}`);
   }
   return JSON.parse(m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'));
 }
