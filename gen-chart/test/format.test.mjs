@@ -7,6 +7,7 @@ test('tick formatting compacts large magnitudes', () => {
   assert.equal(fmtTick(0), '0');
   assert.equal(fmtTick(500), '500');
   assert.equal(fmtTick(12300), '12.3k');
+  assert.equal(fmtTick(5000), '5k'); // whole tick ladder compacts from 1k so 5000 and 10k never mix
   assert.equal(fmtTick(4500000), '4.5M');
   assert.equal(fmtTick(2000000000), '2B');
   assert.equal(fmtTick(-15000), '-15k');

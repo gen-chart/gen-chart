@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.2"
+  version: "0.3"
   author: sses79
   inspired_by: tt-a1i/archify (MIT)
 ---
@@ -23,9 +23,10 @@ specification. You author semantics and data; the deterministic renderer owns
 scales, ticks, layout, and honesty checks. Never emit chart SVG or HTML by
 hand while the CLI is available.
 
-Implemented today: `cartesian` (line, bar, grouped bar, bar+line combo).
-`distribution`, `proportion`, `matrix`, and `visual-check` are planned; the
-`guide` command states honest workarounds until they land.
+Implemented today: `cartesian` (line, bar, grouped bar, bar+line combo)
+with the full interactive viewer and `visual-check`. `distribution`,
+`proportion`, and `matrix` are planned; the `guide` command states honest
+workarounds until they land.
 
 ## Fast authoring path
 
@@ -63,6 +64,18 @@ Implemented today: `cartesian` (line, bar, grouped bar, bar+line combo).
    A non-zero exit is never success. A failed delivery preserves the previous
    output file. Delivery reports SHA-256 and byte counts for spec and
    artifact; include them in your handoff.
+7. After delivery, collect bounded visual evidence without modifying the
+   trusted HTML:
+
+   ```bash
+   node bin/gen-chart.mjs visual-check <output.html> --json
+   ```
+
+   Exit 0 means containment and captures passed; 2 means no Chrome was
+   available — continue and say the check was skipped. The receipt reports
+   `visualReview: "pending"`: inspect the screenshots yourself before
+   describing the chart as polished, and never claim inspection you did
+   not perform.
 
 ## Type router
 
@@ -102,8 +115,16 @@ enums, diagnostic code catalog, or repair-order details.
 
 Generated HTML already contains: dark/light theme toggle honoring
 `prefers-color-scheme`, crosshair tooltip with formatted values and units,
-legend series toggling (auto when ≥2 series), annotations, and takeaway
-cards. Everything is inline — one portable file, no CDN, works offline.
+legend series toggling (auto when ≥2 series), click-to-focus Data Passport
+with render-time stats, deep links (`#theme=`, `#focus=`, `#hidden=`,
+`#brush=`), and an Export menu (PNG 2×, standalone SVG, provenance data
+CSV, 1200×630 share card) that always captures the canonical at-rest chart.
+Everything is inline — one portable file, no CDN, works offline.
+
+`interactions.brush: "x"` is the one opt-in: honest x-only zoom for line
+marks over a time or linear axis (the y scale never rescales). Read
+`references/viewer-runtime.md` only when the user asks about these
+features.
 
 ## Setup and fallback
 
