@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "chart_type": "matrix",
+  "mark": "heatmap",
+  "meta": {
+    "title": "Support Tickets by Day and Shift",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "shift", "type": "string",
+        "values": ["Morning", "Morning", "Morning", "Morning", "Morning", "Morning", "Morning",
+                   "Afternoon", "Afternoon", "Afternoon", "Afternoon", "Afternoon", "Afternoon", "Afternoon",
+                   "Night", "Night", "Night", "Night", "Night", "Night", "Night"] },
+      { "id": "day", "type": "string",
+        "values": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+                   "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+                   "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+      { "id": "tickets", "type": "number", "unit": "tickets",
+        "values": [48, 41, 39, 37, 44, 12, 9,
+                   62, 55, 51, 49, 58, 18, 14,
+                   21, 17, 15, 16, 24, 8, 6] }
+    ]
+  },
+  "encoding": {
+    "row": { "column": "shift" },
+    "column": { "column": "day" },
+    "value": { "column": "tickets" }
+  },
+  "scale": { "kind": "sequential" },
+  "cards": [
+    { "title": "Takeaway", "items": ["Afternoon shifts carry the heaviest load every weekday, peaking Monday.", "Weekend volume drops to roughly a fifth of weekday volume across all shifts."] }
+  ]
+}

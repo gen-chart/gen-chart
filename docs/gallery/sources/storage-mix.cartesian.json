@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "stack": true,
+  "meta": {
+    "title": "Storage grew 3.7\u00d7 in five quarters, four-fifths of it cold archive",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      {
+        "id": "quarter",
+        "type": "string",
+        "values": [
+          "2025 Q3",
+          "2025 Q4",
+          "2026 Q1",
+          "2026 Q2",
+          "2026 Q3"
+        ]
+      },
+      {
+        "id": "hot",
+        "type": "number",
+        "unit": "TB",
+        "values": [
+          42,
+          48,
+          51,
+          55,
+          58
+        ]
+      },
+      {
+        "id": "warm",
+        "type": "number",
+        "unit": "TB",
+        "values": [
+          38,
+          47,
+          61,
+          74,
+          86
+        ]
+      },
+      {
+        "id": "cold",
+        "type": "number",
+        "unit": "TB",
+        "values": [
+          30,
+          62,
+          118,
+          190,
+          264
+        ]
+      }
+    ]
+  },
+  "encoding": {
+    "x": {
+      "column": "quarter",
+      "scale": "band"
+    },
+    "y": {
+      "label": "Stored data (TB)"
+    }
+  },
+  "series": [
+    {
+      "id": "hot",
+      "mark": "bar",
+      "y": "hot",
+      "label": "Hot"
+    },
+    {
+      "id": "warm",
+      "mark": "bar",
+      "y": "warm",
+      "label": "Warm"
+    },
+    {
+      "id": "cold",
+      "mark": "bar",
+      "y": "cold",
+      "label": "Cold archive"
+    }
+  ],
+  "cards": [
+    {
+      "title": "What the numbers show",
+      "items": [
+        "Total storage rose from 110 TB to 408 TB \u2014 3.7\u00d7 in five quarters.",
+        "Cold archive accounts for 234 TB of the 298 TB added, or 79% of all growth.",
+        "Hot storage grew only 16 TB over the same period, from 42 to 58 TB."
+      ]
+    }
+  ]
+}

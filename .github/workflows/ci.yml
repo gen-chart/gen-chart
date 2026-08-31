@@ -43,6 +43,15 @@ jobs:
         working-directory: gen-chart
         run: npm run test:ci
 
+      # The gallery is generated from examples/, so a renderer or example
+      # change must be reflected in the committed docs/.
+      - name: Verify the docs gallery is up to date
+        working-directory: gen-chart
+        run: |
+          npm run build:gallery
+          git diff --exit-code -- ../docs \
+            || { echo "::error::docs/ is stale — run: cd gen-chart && npm run build:gallery"; exit 1; }
+
       - name: Verify the skill package builds deterministically
         working-directory: gen-chart
         run: |

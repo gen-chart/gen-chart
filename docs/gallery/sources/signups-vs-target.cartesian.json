@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Weekly Signups vs Target",
+    "subtitle": "Product-led growth funnel, last 8 weeks",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "week", "type": "string", "values": ["W27", "W28", "W29", "W30", "W31", "W32", "W33", "W34"] },
+      { "id": "signups", "type": "number", "unit": "signups", "values": [312, 298, 351, 389, 344, 412, 458, 471] },
+      { "id": "target", "type": "number", "unit": "signups", "values": [320, 330, 340, 350, 360, 370, 380, 390] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "week", "scale": "band", "label": "ISO week" },
+    "y": { "label": "Signups" }
+  },
+  "series": [
+    { "id": "signups", "mark": "bar", "y": "signups", "label": "Actual signups", "role": "primary" },
+    { "id": "target", "mark": "line", "y": "target", "label": "Target", "role": "comparison", "point": true }
+  ],
+  "cards": [
+    { "title": "Takeaway", "items": ["Signups beat target in 5 of the last 8 weeks and the gap is widening.", "The W31 dip coincided with the pricing-page incident."] }
+  ]
+}
