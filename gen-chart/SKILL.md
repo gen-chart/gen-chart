@@ -17,8 +17,11 @@ metadata:
 
 # gen-chart
 
-> **Status: skeleton — the fast authoring path below is the target contract.
-> Renderers and validation are not implemented yet; see `../gen-chart-plan.md`.**
+> **Status: M1 — `cartesian` (line/bar) is fully implemented: schemas,
+> validation with repair receipts, honesty rules, rendering, and atomic
+> delivery. `distribution`, `proportion`, `matrix`, and the `guide` /
+> `inspect-data` / `visual-check` commands land in M2+; see
+> `../gen-chart-plan.md`.**
 
 Create a self-contained, interactive HTML chart from a small typed JSON
 specification. The agent authors semantics and data; the deterministic

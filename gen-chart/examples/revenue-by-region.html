@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Q2 Revenue by Region</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
+  --grid: #e2e8f0; --border: #e2e8f0; --axis: #94a3b8; --tooltip-bg: #0f172a; --tooltip-ink: #f8fafc;
+  --cat-0: #2563eb; --cat-1: #059669; --cat-2: #d97706; --cat-3: #7c3aed; --cat-4: #db2777; --cat-5: #0891b2;
+  --role-primary: #2563eb; --role-comparison: #64748b; --role-positive: #059669;
+  --role-negative: #e11d48; --role-neutral: #94a3b8; --role-highlight: #d97706;
+}
+:root[data-theme="dark"] {
+  --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+  --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+  --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+  --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+  --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+    --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+    --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+    --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+    --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+  }
+}
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 2rem 1.25rem; display: flex; justify-content: center;
+  transition: background 150ms, color 150ms;
+}
+.gc-wrap { width: 100%; max-width: 1040px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
+.gc-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.2rem; }
+.gc-theme-btn {
+  flex: none; background: var(--panel); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 0.5rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8rem; cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+}
+.gc-theme-btn:hover { border-color: var(--axis); }
+.gc-theme-btn:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; }
+svg.gc-chart { display: block; width: 100%; height: auto; }
+.gc-grid line { stroke: var(--grid); stroke-width: 1; }
+.gc-axis { stroke: var(--axis); stroke-width: 1; }
+.gc-yticks text, .gc-xticks text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-axis-label { fill: var(--muted); font-size: 11.5px; font-weight: 600; font-family: inherit; }
+.gc-series rect { fill: var(--sc); }
+.gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.gc-point { fill: var(--sc); }
+.gc-series.gc-off { display: none; }
+.gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.gc-annotations text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
+.gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
+.gc-legend button {
+  display: inline-flex; align-items: center; gap: 0.45rem; background: none; border: none;
+  color: var(--ink); font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.15rem 0.2rem; border-radius: 0.3rem;
+}
+.gc-legend button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-legend button[aria-pressed="false"] { color: var(--muted); text-decoration: line-through; }
+.gc-legend button[aria-pressed="false"] .gc-swatch { opacity: 0.35; }
+.gc-legend[data-static] button { cursor: default; }
+.gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
+.gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-tooltip {
+  position: fixed; z-index: 10; pointer-events: none; display: none;
+  background: var(--tooltip-bg); color: var(--tooltip-ink);
+  border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+}
+.gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
+.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+.gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
+.gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
+.gc-card ul { padding-left: 1.1rem; font-size: 0.85rem; }
+.gc-card li { margin: 0.2rem 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+  <header>
+    <div>
+      <h1>Q2 Revenue by Region</h1>
+      
+    </div>
+    <button class="gc-theme-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
+  </header>
+  <div class="gc-panel">
+    <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Q2 Revenue by Region" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="45" y1="490" x2="940" y2="490"/><line x1="45" y1="376.5" x2="940" y2="376.5"/><line x1="45" y1="263" x2="940" y2="263"/><line x1="45" y1="149.5" x2="940" y2="149.5"/><line x1="45" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="37" y="493.5" text-anchor="end">0</text><text x="37" y="380" text-anchor="end">500</text><text x="37" y="266.5" text-anchor="end">1000</text><text x="37" y="153" text-anchor="end">1500</text><text x="37" y="39.5" text-anchor="end">2000</text></g><line class="gc-axis" x1="45" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="133.8" y="506" text-anchor="middle">North America</text><text x="313.1" y="506" text-anchor="middle">Europe</text><text x="492.5" y="506" text-anchor="middle">Asia-Pacific</text><text x="671.9" y="506" text-anchor="middle">Latin America</text><text x="851.2" y="506" text-anchor="middle">Middle East &amp; Africa</text></g><text class="gc-axis-label" x="45" y="26" text-anchor="start">Revenue (USD k)</text><g class="gc-series" data-series="q1" style="--sc:var(--role-comparison)"><rect x="71.2" y="115.5" width="57.8" height="374.5" rx="1.5"/><rect x="250.6" y="176.7" width="57.8" height="313.3" rx="1.5"/><rect x="429.9" y="303.9" width="57.8" height="186.1" rx="1.5"/><rect x="609.3" y="403.7" width="57.8" height="86.3" rx="1.5"/><rect x="788.7" y="433.3" width="57.8" height="56.8" rx="1.5"/></g><g class="gc-series" data-series="q2" style="--sc:var(--role-primary)"><rect x="138.5" y="72.3" width="57.8" height="417.7" rx="1.5"/><rect x="317.8" y="167.7" width="57.8" height="322.3" rx="1.5"/><rect x="497.2" y="265.3" width="57.8" height="224.7" rx="1.5"/><rect x="676.6" y="396.9" width="57.8" height="93.1" rx="1.5"/><rect x="855.9" y="431" width="57.8" height="59" rx="1.5"/></g><g class="gc-hover" aria-hidden="true"><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><rect class="gc-hit" x="45" y="36" width="895" height="454" fill="none" pointer-events="all"/></g></svg>
+    <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="q1" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--role-comparison)"></span>Q1</button><button type="button" data-series="q2" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--role-primary)"></span>Q2</button></div>
+  </div>
+  <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.</li><li>North America still contributes 37% of total revenue.</li></ul></section></div>
+</div>
+<div class="gc-tooltip" id="gc-tooltip" role="status"></div>
+<script id="gc-payload" type="application/json">{"unit":"USD k","tooltip":"auto","legendToggle":true,"xPixels":[133.8,313.1,492.5,671.9,851.2],"xLabels":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"plot":{"left":45,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"q1","label":"Q1","mark":"bar","color":"var(--role-comparison)","values":[1650,1380,820,380,250],"formatted":["1,650","1,380","820","380","250"],"pixels":[115.5,176.7,303.9,403.7,433.3],"stats":{"min":250,"max":1650,"mean":896,"last":250,"count":5}},{"id":"q2","label":"Q2","mark":"bar","color":"var(--role-primary)","values":[1840,1420,990,410,260],"formatted":["1,840","1,420","990","410","260"],"pixels":[72.3,167.7,265.3,396.9,431],"stats":{"min":260,"max":1840,"mean":984,"last":260,"count":5}}]}</script>
+<script>
+(function () {
+  'use strict';
+  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
+  var root = document.documentElement;
+  var svg = document.querySelector('svg.gc-chart');
+
+  // Theme: cycle explicit light/dark from whatever "auto" currently shows.
+  document.getElementById('gc-theme').addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    if (current === 'auto') {
+      current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  });
+
+  // Legend toggling.
+  var legend = document.querySelector('.gc-legend');
+  var hidden = {};
+  if (legend && payload.legendToggle) {
+    legend.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-series]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-series');
+      hidden[id] = !hidden[id];
+      btn.setAttribute('aria-pressed', hidden[id] ? 'false' : 'true');
+      var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(id) + '"]');
+      if (g) g.classList.toggle('gc-off', hidden[id]);
+      hide();
+    });
+  } else if (legend) {
+    legend.setAttribute('data-static', '');
+  }
+
+  // Tooltip + crosshair.
+  var tooltip = document.getElementById('gc-tooltip');
+  var crosshair = svg.querySelector('.gc-crosshair');
+  var hit = svg.querySelector('.gc-hit');
+  var dots = {};
+  svg.querySelectorAll('.gc-hover-dot').forEach(function (d) { dots[d.getAttribute('data-for')] = d; });
+
+  function svgX(evt) {
+    var rect = svg.getBoundingClientRect();
+    return (evt.clientX - rect.left) * (payload.width / rect.width);
+  }
+  function nearest(x) {
+    var best = 0;
+    var bd = Infinity;
+    for (var i = 0; i < payload.xPixels.length; i++) {
+      var d = Math.abs(payload.xPixels[i] - x);
+      if (d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
+  function hide() {
+    tooltip.style.display = 'none';
+    crosshair.style.display = 'none';
+    Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
+  }
+  function show(evt) {
+    var i = nearest(svgX(evt));
+    var px = payload.xPixels[i];
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var html = '<div class="gc-tt-x">' + esc(payload.xLabels[i]) + '</div>';
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      var v = s.formatted[i];
+      html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+        + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
+        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = evt.clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = evt.clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, evt.clientY - tooltip.offsetHeight / 2) + 'px';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  if (payload.tooltip !== 'off' && hit) {
+    hit.addEventListener('pointermove', show);
+    hit.addEventListener('pointerleave', hide);
+  }
+})();
+</script>
+</body>
+</html>
