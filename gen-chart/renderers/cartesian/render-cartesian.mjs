@@ -98,6 +98,12 @@ export function analyzeCartesian(spec) {
           }));
       }
     }
+    if (s.mark === 'scatter' && enc.x.scale === 'band') {
+      diagnostics.push(diag('semantic/mark-scale-mismatch', 'error', `${subject}/mark`,
+        'scatter marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading', {
+          supportedFixes: ['use a linear or time x scale', 'change the mark to "bar" for categories']
+        }));
+    }
   }
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
@@ -349,6 +355,18 @@ export function renderSvg(spec, analysis) {
     out.push('</g>');
   });
 
+  // scatter points
+  for (const s of spec.series) {
+    if (s.mark !== 'scatter') continue;
+    const values = columns.get(s.y).values;
+    out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
+    values.forEach((v, i) => {
+      if (v === null) return;
+      out.push(`<circle class="gc-dot" cx="${round(xCenters[i])}" cy="${round(yScale(v))}" r="4"/>`);
+    });
+    out.push('</g>');
+  }
+
   // lines
   for (const s of spec.series) {
     if (s.mark !== 'line') continue;
@@ -409,6 +427,8 @@ export function buildPayload(spec, analysis) {
       : xCol.type === 'number' ? fmtValue(v)
         : v);
   return {
+    family: 'cartesian',
+    hover: 'axis',
     title: spec.meta.title,
     unit: layout.unit,
     xType: spec.encoding.x.scale,
@@ -417,8 +437,10 @@ export function buildPayload(spec, analysis) {
     brush: spec.interactions?.brush ?? null,
     xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
     xLabels: xLabelsFull,
-    xValues: xCol.values,
-    xHeader: xCol.label ?? spec.encoding.x.column,
+    table: {
+      headers: [xCol.label ?? spec.encoding.x.column, ...spec.series.map((s) => s.label)],
+      rows: xCol.values.map((xv, i) => [xv, ...spec.series.map((s) => columns.get(s.y).values[i])])
+    },
     plot: { left: layout.plotLeft, top: layout.plotTop, right: layout.plotRight, bottom: layout.plotBottom },
     width: layout.W,
     height: layout.H,
@@ -435,6 +457,21 @@ export function buildPayload(spec, analysis) {
         stats: seriesStats(values)
       };
     })
+  };
+}
+
+export function buildLegend(spec) {
+  if (spec.series.length < 2) return null;
+  const colors = resolveSeriesColors(spec.series);
+  return {
+    kind: 'series',
+    toggleable: spec.interactions?.legend_toggle ?? true,
+    items: spec.series.map((s) => ({
+      id: s.id,
+      label: s.label,
+      color: colors.get(s.id),
+      mark: s.mark
+    }))
   };
 }
 

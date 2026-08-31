@@ -7,16 +7,14 @@ import { createHash } from 'node:crypto';
 import { resolve, dirname, basename, join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
-import { analyzeCartesian, renderSvg, buildPayload } from '../renderers/cartesian/render-cartesian.mjs';
+import { rendererFor, families } from '../renderers/shared/registry.mjs';
 import { assembleHtml } from '../renderers/shared/html.mjs';
 import { receipt, accepted } from '../renderers/shared/diagnostics.mjs';
-import { supportedChartTypes } from '../renderers/shared/validator.mjs';
 import { guide } from '../renderers/shared/guide.mjs';
 import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
 import { runVisualCheck } from '../renderers/shared/visual-check.mjs';
 
-const VERSION = '0.3.0';
-const ANALYZERS = { cartesian: analyzeCartesian };
+const VERSION = '0.4.0';
 
 function usage() {
   return `gen-chart v${VERSION}
@@ -31,7 +29,7 @@ Usage:
   gen-chart visual-check <out.html> [--json]
   gen-chart doctor
 
-Chart types: ${supportedChartTypes().join(' | ')} (distribution, proportion, matrix planned)
+Chart types: ${families().join(' | ')}
 `;
 }
 
@@ -75,9 +73,9 @@ function loadSpec(path) {
 }
 
 function analyze(chartType, spec) {
-  const analyzer = ANALYZERS[chartType];
-  if (!analyzer) fail(`chart_type "${chartType}" is not implemented; supported: ${supportedChartTypes().join(', ')}`, 2);
-  return analyzer(spec);
+  const renderer = rendererFor(chartType);
+  if (!renderer) fail(`chart_type "${chartType}" is not implemented; supported: ${families().join(', ')}`, 2);
+  return renderer.analyze(spec);
 }
 
 function resolveQuality(options, spec) {
@@ -126,9 +124,10 @@ function cmdRenderOrDeliver(command, argv) {
     return;
   }
 
-  const svg = renderSvg(spec, analysis);
-  const payload = buildPayload(spec, analysis);
-  const html = assembleHtml(spec, svg, payload);
+  const renderer = rendererFor(chartType);
+  const svg = renderer.renderSvg(spec, analysis);
+  const payload = renderer.buildPayload(spec, analysis);
+  const html = assembleHtml(spec, svg, payload, renderer.buildLegend(spec, analysis));
   const outAbs = resolve(output);
 
   if (command === 'deliver') {
@@ -232,12 +231,13 @@ function cmdDemo(argv) {
   const dir = resolve(positional[0]);
   mkdirSync(dir, { recursive: true });
   const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
-  const specs = readdirSync(examplesDir).filter((f) => f.endsWith('.cartesian.json'));
+  const specs = readdirSync(examplesDir).filter((f) => /\.(cartesian|distribution|proportion|matrix)\.json$/.test(f)).sort();
   for (const f of specs) {
     const spec = JSON.parse(readFileSync(examplesDir + f, 'utf8'));
-    const analysis = analyzeCartesian(spec);
-    const html = assembleHtml(spec, renderSvg(spec, analysis), buildPayload(spec, analysis));
-    const out = join(dir, f.replace('.cartesian.json', '.html'));
+    const renderer = rendererFor(spec.chart_type);
+    const analysis = renderer.analyze(spec);
+    const html = assembleHtml(spec, renderer.renderSvg(spec, analysis), renderer.buildPayload(spec, analysis), renderer.buildLegend(spec, analysis));
+    const out = join(dir, f.replace(/\.[a-z]+\.json$/, '.html'));
     writeFileSync(out, html);
     console.log(`demo: ${out}`);
   }
@@ -277,7 +277,7 @@ function doctor() {
     if (!ok) assetsOk = false;
     console.log(`${rel.replace('../', '')} ${ok ? 'OK' : 'MISSING'}`);
   }
-  console.log(`renderers: ${supportedChartTypes().join(', ')} (distribution, proportion, matrix pending)`);
+  console.log(`renderers: ${families().join(', ')}`);
   process.exit(nodeOk && assetsOk ? 0 : 1);
 }
 

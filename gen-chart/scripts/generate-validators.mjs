@@ -14,10 +14,9 @@ const standaloneCode = require('ajv/dist/standalone/index.js').default;
 const root = fileURLToPath(new URL('..', import.meta.url));
 const outPath = `${root}renderers/shared/generated-validators.mjs`;
 
-const schemas = {
-  common: JSON.parse(readFileSync(`${root}schemas/common.schema.json`, 'utf8')),
-  cartesian: JSON.parse(readFileSync(`${root}schemas/cartesian.schema.json`, 'utf8'))
-};
+const NAMES = ['common', 'cartesian', 'distribution', 'proportion', 'matrix'];
+const schemas = Object.fromEntries(NAMES.map((n) =>
+  [n, JSON.parse(readFileSync(`${root}schemas/${n}.schema.json`, 'utf8'))]));
 
 const ajv = new Ajv2020({
   strict: true,
@@ -25,11 +24,13 @@ const ajv = new Ajv2020({
   allErrors: true,
   code: { source: true, esm: true }
 });
-ajv.addSchema(schemas.common);
-ajv.addSchema(schemas.cartesian);
+for (const n of NAMES) ajv.addSchema(schemas[n]);
 
 const code = standaloneCode(ajv, {
-  validateCartesian: schemas.cartesian.$id
+  validateCartesian: schemas.cartesian.$id,
+  validateDistribution: schemas.distribution.$id,
+  validateProportion: schemas.proportion.$id,
+  validateMatrix: schemas.matrix.$id
 });
 
 if (/require\(|from\s+["']ajv/.test(code)) {
