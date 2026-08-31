@@ -1,0 +1,59 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { guide } from '../renderers/shared/guide.mjs';
+
+test('trend scenarios route to cartesian line', () => {
+  const r = guide('show revenue growth over time by month');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.ok(r.recommendation.marks.includes('line'));
+  assert.equal(r.recommendation.implemented, true);
+});
+
+test('category comparison routes to cartesian bar', () => {
+  const r = guide('compare revenue by region for Q2');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.ok(r.recommendation.marks.includes('bar'));
+});
+
+test('actual-vs-target routes to the bar+line combo with high confidence', () => {
+  const r = guide('weekly signups against the target');
+  assert.deepEqual(r.recommendation.marks.sort(), ['bar', 'line']);
+  assert.equal(r.recommendation.confidence, 'high');
+});
+
+test('distribution scenarios are honest about being unimplemented', () => {
+  const r = guide('histogram of response time distribution with outliers');
+  assert.equal(r.recommendation.chart_type, 'distribution');
+  assert.equal(r.recommendation.implemented, false);
+  assert.equal(r.recommendation.planned, 'M4');
+  assert.match(r.recommendation.workaround, /bar/);
+});
+
+test('proportion scenarios recommend the honest bar workaround', () => {
+  const r = guide('pie chart of market share breakdown');
+  assert.equal(r.recommendation.chart_type, 'proportion');
+  assert.match(r.recommendation.workaround, /sorted by value/);
+});
+
+test('scatter is flagged as a planned mark with a workaround', () => {
+  const r = guide('scatter plot of price correlation with demand');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.equal(r.recommendation.implemented, false);
+  assert.match(r.recommendation.workaround, /point/);
+});
+
+test('many-slice pie requests get a caution', () => {
+  const r = guide('pie chart with 15 categories of spend breakdown');
+  assert.ok(r.cautions.some((c) => c.includes('unreadable')));
+});
+
+test('dual-axis requests get the honesty caution', () => {
+  const r = guide('revenue and headcount trend on a dual axis');
+  assert.ok(r.cautions.some((c) => c.includes('dual-axis')));
+});
+
+test('an unmatched scenario falls back to cartesian with default confidence', () => {
+  const r = guide('zzz unrelated request');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.equal(r.recommendation.confidence, 'default');
+});

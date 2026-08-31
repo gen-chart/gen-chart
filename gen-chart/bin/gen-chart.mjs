@@ -1,17 +1,20 @@
 #!/usr/bin/env node
-// gen-chart CLI. Implemented: validate, render, deliver, doctor.
-// Pending (M2+): guide, inspect-data, visual-check, demo.
+// gen-chart CLI. Implemented: validate, render, deliver, guide,
+// inspect-data, demo, doctor. Pending (M3): visual-check.
 
-import { readFileSync, writeFileSync, renameSync, existsSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, renameSync, existsSync, unlinkSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { resolve, dirname, basename, join } from 'node:path';
+import { resolve, dirname, basename, join, extname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { analyzeCartesian, renderSvg, buildPayload } from '../renderers/cartesian/render-cartesian.mjs';
 import { assembleHtml } from '../renderers/shared/html.mjs';
 import { receipt, accepted } from '../renderers/shared/diagnostics.mjs';
 import { supportedChartTypes } from '../renderers/shared/validator.mjs';
+import { guide } from '../renderers/shared/guide.mjs';
+import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 const ANALYZERS = { cartesian: analyzeCartesian };
 
 function usage() {
@@ -21,11 +24,11 @@ Usage:
   gen-chart validate <chart_type> <spec.json> [--quality standard|showcase] [--json]
   gen-chart render   <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--json]
   gen-chart deliver  <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--json]
+  gen-chart guide "<scenario>" [--json]
+  gen-chart inspect-data <file.csv|.tsv|.json> [--spec-out <draft.json>] [--json]
+  gen-chart demo <output-directory>
   gen-chart doctor
-  gen-chart guide "<scenario>" [--json]              (not yet implemented)
-  gen-chart inspect-data <file> [--json]             (not yet implemented)
-  gen-chart visual-check <out.html> [--json]         (not yet implemented)
-  gen-chart demo <output-directory>                  (not yet implemented)
+  gen-chart visual-check <out.html> [--json]         (not yet implemented, M3)
 
 Chart types: ${supportedChartTypes().join(' | ')} (distribution, proportion, matrix planned)
 `;
@@ -33,11 +36,12 @@ Chart types: ${supportedChartTypes().join(' | ')} (distribution, proportion, mat
 
 function parseArgs(argv) {
   const positional = [];
-  const options = { json: false, quality: null };
+  const options = { json: false, quality: null, specOut: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--json') options.json = true;
     else if (a === '--quality') options.quality = argv[++i];
+    else if (a === '--spec-out') options.specOut = argv[++i];
     else if (a.startsWith('--')) fail(`unknown option ${a}\n\n${usage()}`);
     else positional.push(a);
   }
@@ -152,6 +156,93 @@ function cmdRenderOrDeliver(command, argv) {
   }), options);
 }
 
+function cmdGuide(argv) {
+  const { positional, options } = parseArgs(argv);
+  if (positional.length !== 1) fail(usage());
+  const result = { command: 'guide', ...guide(positional[0]) };
+  if (options.json) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    const r = result.recommendation;
+    console.log(`chart_type: ${r.chart_type} (${r.marks.join(', ')}) — confidence ${r.confidence}`);
+    if (!r.implemented) console.log(`  not implemented yet${r.planned ? ` (planned ${r.planned})` : ''}; workaround: ${r.workaround}`);
+    for (const c of result.cautions) console.log(`  caution: ${c}`);
+    console.log(`  next: ${result.next}`);
+  }
+}
+
+function cmdInspectData(argv) {
+  const { positional, options } = parseArgs(argv);
+  if (positional.length !== 1) fail(usage());
+  const path = resolve(positional[0]);
+  const ext = extname(path).toLowerCase();
+  if (!['.csv', '.tsv', '.json'].includes(ext)) fail(`unsupported input extension "${ext}"; use .csv, .tsv, or .json`);
+  let text;
+  try {
+    text = readFileSync(path, 'utf8');
+  } catch {
+    fail(`cannot read data file: ${path}`);
+  }
+  let columns;
+  try {
+    columns = buildColumns(parseInput(text, ext));
+  } catch (e) {
+    fail(`cannot parse ${basename(path)}: ${e.message}`);
+  }
+  const rows = columns[0]?.profile.rows ?? 0;
+  const warnings = [];
+  if (rows > 500) {
+    warnings.push(`file has ${rows} rows; embedded specs stay readable under ~500 rows — consider aggregating (e.g. weekly sums) before charting`);
+  }
+  const result = {
+    command: 'inspect-data',
+    ok: true,
+    file: path,
+    rows,
+    columns: columns.map((c) => c.profile),
+    warnings
+  };
+  if (options.specOut) {
+    const draft = draftSpec(columns);
+    if (!draft) {
+      fail('cannot draft a spec: need at least one date or string column for x and one number column for y');
+    }
+    writeFileSync(resolve(options.specOut), JSON.stringify(draft, null, 2) + '\n');
+    result.spec_out = resolve(options.specOut);
+    result.spec_next = 'edit the draft: set meta.title to the chart\'s one-sentence message, trim series, then validate';
+  }
+  if (options.json) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    console.log(`${basename(path)}: ${rows} rows, ${columns.length} columns`);
+    for (const c of columns) {
+      const p = c.profile;
+      const extra = p.type === 'number' && p.stats ? ` min ${p.stats.min} max ${p.stats.max}` : p.type === 'date' ? ` ${p.first} → ${p.last}` : p.type === 'string' ? ` ${p.distinct} distinct` : '';
+      console.log(`  ${p.id} (${p.type})${extra}${p.nulls ? ` [${p.nulls} null]` : ''}`);
+    }
+    for (const w of warnings) console.log(`  warning: ${w}`);
+    if (result.spec_out) console.log(`  draft spec: ${result.spec_out}`);
+  }
+}
+
+function cmdDemo(argv) {
+  const { positional } = parseArgs(argv);
+  if (positional.length !== 1) fail(usage());
+  const dir = resolve(positional[0]);
+  mkdirSync(dir, { recursive: true });
+  const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
+  const specs = readdirSync(examplesDir).filter((f) => f.endsWith('.cartesian.json'));
+  for (const f of specs) {
+    const spec = JSON.parse(readFileSync(examplesDir + f, 'utf8'));
+    const analysis = analyzeCartesian(spec);
+    const html = assembleHtml(spec, renderSvg(spec, analysis), buildPayload(spec, analysis));
+    const out = join(dir, f.replace('.cartesian.json', '.html'));
+    writeFileSync(out, html);
+    console.log(`demo: ${out}`);
+  }
+  console.log(`open any of the ${specs.length} files above in a browser`);
+}
+
 function doctor() {
   const [major] = process.versions.node.split('.').map(Number);
   const nodeOk = major >= 22;
@@ -187,10 +278,16 @@ switch (command) {
     cmdRenderOrDeliver(command, rest);
     break;
   case 'guide':
+    cmdGuide(rest);
+    break;
   case 'inspect-data':
-  case 'visual-check':
+    cmdInspectData(rest);
+    break;
   case 'demo':
-    console.error(`gen-chart: '${command}' is not implemented yet (planned for M2/M3).`);
+    cmdDemo(rest);
+    break;
+  case 'visual-check':
+    console.error(`gen-chart: '${command}' is not implemented yet (planned for M3).`);
     process.exit(2);
   default:
     console.error(`gen-chart: unknown command '${command}'\n`);
