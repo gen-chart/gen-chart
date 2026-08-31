@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.4"
+  version: "0.5"
   author: sses79
   inspired_by: tt-a1i/archify (MIT)
 ---
@@ -113,6 +113,13 @@ long-format `(row, column, value)` triples.
   the user said it.
 - Dates are ISO (`2026`, `2026-01`, `2026-01-15`), one granularity per
   column, strictly increasing.
+- `meta.locale` (`en` | `zh-CN`) localizes only the fixed viewer chrome and
+  the renderer's computed notes. Authored titles, labels, units, and card
+  copy are reproduced exactly — never translate them yourself, and never
+  leave explanatory copy in a language the user did not use.
+- `meta.views` holds at most five guided readings, each a real combination
+  of `focus` series and a `brush` window with a note you wrote. A view is a
+  saved reading of the data, never a new claim about it.
 
 Read `references/authoring-contract.md` only when you need the full field
 enums, diagnostic code catalog, or repair-order details.
@@ -126,6 +133,10 @@ with render-time stats, deep links (`#theme=`, `#focus=`, `#hidden=`,
 `#brush=`), and an Export menu (PNG 2×, standalone SVG, provenance data
 CSV, 1200×630 share card) that always captures the canonical at-rest chart.
 Everything is inline — one portable file, no CDN, works offline.
+
+Every artifact is also accessible without a pointer: the plot is focusable,
+arrow keys walk the data points and announce them, and a visually hidden
+data table carries the exact numbers for screen readers.
 
 `interactions.brush: "x"` is the one opt-in: honest x-only zoom for line
 marks over a time or linear axis (the y scale never rescales). Read

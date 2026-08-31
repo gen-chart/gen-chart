@@ -104,6 +104,23 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
+.gc-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.gc-figure:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 4px; border-radius: 0.5rem; }
+.gc-views { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.gc-views button {
+  background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.8rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+  transition: border-color 150ms, color 150ms, background 150ms;
+}
+.gc-views button:hover { border-color: var(--axis); color: var(--ink); }
+.gc-views button[aria-pressed="true"] { background: var(--role-primary); border-color: var(--role-primary); color: #fff; }
+.gc-views button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-view-clear { margin-left: auto; }
+.gc-view-note { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.75rem; min-height: 1.2em; }
+.gc-view-note:empty { display: none; }
 .gc-legend button[disabled] { cursor: default; opacity: 1; }
 .gc-series.gc-off { display: none; }
 .gc-series.gc-dim { opacity: 0.22; }
@@ -172,16 +189,22 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
+  
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
-    <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="API Response Time Distribution" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="32" y1="466" x2="936" y2="466"/><line x1="32" y1="377.2" x2="936" y2="377.2"/><line x1="32" y1="288.4" x2="936" y2="288.4"/><line x1="32" y1="199.6" x2="936" y2="199.6"/><line x1="32" y1="110.8" x2="936" y2="110.8"/><line x1="32" y1="22" x2="936" y2="22"/></g><g class="gc-yticks"><text x="24" y="469.5" text-anchor="end">0</text><text x="24" y="380.7" text-anchor="end">5</text><text x="24" y="291.9" text-anchor="end">10</text><text x="24" y="203.1" text-anchor="end">15</text><text x="24" y="114.3" text-anchor="end">20</text><text x="24" y="25.5" text-anchor="end">25</text></g><line class="gc-axis" x1="32" y1="466" x2="936" y2="466"/><text class="gc-axis-label" x="32" y="14" text-anchor="start">Count</text><g class="gc-series" data-series="dist" style="--sc:var(--cat-0)"><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;40 – 60 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;6&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;12.0%&quot;}]}" x="32" y="359.4" width="88.9" height="106.6" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;60 – 80 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;22&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;44.0%&quot;}]}" x="122.4" y="75.3" width="88.9" height="390.7" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;80 – 100 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;11&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;22.0%&quot;}]}" x="212.8" y="270.6" width="88.9" height="195.4" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;100 – 120 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;5&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;10.0%&quot;}]}" x="303.2" y="377.2" width="88.9" height="88.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;120 – 140 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;2&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;4.0%&quot;}]}" x="393.6" y="430.5" width="88.9" height="35.5" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;140 – 160 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="484" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;160 – 180 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="574.4" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;180 – 200 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="664.8" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;200 – 220 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;0&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;0.0%&quot;}]}" x="755.2" y="466" width="88.9" height="0" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;220 – 240 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="845.6" y="448.2" width="88.9" height="17.8" rx="1.5"/></g><g class="gc-xticks"><text x="32" y="482" text-anchor="middle">40</text><text x="122.4" y="482" text-anchor="middle">60</text><text x="212.8" y="482" text-anchor="middle">80</text><text x="303.2" y="482" text-anchor="middle">100</text><text x="393.6" y="482" text-anchor="middle">120</text><text x="484" y="482" text-anchor="middle">140</text><text x="574.4" y="482" text-anchor="middle">160</text><text x="664.8" y="482" text-anchor="middle">180</text><text x="755.2" y="482" text-anchor="middle">200</text><text x="845.6" y="482" text-anchor="middle">220</text><text x="936" y="482" text-anchor="middle">240</text></g><text class="gc-axis-label" x="484" y="512" text-anchor="middle">Response time (ms)</text></svg>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="API Response Time Distribution" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="32" y1="466" x2="936" y2="466"/><line x1="32" y1="377.2" x2="936" y2="377.2"/><line x1="32" y1="288.4" x2="936" y2="288.4"/><line x1="32" y1="199.6" x2="936" y2="199.6"/><line x1="32" y1="110.8" x2="936" y2="110.8"/><line x1="32" y1="22" x2="936" y2="22"/></g><g class="gc-yticks"><text x="24" y="469.5" text-anchor="end">0</text><text x="24" y="380.7" text-anchor="end">5</text><text x="24" y="291.9" text-anchor="end">10</text><text x="24" y="203.1" text-anchor="end">15</text><text x="24" y="114.3" text-anchor="end">20</text><text x="24" y="25.5" text-anchor="end">25</text></g><line class="gc-axis" x1="32" y1="466" x2="936" y2="466"/><text class="gc-axis-label" x="32" y="14" text-anchor="start">Count</text><g class="gc-series" data-series="dist" style="--sc:var(--cat-0)"><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;40 – 60 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;6&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;12.0%&quot;}]}" x="32" y="359.4" width="88.9" height="106.6" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;60 – 80 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;22&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;44.0%&quot;}]}" x="122.4" y="75.3" width="88.9" height="390.7" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;80 – 100 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;11&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;22.0%&quot;}]}" x="212.8" y="270.6" width="88.9" height="195.4" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;100 – 120 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;5&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;10.0%&quot;}]}" x="303.2" y="377.2" width="88.9" height="88.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;120 – 140 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;2&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;4.0%&quot;}]}" x="393.6" y="430.5" width="88.9" height="35.5" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;140 – 160 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="484" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;160 – 180 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="574.4" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;180 – 200 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="664.8" y="448.2" width="88.9" height="17.8" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;200 – 220 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;0&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;0.0%&quot;}]}" x="755.2" y="466" width="88.9" height="0" rx="1.5"/><rect class="gc-bin" data-tip="{&quot;title&quot;:&quot;220 – 240 ms&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;count&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;label&quot;:&quot;share&quot;,&quot;value&quot;:&quot;2.0%&quot;}]}" x="845.6" y="448.2" width="88.9" height="17.8" rx="1.5"/></g><g class="gc-xticks"><text x="32" y="482" text-anchor="middle">40</text><text x="122.4" y="482" text-anchor="middle">60</text><text x="212.8" y="482" text-anchor="middle">80</text><text x="303.2" y="482" text-anchor="middle">100</text><text x="393.6" y="482" text-anchor="middle">120</text><text x="484" y="482" text-anchor="middle">140</text><text x="574.4" y="482" text-anchor="middle">160</text><text x="664.8" y="482" text-anchor="middle">180</text><text x="755.2" y="482" text-anchor="middle">200</text><text x="845.6" y="482" text-anchor="middle">220</text><text x="936" y="482" text-anchor="middle">240</text></g><text class="gc-axis-label" x="484" y="512" text-anchor="middle">Response time (ms)</text></svg>
+    </div>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">bin_start</th><th scope="col">bin_end</th><th scope="col">count</th></tr></thead><tbody><tr><th scope="row">40</th><td>60</td><td>6</td></tr><tr><th scope="row">60</th><td>80</td><td>22</td></tr><tr><th scope="row">80</th><td>100</td><td>11</td></tr><tr><th scope="row">100</th><td>120</td><td>5</td></tr><tr><th scope="row">120</th><td>140</td><td>2</td></tr><tr><th scope="row">140</th><td>160</td><td>1</td></tr><tr><th scope="row">160</th><td>180</td><td>1</td></tr><tr><th scope="row">180</th><td>200</td><td>1</td></tr><tr><th scope="row">200</th><td>220</td><td>0</td></tr><tr><th scope="row">220</th><td>240</td><td>1</td></tr></tbody></table>
     <p class="gc-legend-note">50 observations in 10 bins (Freedman-Diaconis suggested 14)</p>
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Most requests land between 60 and 90 ms, but a right tail stretches past 200 ms.</li><li>The tail, not the median, is what users notice — track p95 rather than the average.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"distribution","hover":"element","title":"API Response Time Distribution","unit":"ms","width":960,"height":520,"legendToggle":false,"table":{"headers":["bin_start","bin_end","count"],"rows":[[40,60,6],[60,80,22],[80,100,11],[100,120,5],[120,140,2],[140,160,1],[160,180,1],[180,200,1],[200,220,0],[220,240,1]]}}</script>
+<script id="gc-payload" type="application/json">{"family":"distribution","hover":"element","title":"API Response Time Distribution","unit":"ms","width":960,"height":520,"legendToggle":false,"table":{"headers":["bin_start","bin_end","count"],"rows":[[40,60,6],[60,80,22],[80,100,11],[100,120,5],[120,140,2],[140,160,1],[160,180,1],[180,200,1],[200,220,0],[220,240,1]]},"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -191,6 +214,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var plot = payload.plot;
   var hidden = {};
   var focusId = null;
+  var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
 
   function esc(s) {
@@ -219,6 +243,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
     if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
+    if (activeView) parts.push('view=' + encodeURIComponent(activeView));
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
   }
 
@@ -283,14 +308,15 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var s = payload.series.find(function (x) { return x.id === focusId; });
     var st = s.stats || {};
     var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var L = payload.i18n;
     passport.innerHTML =
       '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
-      '<dl><div><dt>min</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
-      '<div><dt>max</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
-      '<div><dt>mean</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
-      '<div><dt>last</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
-      '<div><dt>points</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
-      '<button class="gc-btn gc-pp-close" type="button">Close</button>';
+      '<dl><div><dt>' + esc(L['stat.min']) + '</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.max']) + '</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.mean']) + '</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.last']) + '</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.points']) + '</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
+      '<button class="gc-btn gc-pp-close" type="button">' + esc(L['ui.close']) + '</button>';
     passport.setAttribute('data-open', '');
     passport.querySelector('.gc-pp-close').addEventListener('click', function () {
       setFocus(null);
@@ -418,7 +444,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
   }
   function showTip(evt) {
-    var i = nearest(svgX(evt));
+    showTipAt(nearest(svgX(evt)), evt.clientX, evt.clientY);
+  }
+  function showTipAt(i, clientX, clientY) {
     var px = zoomX(payload.xPixels[i]);
     crosshair.setAttribute('x1', px);
     crosshair.setAttribute('x2', px);
@@ -681,6 +709,102 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
   });
 
+  // ------------------------------------------------- keyboard navigation
+  // The chart is focusable and arrow keys walk the data points, so the
+  // reading does not depend on a pointer. Each step announces the value
+  // through the live region for screen readers.
+  var figure = document.getElementById('gc-figure');
+  var live = document.getElementById('gc-live');
+  var cursor = null;
+  if (isAxis && figure) {
+    figure.setAttribute('tabindex', '0');
+    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+    figure.addEventListener('keydown', function (e) {
+      var r = visibleRange();
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (cursor === null) cursor = r[0];
+        else cursor += (e.key === 'ArrowRight' ? 1 : -1);
+        cursor = Math.max(r[0], Math.min(r[1], cursor));
+        showAt(cursor);
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        cursor = e.key === 'Home' ? r[0] : r[1];
+        showAt(cursor);
+      }
+    });
+    figure.addEventListener('blur', function () { cursor = null; hideTip(); });
+  }
+  // Renders the crosshair, markers, and a spoken sentence for one index.
+  function showAt(i) {
+    var px = zoomX(payload.xPixels[i]);
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var parts = [payload.xLabels[i]];
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
+        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    if (live) live.textContent = parts.join(', ');
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / payload.width;
+    showTipAt(i, rect.left + px * scale, rect.top + rect.height / 2);
+  }
+
+  // ----------------------------------------------------- guided views
+  var viewStrip = document.querySelector('.gc-views');
+  var viewNote = document.getElementById('gc-view-note');
+  function applyView(id) {
+    var v = (payload.views || []).find(function (x) { return x.id === id; });
+    if (viewStrip) {
+      viewStrip.querySelectorAll('button[data-view]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-view') === id && id ? 'true' : 'false');
+      });
+    }
+    if (!v) {
+      if (viewNote) viewNote.textContent = '';
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+      setZoom(null);
+      activeView = null;
+      writeHash();
+      return;
+    }
+    activeView = id;
+    if (viewNote) viewNote.textContent = v.note || '';
+    if (v.focus && v.focus.length) {
+      payload.series.forEach(function (s) {
+        hidden[s.id] = v.focus.indexOf(s.id) === -1;
+        applyHidden(s.id);
+      });
+      setFocus(v.focus.length === 1 ? v.focus[0] : null);
+    } else {
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+    }
+    if (v.brush) setZoom(v.brush[0], v.brush[1]);
+    else setZoom(null);
+    writeHash();
+  }
+  if (viewStrip) {
+    viewStrip.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-view]');
+      if (!b) return;
+      var id = b.getAttribute('data-view');
+      applyView(id === activeView ? '' : id);
+    });
+  }
+
   // -------------------------------------------------- restore deep link
   var h = readHash();
   if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
@@ -693,6 +817,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     });
   }
   if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);
     if (m) {

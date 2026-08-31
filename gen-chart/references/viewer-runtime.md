@@ -21,10 +21,35 @@ beyond the spec fields named here.
   never rescales while zoomed, so amplitude comparisons stay honest.
   Reset zoom button or Esc restores; zoom state never enters exports.
 
+- **Guided views** — `meta.views` (max 5). Each view is `{id, label, note?,
+  focus?, brush?}`; the strip replays it, and validation rejects unknown
+  series ids, out-of-range windows, and duplicate ids. Views are authored
+  readings, not computed insights.
+
+## Accessibility
+
+- The plot is focusable; **arrow keys** step through data points and
+  **Home/End** jump to the ends. Each step announces the x label and every
+  visible series value through a live region.
+- A visually hidden `<table>` carries the exact values with proper
+  `scope` attributes — the accessible equivalent of the chart, not a
+  summary. It is present for every family.
+- Hidden series are struck through as well as faded; controls keep visible
+  focus rings and real button semantics.
+- `prefers-reduced-motion` disables transitions; `prefers-color-scheme`
+  picks the default theme.
+
+## Localization
+
+`meta.locale` (`en` | `zh-CN`) selects the fixed chrome: buttons, export
+menu, stat labels, month names, and the renderer's computed notes. Authored
+content is never translated, and numbers keep identical grouping so values
+stay comparable across locales. `<html lang>` follows the locale.
+
 ## Deep links
 
 `#theme=dark|light`, `#focus=<seriesId>`, `#hidden=<id>,<id>`,
-`#brush=<i0>~<i1>` (data indices). Combined with `&`. The viewer restores
+`#brush=<i0>~<i1>` (data indices), `#view=<viewId>`. Combined with `&`. The viewer restores
 them on load and keeps the hash current as the reader explores.
 
 ## Exports

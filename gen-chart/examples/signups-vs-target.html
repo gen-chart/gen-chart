@@ -104,6 +104,23 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
+.gc-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.gc-figure:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 4px; border-radius: 0.5rem; }
+.gc-views { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.gc-views button {
+  background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.8rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+  transition: border-color 150ms, color 150ms, background 150ms;
+}
+.gc-views button:hover { border-color: var(--axis); color: var(--ink); }
+.gc-views button[aria-pressed="true"] { background: var(--role-primary); border-color: var(--role-primary); color: #fff; }
+.gc-views button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-view-clear { margin-left: auto; }
+.gc-view-note { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.75rem; min-height: 1.2em; }
+.gc-view-note:empty { display: none; }
 .gc-legend button[disabled] { cursor: default; opacity: 1; }
 .gc-series.gc-off { display: none; }
 .gc-series.gc-dim { opacity: 0.22; }
@@ -172,16 +189,22 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
+  
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
-    <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Weekly Signups vs Target" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="470" x2="940" y2="470"/><line x1="38" y1="383.2" x2="940" y2="383.2"/><line x1="38" y1="296.4" x2="940" y2="296.4"/><line x1="38" y1="209.6" x2="940" y2="209.6"/><line x1="38" y1="122.8" x2="940" y2="122.8"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="473.5" text-anchor="end">0</text><text x="30" y="386.7" text-anchor="end">100</text><text x="30" y="299.9" text-anchor="end">200</text><text x="30" y="213.1" text-anchor="end">300</text><text x="30" y="126.3" text-anchor="end">400</text><text x="30" y="39.5" text-anchor="end">500</text></g><line class="gc-axis" x1="38" y1="470" x2="940" y2="470"/><g class="gc-xticks"><text x="93.9" y="486" text-anchor="middle">W27</text><text x="206.8" y="486" text-anchor="middle">W28</text><text x="319.7" y="486" text-anchor="middle">W29</text><text x="432.6" y="486" text-anchor="middle">W30</text><text x="545.4" y="486" text-anchor="middle">W31</text><text x="658.3" y="486" text-anchor="middle">W32</text><text x="771.2" y="486" text-anchor="middle">W33</text><text x="884.1" y="486" text-anchor="middle">W34</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Signups</text><text class="gc-axis-label" x="489" y="512" text-anchor="middle">ISO week</text><g class="gc-series" data-series="signups" style="--sc:var(--role-primary)"><rect x="57.5" y="199.2" width="72.8" height="270.8" rx="1.5"/><rect x="170.4" y="211.3" width="72.8" height="258.7" rx="1.5"/><rect x="283.3" y="165.3" width="72.8" height="304.7" rx="1.5"/><rect x="396.1" y="132.3" width="72.8" height="337.7" rx="1.5"/><rect x="509" y="171.4" width="72.8" height="298.6" rx="1.5"/><rect x="621.9" y="112.4" width="72.8" height="357.6" rx="1.5"/><rect x="734.8" y="72.5" width="72.8" height="397.5" rx="1.5"/><rect x="847.7" y="61.2" width="72.8" height="408.8" rx="1.5"/></g><g class="gc-series" data-series="target" style="--sc:var(--role-comparison)"><path class="gc-line" d="M93.9 192.2L206.8 183.6L319.7 174.9L432.6 166.2L545.4 157.5L658.3 148.8L771.2 140.2L884.1 131.5"/><circle class="gc-point" cx="93.9" cy="192.2" r="3"/><circle class="gc-point" cx="206.8" cy="183.6" r="3"/><circle class="gc-point" cx="319.7" cy="174.9" r="3"/><circle class="gc-point" cx="432.6" cy="166.2" r="3"/><circle class="gc-point" cx="545.4" cy="157.5" r="3"/><circle class="gc-point" cx="658.3" cy="148.8" r="3"/><circle class="gc-point" cx="771.2" cy="140.2" r="3"/><circle class="gc-point" cx="884.1" cy="131.5" r="3"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="470" style="display:none"/><circle class="gc-hover-dot" data-for="target" r="4" style="display:none;--sc:var(--role-comparison)"/><rect class="gc-hit" x="38" y="36" width="902" height="434" fill="none" pointer-events="all"/></g></svg>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Weekly Signups vs Target" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="470" x2="940" y2="470"/><line x1="38" y1="383.2" x2="940" y2="383.2"/><line x1="38" y1="296.4" x2="940" y2="296.4"/><line x1="38" y1="209.6" x2="940" y2="209.6"/><line x1="38" y1="122.8" x2="940" y2="122.8"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="473.5" text-anchor="end">0</text><text x="30" y="386.7" text-anchor="end">100</text><text x="30" y="299.9" text-anchor="end">200</text><text x="30" y="213.1" text-anchor="end">300</text><text x="30" y="126.3" text-anchor="end">400</text><text x="30" y="39.5" text-anchor="end">500</text></g><line class="gc-axis" x1="38" y1="470" x2="940" y2="470"/><g class="gc-xticks"><text x="93.9" y="486" text-anchor="middle">W27</text><text x="206.8" y="486" text-anchor="middle">W28</text><text x="319.7" y="486" text-anchor="middle">W29</text><text x="432.6" y="486" text-anchor="middle">W30</text><text x="545.4" y="486" text-anchor="middle">W31</text><text x="658.3" y="486" text-anchor="middle">W32</text><text x="771.2" y="486" text-anchor="middle">W33</text><text x="884.1" y="486" text-anchor="middle">W34</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Signups</text><text class="gc-axis-label" x="489" y="512" text-anchor="middle">ISO week</text><g class="gc-series" data-series="signups" style="--sc:var(--role-primary)"><rect x="57.5" y="199.2" width="72.8" height="270.8" rx="1.5"/><rect x="170.4" y="211.3" width="72.8" height="258.7" rx="1.5"/><rect x="283.3" y="165.3" width="72.8" height="304.7" rx="1.5"/><rect x="396.1" y="132.3" width="72.8" height="337.7" rx="1.5"/><rect x="509" y="171.4" width="72.8" height="298.6" rx="1.5"/><rect x="621.9" y="112.4" width="72.8" height="357.6" rx="1.5"/><rect x="734.8" y="72.5" width="72.8" height="397.5" rx="1.5"/><rect x="847.7" y="61.2" width="72.8" height="408.8" rx="1.5"/></g><g class="gc-series" data-series="target" style="--sc:var(--role-comparison)"><path class="gc-line" d="M93.9 192.2L206.8 183.6L319.7 174.9L432.6 166.2L545.4 157.5L658.3 148.8L771.2 140.2L884.1 131.5"/><circle class="gc-point" cx="93.9" cy="192.2" r="3"/><circle class="gc-point" cx="206.8" cy="183.6" r="3"/><circle class="gc-point" cx="319.7" cy="174.9" r="3"/><circle class="gc-point" cx="432.6" cy="166.2" r="3"/><circle class="gc-point" cx="545.4" cy="157.5" r="3"/><circle class="gc-point" cx="658.3" cy="148.8" r="3"/><circle class="gc-point" cx="771.2" cy="140.2" r="3"/><circle class="gc-point" cx="884.1" cy="131.5" r="3"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="470" style="display:none"/><circle class="gc-hover-dot" data-for="target" r="4" style="display:none;--sc:var(--role-comparison)"/><rect class="gc-hit" x="38" y="36" width="902" height="434" fill="none" pointer-events="all"/></g></svg>
+    </div>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">week</th><th scope="col">Actual signups</th><th scope="col">Target</th></tr></thead><tbody><tr><th scope="row">W27</th><td>312</td><td>320</td></tr><tr><th scope="row">W28</th><td>298</td><td>330</td></tr><tr><th scope="row">W29</th><td>351</td><td>340</td></tr><tr><th scope="row">W30</th><td>389</td><td>350</td></tr><tr><th scope="row">W31</th><td>344</td><td>360</td></tr><tr><th scope="row">W32</th><td>412</td><td>370</td></tr><tr><th scope="row">W33</th><td>458</td><td>380</td></tr><tr><th scope="row">W34</th><td>471</td><td>390</td></tr></tbody></table>
     <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="signups" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--role-primary)"></span>Actual signups</button><button type="button" data-series="target" aria-pressed="true"><span class="gc-swatch" data-mark="line" style="--sw:var(--role-comparison)"></span>Target</button></div>
     <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Signups beat target in 5 of the last 8 weeks and the gap is widening.</li><li>The W31 dip coincided with the pricing-page incident.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Weekly Signups vs Target","unit":"signups","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"xPixels":[93.9,206.8,319.7,432.6,545.4,658.3,771.2,884.1],"xLabels":["W27","W28","W29","W30","W31","W32","W33","W34"],"table":{"headers":["week","Actual signups","Target"],"rows":[["W27",312,320],["W28",298,330],["W29",351,340],["W30",389,350],["W31",344,360],["W32",412,370],["W33",458,380],["W34",471,390]]},"plot":{"left":38,"top":36,"right":940,"bottom":470},"width":960,"height":520,"series":[{"id":"signups","label":"Actual signups","mark":"bar","color":"var(--role-primary)","values":[312,298,351,389,344,412,458,471],"formatted":["312","298","351","389","344","412","458","471"],"pixels":[199.2,211.3,165.3,132.3,171.4,112.4,72.5,61.2],"stats":{"min":298,"max":471,"mean":379.375,"last":471,"count":8}},{"id":"target","label":"Target","mark":"line","color":"var(--role-comparison)","values":[320,330,340,350,360,370,380,390],"formatted":["320","330","340","350","360","370","380","390"],"pixels":[192.2,183.6,174.9,166.2,157.5,148.8,140.2,131.5],"stats":{"min":320,"max":390,"mean":355,"last":390,"count":8}}]}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Weekly Signups vs Target","unit":"signups","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[93.9,206.8,319.7,432.6,545.4,658.3,771.2,884.1],"xLabels":["W27","W28","W29","W30","W31","W32","W33","W34"],"table":{"headers":["week","Actual signups","Target"],"rows":[["W27",312,320],["W28",298,330],["W29",351,340],["W30",389,350],["W31",344,360],["W32",412,370],["W33",458,380],["W34",471,390]]},"plot":{"left":38,"top":36,"right":940,"bottom":470},"width":960,"height":520,"series":[{"id":"signups","label":"Actual signups","mark":"bar","color":"var(--role-primary)","values":[312,298,351,389,344,412,458,471],"formatted":["312","298","351","389","344","412","458","471"],"pixels":[199.2,211.3,165.3,132.3,171.4,112.4,72.5,61.2],"stats":{"min":298,"max":471,"mean":379.375,"last":471,"count":8}},{"id":"target","label":"Target","mark":"line","color":"var(--role-comparison)","values":[320,330,340,350,360,370,380,390],"formatted":["320","330","340","350","360","370","380","390"],"pixels":[192.2,183.6,174.9,166.2,157.5,148.8,140.2,131.5],"stats":{"min":320,"max":390,"mean":355,"last":390,"count":8}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
 <script>
 (function () {
   'use strict';
@@ -191,6 +214,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var plot = payload.plot;
   var hidden = {};
   var focusId = null;
+  var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
 
   function esc(s) {
@@ -219,6 +243,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
     if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
+    if (activeView) parts.push('view=' + encodeURIComponent(activeView));
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
   }
 
@@ -283,14 +308,15 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var s = payload.series.find(function (x) { return x.id === focusId; });
     var st = s.stats || {};
     var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var L = payload.i18n;
     passport.innerHTML =
       '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
-      '<dl><div><dt>min</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
-      '<div><dt>max</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
-      '<div><dt>mean</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
-      '<div><dt>last</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
-      '<div><dt>points</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
-      '<button class="gc-btn gc-pp-close" type="button">Close</button>';
+      '<dl><div><dt>' + esc(L['stat.min']) + '</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.max']) + '</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.mean']) + '</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.last']) + '</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.points']) + '</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
+      '<button class="gc-btn gc-pp-close" type="button">' + esc(L['ui.close']) + '</button>';
     passport.setAttribute('data-open', '');
     passport.querySelector('.gc-pp-close').addEventListener('click', function () {
       setFocus(null);
@@ -418,7 +444,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
   }
   function showTip(evt) {
-    var i = nearest(svgX(evt));
+    showTipAt(nearest(svgX(evt)), evt.clientX, evt.clientY);
+  }
+  function showTipAt(i, clientX, clientY) {
     var px = zoomX(payload.xPixels[i]);
     crosshair.setAttribute('x1', px);
     crosshair.setAttribute('x2', px);
@@ -681,6 +709,102 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
   });
 
+  // ------------------------------------------------- keyboard navigation
+  // The chart is focusable and arrow keys walk the data points, so the
+  // reading does not depend on a pointer. Each step announces the value
+  // through the live region for screen readers.
+  var figure = document.getElementById('gc-figure');
+  var live = document.getElementById('gc-live');
+  var cursor = null;
+  if (isAxis && figure) {
+    figure.setAttribute('tabindex', '0');
+    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+    figure.addEventListener('keydown', function (e) {
+      var r = visibleRange();
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (cursor === null) cursor = r[0];
+        else cursor += (e.key === 'ArrowRight' ? 1 : -1);
+        cursor = Math.max(r[0], Math.min(r[1], cursor));
+        showAt(cursor);
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        cursor = e.key === 'Home' ? r[0] : r[1];
+        showAt(cursor);
+      }
+    });
+    figure.addEventListener('blur', function () { cursor = null; hideTip(); });
+  }
+  // Renders the crosshair, markers, and a spoken sentence for one index.
+  function showAt(i) {
+    var px = zoomX(payload.xPixels[i]);
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var parts = [payload.xLabels[i]];
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
+        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    if (live) live.textContent = parts.join(', ');
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / payload.width;
+    showTipAt(i, rect.left + px * scale, rect.top + rect.height / 2);
+  }
+
+  // ----------------------------------------------------- guided views
+  var viewStrip = document.querySelector('.gc-views');
+  var viewNote = document.getElementById('gc-view-note');
+  function applyView(id) {
+    var v = (payload.views || []).find(function (x) { return x.id === id; });
+    if (viewStrip) {
+      viewStrip.querySelectorAll('button[data-view]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-view') === id && id ? 'true' : 'false');
+      });
+    }
+    if (!v) {
+      if (viewNote) viewNote.textContent = '';
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+      setZoom(null);
+      activeView = null;
+      writeHash();
+      return;
+    }
+    activeView = id;
+    if (viewNote) viewNote.textContent = v.note || '';
+    if (v.focus && v.focus.length) {
+      payload.series.forEach(function (s) {
+        hidden[s.id] = v.focus.indexOf(s.id) === -1;
+        applyHidden(s.id);
+      });
+      setFocus(v.focus.length === 1 ? v.focus[0] : null);
+    } else {
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+    }
+    if (v.brush) setZoom(v.brush[0], v.brush[1]);
+    else setZoom(null);
+    writeHash();
+  }
+  if (viewStrip) {
+    viewStrip.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-view]');
+      if (!b) return;
+      var id = b.getAttribute('data-view');
+      applyView(id === activeView ? '' : id);
+    });
+  }
+
   // -------------------------------------------------- restore deep link
   var h = readHash();
   if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
@@ -693,6 +817,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     });
   }
   if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);
     if (m) {
