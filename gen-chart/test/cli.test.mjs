@@ -97,6 +97,42 @@ test('showcase quality turns warnings into failure; standard passes them', () =>
 });
 
 test('unimplemented commands exit 2, unknown commands exit 1', () => {
-  assert.equal(runFail(['guide', 'x']).status, 2);
+  assert.equal(runFail(['visual-check', 'x.html']).status, 2);
   assert.equal(runFail(['nonsense']).status, 1);
+});
+
+test('guide --json returns a structured recommendation', () => {
+  const r = JSON.parse(run(['guide', 'monthly active user trend', '--json']));
+  assert.equal(r.command, 'guide');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+});
+
+test('inspect-data --spec-out writes a draft that validates clean', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const csv = join(dir, 'data.csv');
+  writeFileSync(csv, 'week,orders\nW1,42\nW2,55\nW3,61\n');
+  const draft = join(dir, 'draft.json');
+  const r = JSON.parse(run(['inspect-data', csv, '--spec-out', draft, '--json']));
+  assert.equal(r.ok, true);
+  assert.equal(r.rows, 3);
+  assert.equal(r.columns[1].type, 'number');
+  const v = JSON.parse(run(['validate', 'cartesian', draft, '--quality', 'showcase', '--json']));
+  assert.equal(v.ok, true);
+});
+
+test('inspect-data warns on oversized row counts', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const csv = join(dir, 'big.csv');
+  let text = 'n,v\n';
+  for (let i = 1; i <= 600; i++) text += `${i},${i * 2}\n`;
+  writeFileSync(csv, text);
+  const r = JSON.parse(run(['inspect-data', csv, '--json']));
+  assert.ok(r.warnings.some((w) => w.includes('aggregating')));
+});
+
+test('demo writes runnable example artifacts', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = run(['demo', dir]);
+  assert.match(out, /mau-trend\.html/);
+  assert.ok(existsSync(join(dir, 'mau-trend.html')));
 });
