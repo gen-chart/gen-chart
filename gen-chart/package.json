@@ -16,7 +16,8 @@
     "check:validators": "node scripts/generate-validators.mjs --check",
     "render:examples": "node scripts/render-examples.mjs",
     "test": "npm run check:validators && node --test",
-    "build:zip": "node scripts/build-zip.mjs"
+    "build:zip": "node scripts/build-zip.mjs",
+    "test:ci": "npm run check:validators && node --test --test-concurrency=1"
   },
   "devDependencies": {
     "ajv": "^8.17.1"
