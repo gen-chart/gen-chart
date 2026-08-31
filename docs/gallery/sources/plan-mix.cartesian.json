@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "stack": true,
+  "meta": {
+    "title": "Accounts grew 52%, and the paid tiers grew fastest",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "month", "type": "date", "values": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06"] },
+      { "id": "free", "type": "number", "unit": "accounts", "values": [6200, 6800, 7100, 7400, 7600, 7900] },
+      { "id": "pro", "type": "number", "unit": "accounts", "values": [1800, 2100, 2500, 2900, 3400, 3900] },
+      { "id": "enterprise", "type": "number", "unit": "accounts", "values": [240, 300, 380, 470, 590, 720] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "month", "scale": "time" },
+    "y": { "label": "Accounts" }
+  },
+  "series": [
+    { "id": "free", "mark": "area", "y": "free", "label": "Free" },
+    { "id": "pro", "mark": "area", "y": "pro", "label": "Pro" },
+    { "id": "enterprise", "mark": "area", "y": "enterprise", "label": "Enterprise" }
+  ],
+  "cards": [
+    {
+      "title": "What the numbers show",
+      "items": [
+        "Total accounts rose 52%, from 8,240 to 12,520 over six months.",
+        "Enterprise tripled and Pro more than doubled, while Free grew 27%.",
+        "Free therefore fell from 75% of accounts to 63%, even though it never shrank in absolute terms."
+      ]
+    }
+  ]
+}

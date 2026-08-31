@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Q2 Revenue by Region",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "region", "type": "string", "values": ["North America", "Europe", "Asia-Pacific", "Latin America", "Middle East & Africa"] },
+      { "id": "q2", "type": "number", "unit": "USD k", "values": [1840, 1420, 990, 410, 260] },
+      { "id": "q1", "type": "number", "unit": "USD k", "values": [1650, 1380, 820, 380, 250] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "region", "scale": "band" },
+    "y": { "label": "Revenue (USD k)" }
+  },
+  "series": [
+    { "id": "q1", "mark": "bar", "y": "q1", "label": "Q1", "role": "comparison" },
+    { "id": "q2", "mark": "bar", "y": "q2", "label": "Q2", "role": "primary" }
+  ],
+  "cards": [
+    { "title": "Takeaway", "items": ["Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.", "North America still contributes 37% of total revenue."] }
+  ]
+}

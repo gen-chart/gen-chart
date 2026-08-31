@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "各渠道季度营收",
+    "locale": "zh-CN",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "quarter", "type": "string", "values": ["第一季度", "第二季度", "第三季度", "第四季度"] },
+      { "id": "direct", "type": "number", "unit": "万元", "values": [1240, 1380, 1510, 1720] },
+      { "id": "partner", "type": "number", "unit": "万元", "values": [860, 910, 1040, 1180] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "quarter", "scale": "band" },
+    "y": { "label": "营收（万元）" }
+  },
+  "series": [
+    { "id": "direct", "mark": "bar", "y": "direct", "label": "直销", "role": "primary" },
+    { "id": "partner", "mark": "bar", "y": "partner", "label": "渠道伙伴", "role": "comparison" }
+  ],
+  "cards": [
+    { "title": "结论", "items": ["直销与渠道伙伴营收均逐季增长，第四季度合计达 2,900 万元。", "两者全年增速接近（直销 +39%，渠道伙伴 +37%），渠道结构基本稳定在 41% 左右。"] }
+  ]
+}

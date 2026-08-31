@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "chart_type": "distribution",
+  "mark": "boxplot",
+  "meta": {
+    "title": "CI Build Duration by Pipeline",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "pipeline", "type": "string",
+        "values": ["unit", "unit", "unit", "unit", "unit", "unit", "unit", "unit", "unit", "unit",
+                   "integration", "integration", "integration", "integration", "integration", "integration", "integration", "integration", "integration", "integration",
+                   "e2e", "e2e", "e2e", "e2e", "e2e", "e2e", "e2e", "e2e", "e2e", "e2e"] },
+      { "id": "seconds", "type": "number", "unit": "s", "label": "Duration",
+        "values": [42, 45, 47, 48, 50, 51, 53, 55, 58, 71,
+                   118, 124, 131, 136, 140, 145, 152, 158, 166, 210,
+                   295, 312, 328, 341, 355, 370, 388, 402, 425, 610] }
+    ]
+  },
+  "encoding": {
+    "value": { "column": "seconds", "label": "Duration (s)" },
+    "group": { "column": "pipeline" }
+  },
+  "cards": [
+    { "title": "Takeaway", "items": ["End-to-end runs dominate total CI time and vary the most.", "Each pipeline has one slow outlier, suggesting a cold-cache run rather than a code regression."] }
+  ]
+}
