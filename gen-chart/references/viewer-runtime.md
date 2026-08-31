@@ -38,6 +38,11 @@ beyond the spec fields named here.
   focus rings and real button semantics.
 - `prefers-reduced-motion` disables transitions; `prefers-color-scheme`
   picks the default theme.
+- Below 700px the chart keeps a legible minimum width and scrolls within its
+  panel rather than shrinking its type; the page body stays contained.
+
+Cartesian charts walk data points along the x axis; distribution,
+proportion, and matrix charts walk their marks. Both announce the same way.
 
 ## Localization
 
