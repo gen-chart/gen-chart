@@ -1,0 +1,22 @@
+{
+  "name": "agen-chart",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed JSON chart spec → deterministic, validated, self-contained interactive HTML charts.",
+  "license": "MIT",
+  "bin": {
+    "agen-chart": "./bin/agen-chart.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "generate:validators": "node scripts/generate-validators.mjs",
+    "check:validators": "node scripts/generate-validators.mjs --check",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}
