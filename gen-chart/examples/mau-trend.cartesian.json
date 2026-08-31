@@ -23,6 +23,7 @@
   "annotations": [
     { "id": "v2-launch", "kind": "x-line", "at": "2026-02", "label": "v2 launch" }
   ],
+  "interactions": { "brush": "x" },
   "cards": [
     { "title": "Takeaway", "items": ["MAU grew 2.4× over twelve months, with growth accelerating after the v2 launch in February.", "Paying users grew faster than the base: 4.2× over the same period."] }
   ]

@@ -13,7 +13,7 @@ export function fmtTick(v) {
   const abs = Math.abs(v);
   if (abs >= 1e9) return trimZeros((v / 1e9).toFixed(1)) + 'B';
   if (abs >= 1e6) return trimZeros((v / 1e6).toFixed(1)) + 'M';
-  if (abs >= 1e4) return trimZeros((v / 1e3).toFixed(1)) + 'k';
+  if (abs >= 1e3) return trimZeros((v / 1e3).toFixed(1)) + 'k';
   if (Number.isInteger(v)) return String(v);
   return trimZeros(v.toFixed(2));
 }

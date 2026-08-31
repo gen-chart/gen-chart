@@ -98,7 +98,8 @@
       "additionalProperties": false,
       "properties": {
         "tooltip": { "enum": ["auto", "off"] },
-        "legend_toggle": { "type": "boolean" }
+        "legend_toggle": { "type": "boolean" },
+        "brush": { "enum": ["x"] }
       }
     },
     "cards": { "$ref": "common.schema.json#/$defs/cards" }

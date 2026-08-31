@@ -6,3 +6,7 @@ dist/
 gen-chart/examples/*.html.tmp*
 /tmp/
 .claude/settings.local.json
+
+# visual-check evidence (regenerated on demand)
+*.visual-check.json
+*.visual-check.*.png
