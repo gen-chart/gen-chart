@@ -153,3 +153,29 @@ export function parseDateValue(s) {
   }
   return null;
 }
+
+// Log ticks at decade boundaries, with 2x/5x subdivisions when a narrow
+// domain would otherwise show only one or two labels.
+export function logTicks(min, max) {
+  const lo = Math.floor(Math.log10(min));
+  const hi = Math.ceil(Math.log10(max));
+  const decades = [];
+  for (let e = lo; e <= hi; e++) decades.push(10 ** e);
+  const inDomain = (t) => t >= min * 0.999 && t <= max * 1.001;
+  let ticks = decades.filter(inDomain);
+  if (ticks.length < 4) {
+    const fine = [];
+    for (let e = lo; e <= hi; e++) for (const m of [1, 2, 5]) fine.push(m * 10 ** e);
+    const sub = fine.filter(inDomain).sort((a, b) => a - b);
+    if (sub.length >= ticks.length) ticks = sub;
+  }
+  if (ticks.length < 2) ticks = [min, max];
+  return ticks.map((t) => Number(t.toPrecision(12)));
+}
+
+export function logScale(domainMin, domainMax, rangeMin, rangeMax) {
+  const a = Math.log10(domainMin);
+  const b = Math.log10(domainMax);
+  const d = b - a || 1;
+  return (v) => rangeMin + ((Math.log10(v) - a) / d) * (rangeMax - rangeMin);
+}

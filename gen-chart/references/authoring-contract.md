@@ -8,13 +8,21 @@ diagnostic catalog, or repair rules.
 - `encoding.x.scale`: `linear` (number column, strictly increasing), `time`
   (date column), `band` (string column). Bar marks require `band`.
 - `encoding.y`: `zero` (boolean, default true; rejected as `false` while any
-  bar series exists), `label` (axis caption), `scale` fixed to `linear`.
+  bar series exists), `label` (axis caption), `scale` — `linear` (default)
+  or `log`. A log axis requires strictly positive values, refuses bar marks
+  and `zero: true`, and appends "(log scale)" to its own caption so the
+  reader never has to infer it. Reach for it only when the data spans
+  multiple orders of magnitude.
 - `series[].mark`: `line` | `bar` | `scatter`. `point: true` draws circles on
   line vertices — use it when the reader should see individual observations
   (≤ ~30 points). `scatter` needs a linear or time x, never `band`.
 - `series[].role`: `primary`, `comparison`, `positive`, `negative`,
   `neutral`, `highlight`. `positive`/`negative` are for signed semantics
-  (gain/loss), not decoration.
+  (gain/loss), not decoration, and validation enforces it: a directional
+  role over mixed-sign data is rejected, since one colour cannot assert a
+  direction half the values contradict. An all-positive column under a
+  `negative` role is fine — churn is a positive number that means something
+  bad.
 - `annotations[]`: `kind: "x-line"` (at = category string, ISO date, or
   number matching the x scale) or `"y-line"` (at = number inside the y
   domain). Out-of-domain annotations are dropped with a warning.
@@ -80,6 +88,11 @@ diagnostic catalog, or repair rules.
 | `semantic/annotation-out-of-range` | warning | annotation dropped |
 | `honesty/bar-zero-baseline` | error | bars must include zero |
 | `honesty/mixed-units` | error | one y axis, one unit |
+| `honesty/color-meaning` | error | a directional role over mixed-sign or contradicting data |
+| `honesty/log-bar` | error | bars encode length, which a log axis destroys |
+| `honesty/log-nonpositive` | error | a log axis is undefined at or below zero |
+| `honesty/log-zero` | error | a log axis cannot be asked to include zero |
+| `composition/annotation-overlap` | warning | annotation labels would collide |
 | `composition/series-count` | warning | more than 5 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |
 | `composition/x-tick-overflow` | error | labels cannot fit at all |

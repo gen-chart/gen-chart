@@ -6,7 +6,7 @@
 import { checkSchema } from '../shared/validator.mjs';
 import { checkData, seriesStats } from '../shared/data.mjs';
 import { diag } from '../shared/diagnostics.mjs';
-import { niceLinearTicks, linearScale, bandScale, timeTicks, parseDateValue } from '../shared/scales.mjs';
+import { niceLinearTicks, linearScale, bandScale, timeTicks, parseDateValue, logTicks, logScale } from '../shared/scales.mjs';
 import { fmtTick, fmtValue, fmtDate, escapeXml } from '../shared/format.mjs';
 import { estimateWidth } from '../shared/text-fit.mjs';
 import { resolveSeriesColors } from '../shared/palette.mjs';
@@ -98,6 +98,29 @@ export function analyzeCartesian(spec) {
           }));
       }
     }
+    // A positive/negative role asserts a direction. Mixed-sign data goes both
+    // ways, so one directional colour would mislabel half the marks; and a
+    // "positive" role over entirely negative values contradicts the numbers.
+    // (An all-positive column under a "negative" role is legitimate — churn
+    // counts are positive numbers that mean something bad — so it passes.)
+    if ((s.role === 'positive' || s.role === 'negative') && col && col.type === 'number') {
+      const present = col.values.filter((v) => v !== null);
+      const hasPos = present.some((v) => v > 0);
+      const hasNeg = present.some((v) => v < 0);
+      if (hasPos && hasNeg) {
+        diagnostics.push(diag('honesty/color-meaning', 'error', `${subject}/role`,
+          `series "${s.id}" carries the directional role "${s.role}", but its values include both gains and losses; one colour would assert a direction half the data contradicts`, {
+            evidence: { role: s.role, positives: present.filter((v) => v > 0).length, negatives: present.filter((v) => v < 0).length },
+            supportedFixes: ['use "neutral" or "primary" for mixed-sign data', 'split gains and losses into separate series']
+          }));
+      } else if (s.role === 'positive' && hasNeg && !hasPos) {
+        diagnostics.push(diag('honesty/color-meaning', 'error', `${subject}/role`,
+          `series "${s.id}" is coloured as a gain but every value is negative`, {
+            evidence: { role: s.role, min: Math.min(...present), max: Math.max(...present) },
+            supportedFixes: ['use the "negative" role', 'use "neutral" if the sign carries no judgement']
+          }));
+      }
+    }
     if (s.mark === 'scatter' && enc.x.scale === 'band') {
       diagnostics.push(diag('semantic/mark-scale-mismatch', 'error', `${subject}/mark`,
         'scatter marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading', {
@@ -113,6 +136,39 @@ export function analyzeCartesian(spec) {
         supportedFixes: ['remove interactions.brush', 'change bar series to line marks over a time or linear x']
       }));
     return { diagnostics };
+  }
+
+  const isLog = enc.y.scale === 'log';
+  if (isLog) {
+    // Length encoding on a log axis is meaningless: a bar twice as tall does
+    // not mean twice the value.
+    if (hasBar) {
+      diagnostics.push(diag('honesty/log-bar', 'error', '/encoding/y/scale',
+        'bars encode value as length, which a logarithmic axis destroys — a bar twice as tall would not mean twice the value', {
+          supportedFixes: ['use a line or scatter mark with the log scale', 'use a linear y scale for bars']
+        }));
+      return { diagnostics };
+    }
+    if (enc.y.zero === true) {
+      diagnostics.push(diag('honesty/log-zero', 'error', '/encoding/y/zero',
+        'a logarithmic axis cannot reach zero; "zero": true is not satisfiable', {
+          supportedFixes: ['remove "zero" from the log axis', 'use a linear y scale']
+        }));
+      return { diagnostics };
+    }
+    const nonPositive = [];
+    for (const s2 of spec.series) {
+      const col = columns.get(s2.y);
+      col.values.forEach((v, i) => { if (v !== null && v <= 0) nonPositive.push({ series: s2.id, index: i, value: v }); });
+    }
+    if (nonPositive.length > 0) {
+      diagnostics.push(diag('honesty/log-nonpositive', 'error', '/encoding/y/scale',
+        `a logarithmic axis is undefined at or below zero, but ${nonPositive.length} plotted value(s) are not positive`, {
+          evidence: { offending: nonPositive.slice(0, 5) },
+          supportedFixes: ['use a linear y scale', 'remove or correct the non-positive values']
+        }));
+      return { diagnostics };
+    }
   }
 
   if (hasBar && enc.y.zero === false) {
@@ -132,7 +188,7 @@ export function analyzeCartesian(spec) {
   }
 
   // ---- y domain and ticks
-  const zero = enc.y.zero !== false || hasBar;
+  const zero = enc.y.scale === 'log' ? false : (enc.y.zero !== false || hasBar);
   let yMin = zero ? 0 : Infinity;
   let yMax = zero ? 0 : -Infinity;
   for (const s of spec.series) {
@@ -149,7 +205,11 @@ export function analyzeCartesian(spec) {
       }));
     return { diagnostics };
   }
-  const yNice = niceLinearTicks(yMin, yMax, 5);
+  // A log axis spans its own data decades; nice-linear rounding does not apply.
+  const yTickValues = isLog ? logTicks(yMin, yMax) : niceLinearTicks(yMin, yMax, 5).ticks;
+  const yNice = isLog
+    ? { ticks: yTickValues, min: Math.min(yMin, yTickValues[0]), max: Math.max(yMax, yTickValues[yTickValues.length - 1]) }
+    : niceLinearTicks(yMin, yMax, 5);
 
   // ---- frame and margins
   const W = spec.meta.width ?? 960;
@@ -238,7 +298,9 @@ export function analyzeCartesian(spec) {
 
   const plotTop = margin.top;
   const plotBottom = H - margin.bottom;
-  const yScale = linearScale(yNice.min, yNice.max, plotBottom, plotTop);
+  const yScale = isLog
+    ? logScale(yNice.min, yNice.max, plotBottom, plotTop)
+    : linearScale(yNice.min, yNice.max, plotBottom, plotTop);
 
   // ---- annotations
   const annotations = [];
@@ -310,6 +372,24 @@ export function analyzeCartesian(spec) {
   });
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
+  // Annotation labels share one band across the top of the plot; two that
+  // overlap read as a single garbled string.
+  const placedX = annotations.filter((a) => a.kind === 'x-line' && a.label)
+    .map((a) => ({ id: a.id, label: a.label, x: a.x, w: estimateWidth(a.label, ANNOTATION_FONT) }))
+    .sort((p, q) => p.x - q.x);
+  for (let i = 1; i < placedX.length; i++) {
+    const prev = placedX[i - 1];
+    const cur = placedX[i];
+    const gap = cur.x - prev.x;
+    if (gap < prev.w + 10) {
+      diagnostics.push(diag('composition/annotation-overlap', 'warning', '/annotations',
+        `annotation labels "${prev.label}" and "${cur.label}" are ${Math.round(gap)}px apart but need ${Math.ceil(prev.w + 10)}px to sit side by side`, {
+          evidence: { gapPx: Math.round(gap), neededPx: Math.ceil(prev.w + 10), ids: [prev.id, cur.id] },
+          supportedFixes: ['shorten one label', 'drop the less important annotation', 'increase meta.width']
+        }));
+    }
+  }
+
   return {
     diagnostics,
     columns,
@@ -317,7 +397,7 @@ export function analyzeCartesian(spec) {
       W, H, margin, plotLeft, plotRight, plotTop, plotBottom,
       xCenters, xTicks, rotated, thinnedEvery, band,
       yTicks: yNice.ticks, yScale, yMin: yNice.min, yMax: yNice.max,
-      unit: unit ?? null, annotations
+      unit: unit ?? null, annotations, isLog
     }
   };
 }
@@ -365,8 +445,9 @@ export function renderSvg(spec, analysis) {
   out.push('</g>');
 
   // axis labels
-  if (enc.y.label) {
-    out.push(`<text class="gc-axis-label" x="${plotLeft}" y="${plotTop - 10}" text-anchor="start">${escapeXml(enc.y.label)}</text>`);
+  const yCaption = (enc.y.label ?? '') + (layout.isLog ? (enc.y.label ? ' ' : '') + '(log scale)' : '');
+  if (yCaption) {
+    out.push(`<text class="gc-axis-label" x="${plotLeft}" y="${plotTop - 10}" text-anchor="start">${escapeXml(yCaption)}</text>`);
   }
   if (enc.x.label) {
     out.push(`<text class="gc-axis-label" x="${round((plotLeft + plotRight) / 2)}" y="${H - 8}" text-anchor="middle">${escapeXml(enc.x.label)}</text>`);
