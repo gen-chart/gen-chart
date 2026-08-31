@@ -9,9 +9,9 @@ diagnostic catalog, or repair rules.
   (date column), `band` (string column). Bar marks require `band`.
 - `encoding.y`: `zero` (boolean, default true; rejected as `false` while any
   bar series exists), `label` (axis caption), `scale` fixed to `linear`.
-- `series[].mark`: `line` | `bar`. `point: true` draws circles on line
-  vertices — use it when the reader should see individual observations
-  (≤ ~30 points).
+- `series[].mark`: `line` | `bar` | `scatter`. `point: true` draws circles on
+  line vertices — use it when the reader should see individual observations
+  (≤ ~30 points). `scatter` needs a linear or time x, never `band`.
 - `series[].role`: `primary`, `comparison`, `positive`, `negative`,
   `neutral`, `highlight`. `positive`/`negative` are for signed semantics
   (gain/loss), not decoration.
@@ -25,6 +25,39 @@ diagnostic catalog, or repair rules.
 - `interactions`: `tooltip: "auto" | "off"`, `legend_toggle: boolean`
   (default true), `brush: "x"` (opt-in zoom; line marks over time/linear x
   only). Omit the whole object normally.
+
+## Distribution field reference
+
+- `mark`: `histogram` | `boxplot`.
+- `encoding.value.column` — the raw observations (number). Never pass
+  pre-aggregated counts or quartiles; the renderer computes them.
+- `encoding.group.column` — optional string column; boxplot only. One box
+  per distinct value, in first-appearance order.
+- `bins` — optional histogram override. Omit it: the default is
+  Freedman-Diaconis with a Sturges fallback, and edges snap to round
+  numbers, so the drawn bin count may differ slightly from the target.
+- Minimum 5 observations (per group for boxplots).
+
+## Proportion field reference
+
+- `mark`: `pie` | `donut`. Donut prints the total in the hole.
+- `encoding.category.column` (string) and `encoding.value.column` (number).
+- `total` — optional declared whole. If given, the parts must sum to it
+  within 0.5%; otherwise add an explicit remainder row rather than letting
+  the chart renormalize silently.
+- 2–7 slices. Shares below 8% get no in-slice label; the legend carries
+  every percentage.
+
+## Matrix field reference
+
+- `mark`: `heatmap`. Data is long-format: one row per cell.
+- `encoding.row.column`, `encoding.column.column` (both string), and
+  `encoding.value.column` (number). Missing cells render empty.
+- `scale.kind`: `sequential` (default, non-negative only) or `diverging`
+  with a required `scale.midpoint`.
+- Values quantize into at most 6 buckets fitted to the data; the legend
+  states every boundary. Cells show their value when the grid is coarse
+  enough to fit it.
 
 ## Diagnostic catalog
 
@@ -43,6 +76,18 @@ diagnostic catalog, or repair rules.
 | `composition/series-count` | warning | more than 5 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |
 | `composition/x-tick-overflow` | error | labels cannot fit at all |
+| `data/insufficient-observations` | error/warning | too few raw values to summarize |
+| `data/matrix-duplicate-cell` | error | two values for one (row, column) |
+| `semantic/bins-not-applicable` | error | `bins` set on a boxplot |
+| `honesty/binning` | error/warning | bin count distorts the shape |
+| `honesty/proportion-negative` | error | a part of a whole cannot be negative |
+| `honesty/proportion-slice-count` | error | fewer than 2 or more than 7 slices |
+| `honesty/proportion-total` | error | parts do not match the declared total |
+| `honesty/matrix-sequential-negative` | error | signed data on a sequential ramp |
+| `honesty/matrix-diverging-midpoint` | error | diverging scale without a midpoint |
+| `composition/matrix-sparse` | warning | under half the grid has values |
+| `composition/matrix-too-dense` | error | cells too small to read |
+| `composition/group-count` | warning | more than 12 boxes |
 
 ## Repair order
 

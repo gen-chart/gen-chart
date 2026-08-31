@@ -1,22 +1,28 @@
 // Assembles the final self-contained HTML artifact from the template, the
-// rendered SVG, and the viewer payload. All placeholder content is escaped;
-// the payload is JSON inside a <script type="application/json"> block.
+// rendered SVG, the viewer payload, and the renderer's legend structure.
+// All placeholder content is escaped; the payload is JSON inside a
+// <script type="application/json"> block.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
-import { resolveSeriesColors } from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
-function legendHtml(spec) {
-  const colors = resolveSeriesColors(spec.series);
-  if (spec.series.length < 2) return '';
-  const items = spec.series.map((s) =>
-    `<button type="button" data-series="${escapeXml(s.id)}" aria-pressed="true">` +
-    `<span class="gc-swatch" data-mark="${s.mark}" style="--sw:${colors.get(s.id)}"></span>${escapeXml(s.label)}</button>`
+// legend is one of:
+//   { kind: 'series', toggleable, items: [{id, label, color, mark}] }
+//   { kind: 'note', text }
+//   null
+function legendHtml(legend) {
+  if (!legend) return '';
+  if (legend.kind === 'note') {
+    return `<p class="gc-legend-note">${escapeXml(legend.text)}</p>`;
+  }
+  const items = legend.items.map((it) =>
+    `<button type="button" data-series="${escapeXml(it.id)}" aria-pressed="true"${legend.toggleable ? '' : ' disabled'}>` +
+    `<span class="gc-swatch" data-mark="${escapeXml(it.mark)}" style="--sw:${it.color}"></span>${escapeXml(it.label)}</button>`
   ).join('');
-  return `<div class="gc-legend" role="group" aria-label="Series">${items}</div>`;
+  return `<div class="gc-legend"${legend.toggleable ? '' : ' data-static'} role="group" aria-label="Series">${items}</div>`;
 }
 
 function cardsHtml(spec) {
@@ -29,7 +35,7 @@ function cardsHtml(spec) {
   return `<div class="gc-cards">${cards}</div>`;
 }
 
-export function assembleHtml(spec, svg, payload) {
+export function assembleHtml(spec, svg, payload, legend = null) {
   const template = readFileSync(templatePath, 'utf8');
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
@@ -42,7 +48,7 @@ export function assembleHtml(spec, svg, payload) {
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('{{SUBTITLE_BLOCK}}', subtitle)
     .replace('{{SVG}}', svg)
-    .replace('{{LEGEND}}', legendHtml(spec))
+    .replace('{{LEGEND}}', legendHtml(legend))
     .replace('{{CARDS_BLOCK}}', cardsHtml(spec))
     .replace('{{PAYLOAD}}', payloadJson);
 }

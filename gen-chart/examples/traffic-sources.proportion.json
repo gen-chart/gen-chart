@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "chart_type": "proportion",
+  "mark": "donut",
+  "meta": {
+    "title": "Signup Traffic by Source",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "source", "type": "string", "values": ["Organic search", "Direct", "Referral", "Paid social", "Email", "Other"] },
+      { "id": "signups", "type": "number", "unit": "signups", "values": [4820, 2310, 1640, 980, 610, 340] }
+    ]
+  },
+  "encoding": {
+    "category": { "column": "source" },
+    "value": { "column": "signups" }
+  },
+  "cards": [
+    { "title": "Takeaway", "items": ["Organic search brings 44% of signups — more than paid social, email, and referral combined.", "Paid social is the smallest tracked channel outside the Other bucket."] }
+  ]
+}

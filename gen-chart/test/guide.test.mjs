@@ -21,30 +21,35 @@ test('actual-vs-target routes to the bar+line combo with high confidence', () =>
   assert.equal(r.recommendation.confidence, 'high');
 });
 
-test('distribution scenarios are honest about being unimplemented', () => {
+test('distribution scenarios route to the implemented distribution family', () => {
   const r = guide('histogram of response time distribution with outliers');
   assert.equal(r.recommendation.chart_type, 'distribution');
-  assert.equal(r.recommendation.implemented, false);
-  assert.equal(r.recommendation.planned, 'M4');
-  assert.match(r.recommendation.workaround, /bar/);
+  assert.equal(r.recommendation.implemented, true);
+  assert.equal(r.recommendation.workaround, null);
 });
 
-test('proportion scenarios recommend the honest bar workaround', () => {
+test('proportion scenarios route to pie/donut', () => {
   const r = guide('pie chart of market share breakdown');
   assert.equal(r.recommendation.chart_type, 'proportion');
-  assert.match(r.recommendation.workaround, /sorted by value/);
+  assert.equal(r.recommendation.implemented, true);
 });
 
-test('scatter is flagged as a planned mark with a workaround', () => {
+test('scatter routes to cartesian and is implemented', () => {
   const r = guide('scatter plot of price correlation with demand');
   assert.equal(r.recommendation.chart_type, 'cartesian');
-  assert.equal(r.recommendation.implemented, false);
-  assert.match(r.recommendation.workaround, /point/);
+  assert.equal(r.recommendation.implemented, true);
+  assert.ok(r.recommendation.marks.includes('scatter'));
+});
+
+test('heatmap scenarios route to the matrix family', () => {
+  const r = guide('heatmap of tickets by hour and day of week');
+  assert.equal(r.recommendation.chart_type, 'matrix');
+  assert.equal(r.recommendation.implemented, true);
 });
 
 test('many-slice pie requests get a caution', () => {
   const r = guide('pie chart with 15 categories of spend breakdown');
-  assert.ok(r.cautions.some((c) => c.includes('unreadable')));
+  assert.ok(r.cautions.some((c) => c.includes('7 slices')));
 });
 
 test('dual-axis requests get the honesty caution', () => {

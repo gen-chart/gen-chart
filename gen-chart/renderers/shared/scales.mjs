@@ -33,6 +33,26 @@ export function niceLinearTicks(min, max, count = 5) {
   return { ticks, min: lo, max: hi };
 }
 
+// Ticks at nice round positions strictly inside [min, max], leaving the
+// domain itself untouched. Use where the axis legitimately does not start at
+// zero (boxplots, scatter): niceLinearTicks would snap the floor down to a
+// step multiple and squash the data into a corner.
+export function ticksWithin(min, max, { minTicks = 4, maxTicks = 8 } = {}) {
+  const span = max - min;
+  if (span <= 0) return [min];
+  for (const target of [5, 6, 8, 10, 12]) {
+    const step = niceStep(span, target);
+    const first = Math.ceil(min / step) * step;
+    const count = Math.floor((max - first) / step) + 1;
+    if (count >= minTicks && count <= maxTicks) {
+      const ticks = [];
+      for (let i = 0; i < count; i++) ticks.push(Number((first + i * step).toPrecision(12)));
+      return ticks;
+    }
+  }
+  return [Number(min.toPrecision(12)), Number(max.toPrecision(12))];
+}
+
 export function linearScale(domainMin, domainMax, rangeMin, rangeMax) {
   const d = domainMax - domainMin || 1;
   return (v) => rangeMin + ((v - domainMin) / d) * (rangeMax - rangeMin);

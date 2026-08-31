@@ -1,10 +1,15 @@
 // Schema-layer validation: runs the committed standalone validator and maps
 // ajv errors to gen-chart diagnostics.
 
-import { validateCartesian } from './generated-validators.mjs';
+import { validateCartesian, validateDistribution, validateProportion, validateMatrix } from './generated-validators.mjs';
 import { diag } from './diagnostics.mjs';
 
-const VALIDATORS = { cartesian: validateCartesian };
+const VALIDATORS = {
+  cartesian: validateCartesian,
+  distribution: validateDistribution,
+  proportion: validateProportion,
+  matrix: validateMatrix
+};
 
 export function supportedChartTypes() {
   return Object.keys(VALIDATORS);
