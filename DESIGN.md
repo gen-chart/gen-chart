@@ -176,6 +176,9 @@ windows are stripped before capture.
   document language.
 - Color is never the only channel: legends carry text, and toggled-off series
   are struck through, not merely faded.
+- Below 700px the chart holds a legible minimum width and scrolls inside its
+  own panel; the page body never scrolls sideways. Shrinking axis type to fit
+  a phone is not containment, it is illegibility.
 - `prefers-reduced-motion` disables transitions; `prefers-color-scheme` sets
   the default theme.
 
