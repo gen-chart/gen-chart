@@ -42,6 +42,7 @@ window.addEventListener('load', function () {
   writeFileSync(probePath, readFileSync(htmlPath, 'utf8').replace('</body>', wrapper + '</body>'));
   const dom = execFileSync(chrome, [
     '--headless=new', '--disable-gpu', '--hide-scrollbars',
+    '--no-sandbox', '--disable-dev-shm-usage', 
     `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
     '--dump-dom', `file://${probePath}`
   ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 40000 });
