@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.5"
+  version: "0.6"
   author: sses79
   inspired_by: tt-a1i/archify (MIT)
 ---

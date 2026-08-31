@@ -51,6 +51,8 @@ export function parseMeasure(dom) {
 function chrome(bin, args) {
   return execFileSync(bin, [
     '--headless=new', '--disable-gpu', '--hide-scrollbars',
+    // Containers give Chrome a small /dev/shm and no sandbox privileges.
+    '--no-sandbox', '--disable-dev-shm-usage',
     '--virtual-time-budget=2500', ...args
   ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
 }

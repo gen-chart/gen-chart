@@ -191,13 +191,42 @@ North star: **"The Honest Ledger"** — a chart is a claim about numbers; every 
 
 ## 11. Build order (milestones)
 
-> **Progress:** M1–M5 complete as of 2026-08-31. The skill is feature complete against this plan.
+> **Progress (audited 2026-08-31).** M1–M5 and M7 are complete; M6 was an
+> unplanned viewer-fix milestone. The skill is **not** feature complete
+> against this document — §1–§10 describe scope the milestones never
+> covered. Verified gaps below.
+>
+> **Still missing:**
+> - **Marks (§4):** no `area`, no stacked bar, no 100%-stacked bar, no
+>   calendar heatmap. `guide` can still route toward these.
+> - **Honesty (§5):** `honesty/dual-axis` exists only as a `guide` caution —
+>   dual axes are unsupported rather than validated.
+> - **Composition (§5.4):** no point-density downsample suggestion (>2k).
+> - **Layout (§2):** `collision.mjs` and `legend.mjs` were never split out
+>   (that logic lives in the renderers); `references/delivery-contract.md`
+>   is missing from the progressive-disclosure set.
+> - **Repo (§2):** no `CHANGELOG.md`, no `docs/` gallery.
+> - **Other:** no `meta.animation: "draw"` (§6), no `brand_palette` (§3), no
+>   byte-size caps (§12 — row caps exist instead), no `ordinary-model-floor`
+>   benchmark (§10, deferred by design).
+>
+> **Deviations from plan:** DESIGN.md is light-default with one system sans,
+> where §9 called for dark-first with a mono numeric face. §6 said "no
+> horizontal scroll"; below 700px the chart scrolls inside its own panel
+> because shrinking axis type to fit a phone is illegibility, not
+> containment.
 
 1. **M1 — Cartesian core**: common+cartesian schemas, generated validators, scales/format/text-fit, line+bar renderer, minimal template (tooltip, legend toggle, theme), `validate`/`render`/`deliver`/`doctor`, 3 examples, golden tests.
 2. **M2 — Honesty engine + SKILL.md**: honesty rule codes with repair receipts, quality profiles, `guide`, `inspect-data`, first full SKILL.md, `demo`.
 3. **M3 — Interactivity depth**: brush zoom, focus/Data Passport, deep links, exports (PNG/SVG/CSV/share card), `visual-check`.
 4. **M4 — Remaining families**: scatter/combo, proportion, distribution, matrix renderers + their honesty rules and examples.
 5. **M5 — Polish & distribution**: guided views, i18n (`en`/`zh-CN`), a11y pass (keyboard data walking, ARIA), DESIGN.md, docs gallery, deterministic zip, `npx skills add` packaging.
+6. **M6 — Viewer fixes** (unplanned): tooltip positioning regression, phone
+   legibility, keyboard parity across families, real-browser smoke tests.
+7. **M7 — Honesty completion + CI**: `honesty/color-meaning`,
+   `composition/annotation-overlap`, WCAG AA palette verification,
+   logarithmic y axis with `log-bar` / `log-nonpositive` / `log-zero` rules
+   and axis self-disclosure, GitHub Actions CI.
 
 ## 12. Open questions
 
