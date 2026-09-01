@@ -11,7 +11,7 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 
 ![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.8.0-0891b2?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-160-0891b2?style=flat-square)
 
