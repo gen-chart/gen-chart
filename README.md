@@ -43,16 +43,18 @@ cd gen-chart && npm run build:zip
 
 Extract `gen-chart.zip` into your agent's skills directory — `~/.claude/skills/` for Claude Code — which yields `<skills>/gen-chart`. Requires Node.js ≥ 22. Skills load at session start, so open a new session afterwards.
 
-## 02 · Ask one bounded question
+## 02 · Type one message, get a chart
 
-**One message per chart.** A chart answers a single question, and the tighter the question the better the answer. Give it:
+**Everything the chart needs, in one prompt.** No repository, API key, or running service — but the data has to be in the message or in a file you point at. gen-chart will not invent numbers, so a prompt without them gets a request for them instead of a chart.
 
-- the numbers — pasted inline, or a file in your workspace
-- the one comparison that carries the message
-- the unit
-- what you want the reader to conclude
+A good prompt carries four things:
 
-No repository, API key, or running service is required.
+- **the numbers** — pasted inline, or a file in your workspace
+- **the one comparison** that carries the message
+- **the unit**
+- **what you want the reader to conclude**
+
+Every prompt below is complete: copy one and it works.
 
 ### Start from a description — no file required
 
@@ -71,7 +73,7 @@ Latin America 380/410, Middle East & Africa 250/260 (USD thousands).
 ### Start from a file in your workspace
 
 ```
-Inspect data/revenue.csv, then use gen-chart to chart quarterly revenue by region.
+Inspect data/revenue.csv (your file), then use gen-chart to chart quarterly revenue by region.
 Show one clear message in the title, at most two emphasized series,
 and put the supporting detail in cards instead of on the canvas.
 ```
@@ -86,11 +88,18 @@ Use gen-chart to show the distribution of these API response times and describe 
 ```
 
 ```
-Use gen-chart to compare build durations across our unit, integration, and e2e pipelines as a boxplot.
+Use gen-chart to compare build durations across our pipelines as a boxplot (seconds):
+unit:         42 45 47 48 50 51 53 55 58 71
+integration: 118 124 131 136 140 145 152 158 166 210
+e2e:         295 312 328 341 355 370 388 402 425 610
 ```
 
 ```
-Use gen-chart to build a heatmap of support tickets by day of week and shift.
+Use gen-chart to build a heatmap of support tickets by day and shift.
+Columns are Mon through Sun.
+Morning:    48 41 39 37 44 12 9
+Afternoon:  62 55 51 49 58 18 14
+Night:      21 17 15 16 24 8 6
 ```
 
 ```
@@ -101,18 +110,24 @@ referral 1640, paid social 980, email 610, other 340.
 ### Guided views, localization, iteration
 
 ```
-Use gen-chart to chart our 12-month MAU trend, and add guided views for the full year,
-the period after the v2 launch, and paying users on their own.
+Use gen-chart to chart 12 months of monthly active users from September 2025,
+and add guided views for the full year, the period after the v2 launch in
+February 2026, and paying users on their own.
+All active: 8200 8900 9400 9100 10500 12300 13800 14600 15900 17400 18100 19700
+Paying:      610  700  780  760   940  1180  1420  1560  1810  2050  2230  2540
 ```
 
 ```
-用 gen-chart 画一张各渠道季度营收的柱状图，界面语言用中文。
+用 gen-chart 画一张各渠道季度营收的柱状图，界面语言用中文。单位万元：
+直销：1240 1380 1510 1720
+渠道伙伴：860 910 1040 1180
+（第一季度至第四季度）
 ```
 
-Then refine in chat — the typed spec stays available for targeted edits:
+Then refine in chat. The typed spec stays available, so follow-ups edit it rather than starting over:
 
 ```
-add a target line at 400 and highlight the weeks we missed it
+add a target line at 15000 and mark the months below it
 ```
 
 ### Where it will push back
@@ -120,7 +135,10 @@ add a target line at 400 and highlight the weeks we missed it
 Worth trying deliberately:
 
 ```
-Use gen-chart to make a pie chart of our 12 spend categories.
+Use gen-chart to make a pie chart of our spend by category (USD k):
+Salaries 4200, Cloud 1850, Contractors 940, Marketing 780, Travel 410,
+Software 360, Office 290, Legal 220, Recruiting 180, Training 120,
+Events 95, Other 70.
 ```
 
 Validation caps a pie at 7 slices, so instead of quietly producing an unreadable chart it routes you to a sorted bar chart — or keeps the top 6 and rolls the rest into an explicit "Other" — and says why. The same happens if you ask for a truncated bar axis, or two different units on one axis.
@@ -222,25 +240,8 @@ For a manual install, Claude Code reads `~/.claude/skills/` (or `.claude/skills/
 
 ## Development
 
-Requires Node.js ≥ 22. No runtime dependencies; `ajv` is a dev dependency that precompiles the committed validators.
-
-```bash
-cd gen-chart && npm ci && npm test
-```
-
-```
-gen-chart/        the skill package (what gets installed)
-├── SKILL.md      agent contract
-├── bin/          the CLI
-├── schemas/      typed JSON IR
-├── renderers/    deterministic SVG renderers and shared modules
-├── references/   authoring, delivery, and viewer contracts
-├── assets/       viewer runtime template
-├── examples/     12 specs and their rendered artifacts
-└── test/         node --test suites and golden baselines
-```
-
-`npm run build:gallery` regenerates [docs/](docs/); `npm run build:zip` builds the distributable package. Both are drift-checked in CI.
+Contributions, local setup, the repository layout, and the test and release
+tooling are documented in **[DEVELOPMENT.md](DEVELOPMENT.md)**.
 
 ## License
 
