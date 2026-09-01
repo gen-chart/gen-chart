@@ -15,6 +15,10 @@ beyond the spec fields named here.
   entry) opens a stats strip: min / max / mean / last / point count with
   unit. Stats are computed at render time from the authored values, never
   in the viewer. Other series dim; Close or Esc clears.
+- **Color palette** — Color follows Theme in the toolbar. Its picker applies
+  Classic (the default), Cool, Warm, or Primary to categorical series and
+  leaves semantic roles and heatmap ramps unchanged. Reset restores Classic.
+  Arrow keys move through choices; Enter or Space selects; Escape closes.
 - **Brush zoom** — `interactions.brush: "x"`, valid only for line marks
   over a time or linear x (validation enforces this). Drag selects an index
   window; the viewer re-projects marks with an affine x remap. The y axis
@@ -53,14 +57,17 @@ stay comparable across locales. `<html lang>` follows the locale.
 
 ## Deep links
 
-`#theme=dark|light`, `#focus=<seriesId>`, `#hidden=<id>,<id>`,
-`#brush=<i0>~<i1>` (data indices), `#view=<viewId>`. Combined with `&`. The viewer restores
-them on load and keeps the hash current as the reader explores.
+`#theme=dark|light`, `#palette=classic|cool|warm|primary`,
+`#focus=<seriesId>`, `#hidden=<id>,<id>`, `#brush=<i0>~<i1>` (data indices),
+`#view=<viewId>`. Combined with `&`. The viewer restores them on load and
+keeps the hash current as the reader explores. Classic is omitted because it
+is the palette default.
 
 ## Exports
 
 The Export menu is canonical-at-rest: hover, dim, hidden-series, and zoom
 state are stripped, and the full authored chart is restored before capture.
+The selected theme and color palette are presentation choices and remain.
 
 - **PNG (2×)** — raster on the current theme's panel background.
 - **SVG** — standalone, theme tokens resolved and inlined.

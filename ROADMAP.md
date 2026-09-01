@@ -37,14 +37,15 @@ segments verified perceptually distinguishable via CIEDE2000.
 
 **The viewer.** One self-contained HTML file, offline, no CDN: crosshair
 tooltips, legend toggling, click-to-focus Data Passport with render-time
-statistics, opt-in brush zoom that never rescales y, up to five authored
-guided views, deep links, and exports (PNG, standalone SVG, provenance CSV,
-1200×630 share card) that always capture the canonical chart at rest.
+statistics, a Color picker for Classic, Cool, Warm, and Primary categorical
+palettes, opt-in brush zoom that never rescales y, up to five authored guided
+views, deep links, and exports (PNG, standalone SVG, provenance CSV, 1200×630
+share card) that always capture the canonical chart at rest.
 
 **Accessibility.** A visually hidden data table with the exact values on
-every chart, keyboard walking of every family with live-region
-announcements, non-colour state cues, and a palette verified against WCAG AA
-in both themes.
+every chart, keyboard walking of every family with live-region announcements,
+non-colour state cues, and semantic-role and heatmap colors verified against
+WCAG AA in both themes.
 
 **Localization.** `en` and `zh-CN` for viewer chrome and computed notes;
 authored content is never translated.
@@ -88,6 +89,9 @@ Roughly in the order they would earn their place.
 
 ### Ergonomics
 
+- **Selectable palette accessibility hardening.** Preserve the approved
+  visual direction while resolving the measured light-panel contrast and
+  adjacent-series ΔE gaps recorded in the palette picker feature plan.
 - **Data size caps.** Row limits exist; byte-level caps with a downsampling
   fix are not implemented.
 - **`meta.animation: "draw"`** — a finite line draw-in, opt-in, excluded from

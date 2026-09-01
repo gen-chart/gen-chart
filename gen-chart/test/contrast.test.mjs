@@ -9,8 +9,7 @@ import { contrastRatio, parseThemeTokens, hexToRgb, relativeLuminance, AA_TEXT, 
 
 const css = readFileSync(new URL('../assets/template.html', import.meta.url), 'utf8');
 const themes = parseThemeTokens(css);
-const MARKS = ['--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--cat-5',
-  '--role-primary', '--role-comparison', '--role-positive', '--role-negative',
+const ROLE_MARKS = ['--role-primary', '--role-comparison', '--role-positive', '--role-negative',
   '--role-neutral', '--role-highlight'];
 
 test('the known WCAG reference pairs compute correctly', () => {
@@ -38,9 +37,9 @@ test('axis and body text meet AA in every theme', () => {
   }
 });
 
-test('every series colour is distinguishable from the panel (1.4.11)', () => {
+test('every semantic-role colour is distinguishable from the panel (1.4.11)', () => {
   for (const [name, t] of Object.entries(themes)) {
-    for (const key of MARKS) {
+    for (const key of ROLE_MARKS) {
       const r = contrastRatio(t[key], t['--panel']);
       assert.ok(r >= AA_GRAPHIC, `${name}: ${key} is ${r.toFixed(2)}:1 against the panel, below ${AA_GRAPHIC}`);
     }

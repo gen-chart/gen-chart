@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="auto">
+<html lang="en" data-theme="auto" data-palette="classic">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,6 +40,10 @@
     --div-ink-0: #fff1f2; --div-ink-1: #ffffff; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
   }
 }
+:root[data-palette="classic"] { --cat-0: #A2C9FB; --cat-1: #5996E7; --cat-2: #D5C4FC; --cat-3: #7563DB; --cat-4: #F6D147; --cat-5: #FBF19F; }
+:root[data-palette="cool"] { --cat-0: #CCE7C1; --cat-1: #AAD7BA; --cat-2: #88C7C6; --cat-3: #68ACCD; --cat-4: #5494C0; --cat-5: #417AB3; }
+:root[data-palette="warm"] { --cat-0: #F6E287; --cat-1: #F8DB82; --cat-2: #F2B75C; --cat-3: #EE944B; --cat-4: #E85E38; --cat-5: #D03828; }
+:root[data-palette="primary"] { --cat-0: #E74C3C; --cat-1: #F06A5B; --cat-2: #F4D03F; --cat-3: #F7DC6F; --cat-4: #3498DB; --cat-5: #5DADE2; }
 * { box-sizing: border-box; margin: 0; }
 body {
   background: var(--bg); color: var(--ink);
@@ -51,7 +55,7 @@ body {
 header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
 .gc-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.2rem; }
-.gc-toolbar { display: flex; gap: 0.5rem; flex: none; position: relative; }
+.gc-toolbar { display: flex; align-items: flex-start; gap: 0.5rem; flex: none; position: relative; }
 .gc-btn {
   background: var(--panel); color: var(--ink); border: 1px solid var(--border);
   border-radius: 0.5rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8rem; cursor: pointer;
@@ -70,6 +74,22 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
   font: inherit; font-size: 0.8rem; padding: 0.42rem 0.6rem; border-radius: 0.4rem; cursor: pointer;
 }
 .gc-menu button:hover { background: var(--grid); }
+.gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
+.gc-palette-menu { min-width: 250px; padding: 0.5rem; }
+.gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
+.gc-palette-head h2 { font-size: 0.82rem; font-weight: 700; }
+.gc-menu .gc-palette-reset { width: auto; color: var(--role-primary); font-weight: 700; padding: 0.25rem 0.4rem; }
+.gc-palette-options { display: grid; gap: 0.15rem; }
+.gc-menu .gc-palette-option { display: flex; align-items: center; gap: 0.65rem; }
+.gc-palette-option[aria-selected="true"] { background: var(--grid); font-weight: 700; }
+.gc-palette-preview { display: inline-flex; flex: none; gap: 2px; }
+.gc-palette-swatch {
+  width: 14px; height: 14px; background: var(--preview); box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+.gc-palette-swatch:first-child { border-radius: 4px 0 0 4px; }
+.gc-palette-swatch:last-child { border-radius: 0 4px 4px 0; }
+.gc-palette-check { margin-left: auto; opacity: 0; font-weight: 800; }
+.gc-palette-option[aria-selected="true"] .gc-palette-check { opacity: 1; }
 .gc-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; position: relative; }
 .gc-reset {
   position: absolute; top: 0.9rem; right: 0.9rem; display: none;
@@ -174,6 +194,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
    inside its own panel instead, so the page body never scrolls sideways. */
 @media (max-width: 700px) {
   body { padding: 1.25rem 0.75rem; }
+  header { flex-wrap: wrap; }
+  .gc-toolbar { margin-left: auto; }
+  .gc-palette-menu { max-width: calc(100vw - 1.5rem); }
   .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
   svg.gc-chart { min-width: 560px; }
   .gc-panel { padding: 1rem 0.85rem; }
@@ -191,11 +214,21 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     <div class="gc-toolbar">
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
       <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
+      <button class="gc-btn" id="gc-color-btn" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
       <div class="gc-menu" id="gc-export-menu" role="menu">
         <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
         <button type="button" data-export="svg" role="menuitem">Download SVG</button>
         <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
         <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+      </div>
+      <div class="gc-menu gc-palette-menu" id="gc-color-menu">
+        <div class="gc-palette-head">
+          <h2 id="gc-color-heading">Color palette</h2>
+          <button class="gc-palette-reset" id="gc-color-reset" type="button">Reset</button>
+        </div>
+        <div class="gc-palette-options" id="gc-palette-options" role="listbox" aria-labelledby="gc-color-heading">
+          <button class="gc-palette-option" type="button" role="option" data-palette="classic" aria-selected="true" tabindex="0"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#5996E7"></span><span class="gc-palette-swatch" style="--preview:#8AA7F5"></span><span class="gc-palette-swatch" style="--preview:#F6D985"></span></span><span>Classic</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="cool" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#AAD7BA"></span><span class="gc-palette-swatch" style="--preview:#68ACCD"></span><span class="gc-palette-swatch" style="--preview:#417AB3"></span></span><span>Cool</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="warm" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#F5D06C"></span><span class="gc-palette-swatch" style="--preview:#EE944B"></span><span class="gc-palette-swatch" style="--preview:#D03828"></span></span><span>Warm</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="primary" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#E74C3C"></span><span class="gc-palette-swatch" style="--preview:#F4D03F"></span><span class="gc-palette-swatch" style="--preview:#3498DB"></span></span><span>Primary</span><span class="gc-palette-check" aria-hidden="true">✓</span></button>
+        </div>
       </div>
     </div>
   </header>
@@ -214,7 +247,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Most requests land between 60 and 90 ms, but a right tail stretches past 200 ms.</li><li>The tail, not the median, is what users notice — track p95 rather than the average.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"distribution","hover":"element","title":"API Response Time Distribution","unit":"ms","width":960,"height":520,"legendToggle":false,"table":{"headers":["bin_start","bin_end","count"],"rows":[[40,60,6],[60,80,22],[80,100,11],[100,120,5],[120,140,2],[140,160,1],[160,180,1],[180,200,1],[200,220,0],[220,240,1]]},"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
+<script id="gc-payload" type="application/json">{"family":"distribution","hover":"element","title":"API Response Time Distribution","unit":"ms","width":960,"height":520,"legendToggle":false,"table":{"headers":["bin_start","bin_end","count"],"rows":[[40,60,6],[60,80,22],[80,100,11],[100,120,5],[120,140,2],[140,160,1],[160,180,1],[180,200,1],[200,220,0],[220,240,1]]},"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -226,6 +259,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var focusId = null;
   var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
+  var paletteIds = Object.keys(payload.palettes || {});
+  var currentPalette = 'classic';
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -249,6 +284,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var parts = [];
     var theme = root.getAttribute('data-theme');
     if (theme !== 'auto') parts.push('theme=' + theme);
+    if (currentPalette !== 'classic') parts.push('palette=' + currentPalette);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
@@ -566,14 +602,97 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // ------------------------------------------------------------ exports
   var exportBtn = document.getElementById('gc-export-btn');
   var exportMenu = document.getElementById('gc-export-menu');
+  var colorBtn = document.getElementById('gc-color-btn');
+  var colorMenu = document.getElementById('gc-color-menu');
+  var colorReset = document.getElementById('gc-color-reset');
+  var paletteOptions = Array.from(document.querySelectorAll('.gc-palette-option'));
+
+  function closeExportMenu() {
+    exportMenu.removeAttribute('data-open');
+    exportBtn.setAttribute('aria-expanded', 'false');
+  }
+  function closeColorMenu(restoreFocus) {
+    colorMenu.removeAttribute('data-open');
+    colorBtn.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) colorBtn.focus();
+  }
+  function setPalette(id, updateHash) {
+    currentPalette = paletteIds.indexOf(id) === -1 ? 'classic' : id;
+    root.setAttribute('data-palette', currentPalette);
+    paletteOptions.forEach(function (option) {
+      var selected = option.getAttribute('data-palette') === currentPalette;
+      option.setAttribute('aria-selected', selected ? 'true' : 'false');
+      option.tabIndex = selected ? 0 : -1;
+    });
+    if (updateHash) writeHash();
+  }
+  function focusPalette(index) {
+    if (!paletteOptions.length) return;
+    var target = paletteOptions[(index + paletteOptions.length) % paletteOptions.length];
+    paletteOptions.forEach(function (option) { option.tabIndex = option === target ? 0 : -1; });
+    target.focus();
+  }
+  function openColorMenu(focusSelection) {
+    closeExportMenu();
+    colorMenu.setAttribute('data-open', '');
+    colorBtn.setAttribute('aria-expanded', 'true');
+    if (focusSelection) {
+      var index = paletteOptions.findIndex(function (option) {
+        return option.getAttribute('data-palette') === currentPalette;
+      });
+      focusPalette(Math.max(0, index));
+    }
+  }
+
   exportBtn.addEventListener('click', function () {
-    var open = exportMenu.toggleAttribute('data-open');
+    var opening = !exportMenu.hasAttribute('data-open');
+    closeColorMenu(false);
+    exportMenu.toggleAttribute('data-open', opening);
+    var open = exportMenu.hasAttribute('data-open');
     exportBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  colorBtn.addEventListener('click', function () {
+    if (colorMenu.hasAttribute('data-open')) closeColorMenu(false);
+    else openColorMenu(false);
+  });
+  colorBtn.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      openColorMenu(true);
+    } else if (e.key === 'Escape' && colorMenu.hasAttribute('data-open')) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeColorMenu(true);
+    }
+  });
+  colorReset.addEventListener('click', function () { setPalette('classic', true); });
+  colorMenu.addEventListener('click', function (e) {
+    var option = e.target.closest('.gc-palette-option');
+    if (option) setPalette(option.getAttribute('data-palette'), true);
+  });
+  colorMenu.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closeColorMenu(true);
+      return;
+    }
+    var option = e.target.closest('.gc-palette-option');
+    if (!option) return;
+    var index = paletteOptions.indexOf(option);
+    if (e.key === 'ArrowDown') { e.preventDefault(); focusPalette(index + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); focusPalette(index - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); focusPalette(0); }
+    else if (e.key === 'End') { e.preventDefault(); focusPalette(paletteOptions.length - 1); }
+    else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setPalette(option.getAttribute('data-palette'), true);
+    }
   });
   document.addEventListener('click', function (e) {
     if (!e.target.closest('.gc-toolbar')) {
-      exportMenu.removeAttribute('data-open');
-      exportBtn.setAttribute('aria-expanded', 'false');
+      closeExportMenu();
+      closeColorMenu(false);
     }
   });
 
@@ -864,6 +983,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 
   // -------------------------------------------------- restore deep link
   var h = readHash();
+  setPalette(h.palette, false);
   if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
   if (h.hidden && isAxis) {
     h.hidden.split(',').forEach(function (id) {

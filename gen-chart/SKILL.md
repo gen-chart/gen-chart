@@ -137,12 +137,14 @@ receipt shapes, exit codes, and the repair loop in detail.
 ## Viewer capabilities (no extra authoring work)
 
 Generated HTML already contains: dark/light theme toggle honoring
-`prefers-color-scheme`, crosshair tooltip with formatted values and units,
+`prefers-color-scheme`, a Color picker for Classic, Cool, Warm, and Primary
+categorical palettes, crosshair tooltip with formatted values and units,
 legend series toggling (auto when ≥2 series), click-to-focus Data Passport
-with render-time stats, deep links (`#theme=`, `#focus=`, `#hidden=`,
-`#brush=`), and an Export menu (PNG 2×, standalone SVG, provenance data
-CSV, 1200×630 share card) that always captures the canonical at-rest chart.
-Everything is inline — one portable file, no CDN, works offline.
+with render-time stats, deep links (`#theme=`, `#palette=`, `#focus=`,
+`#hidden=`, `#brush=`), and an Export menu (PNG 2×, standalone SVG,
+provenance data CSV, 1200×630 share card) that always captures the canonical
+at-rest chart with the selected theme and palette. Everything is inline — one
+portable file, no CDN, works offline.
 
 Every artifact is also accessible without a pointer: the plot is focusable,
 arrow keys walk the data points and announce them, and a visually hidden

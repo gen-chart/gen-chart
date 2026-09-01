@@ -53,8 +53,12 @@ test('a zh-CN artifact localizes chrome and sets the document language', () => {
   assert.match(html, /<html lang="zh-CN"/);
   assert.ok(html.includes('导出'), 'Export button localized');
   assert.ok(html.includes('主题'), 'Theme button localized');
+  assert.ok(html.includes('颜色'), 'Color button localized');
+  assert.ok(html.includes('图表配色'), 'palette heading localized');
+  assert.ok(html.includes('经典'), 'palette option localized');
   assert.ok(html.includes('下载数据 CSV'), 'export menu localized');
   assert.ok(!html.includes('>Export<'), 'no English chrome leaks through');
+  assert.ok(!html.includes('>Color<'), 'no English palette chrome leaks through');
 });
 
 test('authored content is reproduced exactly, never translated', () => {

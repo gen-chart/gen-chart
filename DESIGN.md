@@ -90,6 +90,55 @@ diverging ramp with paired ink tokens.
 `bg` → `panel` → `grid` → `axis` → `muted` → `ink`. Structure comes from this
 ladder; a saturated color never does a job that contrast can do.
 
+### Selectable chart palettes
+
+The HTML viewer offers four named categorical palettes. **Classic** is the
+default; the other choices change the visual character without changing
+series order or meaning.
+
+| Palette | Character | Intended use |
+|---|---|---|
+| **Classic** | Blue, violet, and yellow pairs | General-purpose categorical charts |
+| **Cool** | A pale green through teal to blue progression | Calm, technical, or analytical charts |
+| **Warm** | A yellow through amber and orange to red progression | Energetic charts where warmth suits the subject |
+| **Primary** | Red, yellow, and blue pairs | Categorical charts using familiar primary-color families |
+
+The six-color arrays map in order to `--cat-0`…`--cat-5`. The three-color
+arrays are the abbreviated swatches shown in the palette picker; they do not
+change chart rendering.
+
+```js
+const palettes = {
+  classic: {
+    six: ['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F'],
+    three: ['#5996E7', '#8AA7F5', '#F6D985'],
+  },
+  cool: {
+    six: ['#CCE7C1', '#AAD7BA', '#88C7C6', '#68ACCD', '#5494C0', '#417AB3'],
+    three: ['#AAD7BA', '#68ACCD', '#417AB3'],
+  },
+  warm: {
+    six: ['#F6E287', '#F8DB82', '#F2B75C', '#EE944B', '#E85E38', '#D03828'],
+    three: ['#F5D06C', '#EE944B', '#D03828'],
+  },
+  primary: {
+    six: ['#E74C3C', '#F06A5B', '#F4D03F', '#F7DC6F', '#3498DB', '#5DADE2'],
+    three: ['#E74C3C', '#F4D03F', '#3498DB'],
+  },
+};
+```
+
+Selecting a palette remaps only categorical series: declared semantic roles,
+positive/negative meaning, annotations, and sequential or diverging heatmap
+ramps do not change.
+
+**Known accessibility gap.** The supplied palette values clear the current
+dark-panel contrast check, but several pale colors do not clear 3:1 against
+the light panel, and some same-family neighbours fall below the current ΔE 9
+threshold. The measured audit and resolution options live in
+`CHART-COLOUR-PALETTE-PICKER-PLAN.md`. Do not weaken those thresholds or claim
+palette accessibility sign-off until that follow-up is resolved.
+
 ### Named rules
 
 **The Semantic Color Rule.** Every saturated color maps to a data meaning.
@@ -145,8 +194,24 @@ beside the chart.
 
 ## Interaction
 
-Chrome is two buttons (Export, Theme) plus, when earned, a guided-view strip
-and a reset control. Everything else appears on demand.
+Chrome is three buttons in order — **Export**, **Theme**, **Color** — plus,
+when earned, a guided-view strip and a reset control. Everything else appears
+on demand.
+
+### Color palette picker
+
+**Color** sits immediately after **Theme** and opens a compact popover modelled
+on a palette override menu. The popover lists **Classic**, **Cool**, **Warm**,
+and **Primary** vertically; each row includes a three-swatch preview and its
+name. The selected row has a visible check or selection mark and
+`aria-selected="true"`, so selection is never communicated by color alone.
+
+Choosing a row previews and applies it immediately without closing the
+popover. **Reset**, aligned with the popover heading, restores **Classic**.
+Escape closes the popover, arrow keys move through options, and Enter or Space
+selects one. The choice survives theme changes and is included in deep links;
+exports use the selected palette while still stripping transient hover,
+focus, legend, and zoom state.
 
 - **Tooltip / crosshair** reveals exact authored values.
 - **Legend** toggles series; double-click isolates one.
