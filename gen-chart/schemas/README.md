@@ -21,7 +21,7 @@ Distribution and matrix schemas accept *raw* inputs — observations and
 long-format cell triples — because the renderer, not the author, computes
 bins, quartiles, fences, and colour buckets.
 
-Rules carried over from Archify:
+Design rules:
 
 - `additionalProperties: false` at every level; unknown fields are rejected.
 - Validators are precompiled with ajv (dev dependency) into a committed

@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rollbacks fell from 10.5% to 7.7% of deploys over six months</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f8fafc; --ink: #0f172a; --muted: #64748b;
+  --grid: #e2e8f0; --border: #e2e8f0; --axis: #94a3b8; --tooltip-bg: #0f172a; --tooltip-ink: #f8fafc;
+  --cat-0: #2563eb; --cat-1: #059669; --cat-2: #d97706; --cat-3: #7c3aed; --cat-4: #db2777; --cat-5: #0891b2;
+  --role-primary: #2563eb; --role-comparison: #64748b; --role-positive: #059669;
+  --role-negative: #e11d48; --role-neutral: #748296; --role-highlight: #d97706;
+  --seq-0: #dbeafe; --seq-1: #bfdbfe; --seq-2: #93c5fd; --seq-3: #60a5fa; --seq-4: #3b82f6; --seq-5: #1d4ed8;
+  --seq-ink-0: #0f172a; --seq-ink-1: #0f172a; --seq-ink-2: #0f172a; --seq-ink-3: #0f172a; --seq-ink-4: #0f172a; --seq-ink-5: #f8fafc;
+  --div-0: #be123c; --div-1: #fb7185; --div-2: #fecdd3; --div-3: #a7f3d0; --div-4: #34d399; --div-5: #047857;
+  --div-ink-0: #fff1f2; --div-ink-1: #0f172a; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
+}
+:root[data-theme="dark"] {
+  --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+  --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+  --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+  --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+  --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+  --seq-0: #0b2545; --seq-1: #123a63; --seq-2: #1b5183; --seq-3: #2a6ea8; --seq-4: #3f92cf; --seq-5: #60b8f2;
+  --seq-ink-0: #e2e8f0; --seq-ink-1: #e2e8f0; --seq-ink-2: #e2e8f0; --seq-ink-3: #ffffff; --seq-ink-4: #04121f; --seq-ink-5: #04121f;
+  --div-0: #9f1239; --div-1: #e11d48; --div-2: #fda4af; --div-3: #6ee7b7; --div-4: #10b981; --div-5: #065f46;
+  --div-ink-0: #fff1f2; --div-ink-1: #ffffff; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #020617; --panel: #0f172a; --ink: #f8fafc; --muted: #94a3b8;
+    --grid: #1e293b; --border: #1e293b; --axis: #475569; --tooltip-bg: #f8fafc; --tooltip-ink: #0f172a;
+    --cat-0: #60a5fa; --cat-1: #34d399; --cat-2: #fbbf24; --cat-3: #a78bfa; --cat-4: #f472b6; --cat-5: #22d3ee;
+    --role-primary: #60a5fa; --role-comparison: #94a3b8; --role-positive: #34d399;
+    --role-negative: #fb7185; --role-neutral: #64748b; --role-highlight: #fbbf24;
+    --seq-0: #0b2545; --seq-1: #123a63; --seq-2: #1b5183; --seq-3: #2a6ea8; --seq-4: #3f92cf; --seq-5: #60b8f2;
+    --seq-ink-0: #e2e8f0; --seq-ink-1: #e2e8f0; --seq-ink-2: #e2e8f0; --seq-ink-3: #ffffff; --seq-ink-4: #04121f; --seq-ink-5: #04121f;
+    --div-0: #9f1239; --div-1: #e11d48; --div-2: #fda4af; --div-3: #6ee7b7; --div-4: #10b981; --div-5: #065f46;
+    --div-ink-0: #fff1f2; --div-ink-1: #ffffff; --div-ink-2: #0f172a; --div-ink-3: #0f172a; --div-ink-4: #0f172a; --div-ink-5: #ecfdf5;
+  }
+}
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 2rem 1.25rem; display: flex; justify-content: center;
+  transition: background 150ms, color 150ms;
+}
+.gc-wrap { width: 100%; max-width: 1040px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
+.gc-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.2rem; }
+.gc-toolbar { display: flex; gap: 0.5rem; flex: none; position: relative; }
+.gc-btn {
+  background: var(--panel); color: var(--ink); border: 1px solid var(--border);
+  border-radius: 0.5rem; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.8rem; cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+}
+.gc-btn:hover { border-color: var(--axis); }
+.gc-btn:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; display: none; min-width: 190px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 0.6rem;
+  padding: 0.35rem; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+.gc-menu[data-open] { display: block; }
+.gc-menu button {
+  display: block; width: 100%; text-align: left; background: none; border: none; color: var(--ink);
+  font: inherit; font-size: 0.8rem; padding: 0.42rem 0.6rem; border-radius: 0.4rem; cursor: pointer;
+}
+.gc-menu button:hover { background: var(--grid); }
+.gc-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; position: relative; }
+.gc-reset {
+  position: absolute; top: 0.9rem; right: 0.9rem; display: none;
+}
+.gc-reset[data-on] { display: block; }
+svg.gc-chart { display: block; width: 100%; height: auto; }
+.gc-grid line { stroke: var(--grid); stroke-width: 1; }
+.gc-axis { stroke: var(--axis); stroke-width: 1; }
+.gc-yticks text, .gc-xticks text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-axis-label { fill: var(--muted); font-size: 11.5px; font-weight: 600; font-family: inherit; }
+.gc-series rect { fill: var(--sc); }
+.gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.gc-point { fill: var(--sc); }
+.gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
+.gc-bin { fill: var(--sc); }
+.gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-whisker, .gc-box .gc-cap { stroke: var(--sc); stroke-width: 1.5; }
+.gc-box .gc-median { stroke: var(--sc); stroke-width: 2.5; }
+.gc-box .gc-outlier { fill: var(--sc); fill-opacity: 0.7; }
+.gc-slice { fill: var(--sc); stroke: var(--panel); stroke-width: 1.5; }
+.gc-slice-label { fill: #f8fafc; font-size: 11px; font-weight: 700; font-family: inherit; paint-order: stroke; stroke: rgba(2, 6, 23, 0.35); stroke-width: 2.5px; }
+.gc-donut-total { fill: var(--ink); font-size: 20px; font-weight: 700; font-family: inherit; }
+.gc-donut-unit { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-cell { fill: var(--sc); }
+.gc-cell-empty { fill: var(--grid); }
+.gc-cell-label { fill: var(--ci); font-size: 10.5px; font-weight: 600; font-family: inherit; }
+.gc-row-label { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.gc-ramp rect { fill: var(--sc); }
+.gc-ramp text { fill: var(--muted); font-size: 10px; font-family: inherit; }
+[data-tip] { cursor: default; }
+.gc-hot { filter: brightness(1.12); }
+.gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
+.gc-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.gc-figure:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 4px; border-radius: 0.5rem; }
+.gc-views { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+.gc-views button {
+  background: var(--panel); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.3rem 0.8rem; font: inherit; font-size: 0.78rem; cursor: pointer;
+  transition: border-color 150ms, color 150ms, background 150ms;
+}
+.gc-views button:hover { border-color: var(--axis); color: var(--ink); }
+.gc-views button[aria-pressed="true"] { background: var(--role-primary); border-color: var(--role-primary); color: #fff; }
+.gc-views button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-view-clear { margin-left: auto; }
+.gc-view-note { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.75rem; min-height: 1.2em; }
+.gc-view-note:empty { display: none; }
+.gc-legend button[disabled] { cursor: default; opacity: 1; }
+.gc-series.gc-off { display: none; }
+.gc-series.gc-dim { opacity: 0.22; }
+.gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.gc-annotations text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-annotations [data-gone] { display: none; }
+.gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
+.gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
+.gc-hit { cursor: crosshair; }
+.gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
+.gc-legend button {
+  display: inline-flex; align-items: center; gap: 0.45rem; background: none; border: none;
+  color: var(--ink); font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.15rem 0.2rem; border-radius: 0.3rem;
+}
+.gc-legend button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: 2px; }
+.gc-legend button[aria-pressed="false"] { color: var(--muted); text-decoration: line-through; }
+.gc-legend button[aria-pressed="false"] .gc-swatch { opacity: 0.35; }
+.gc-legend[data-static] button { cursor: default; }
+.gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
+.gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-passport {
+  display: none; margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.8rem;
+  font-size: 0.82rem;
+}
+.gc-passport[data-open] { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.gc-passport .gc-pp-name { font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; }
+.gc-passport .gc-pp-dot { width: 9px; height: 9px; border-radius: 50%; }
+.gc-passport dl { display: inline-flex; gap: 1.2rem; margin: 0; }
+.gc-passport dt { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.gc-passport dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+.gc-passport .gc-pp-close { margin-left: auto; }
+.gc-tooltip {
+  position: fixed; z-index: 10; pointer-events: none; display: none;
+  background: var(--tooltip-bg); color: var(--tooltip-ink);
+  border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+}
+.gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
+.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+.gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
+.gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
+.gc-card ul { padding-left: 1.1rem; font-size: 0.85rem; }
+.gc-card li { margin: 0.2rem 0; }
+/* Narrow screens: scaling a 960px chart down to phone width shrinks 11px
+   axis type to roughly 3px. Hold a legible minimum and let the chart scroll
+   inside its own panel instead, so the page body never scrolls sideways. */
+@media (max-width: 700px) {
+  body { padding: 1.25rem 0.75rem; }
+  .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
+  svg.gc-chart { min-width: 560px; }
+  .gc-panel { padding: 1rem 0.85rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="gc-wrap">
+  <header>
+    <div>
+      <h1>Rollbacks fell from 10.5% to 7.7% of deploys over six months</h1>
+      
+    </div>
+    <div class="gc-toolbar">
+      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
+      <div class="gc-menu" id="gc-export-menu" role="menu">
+        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+      </div>
+    </div>
+  </header>
+  
+  <div class="gc-panel">
+    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+      <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Rollbacks fell from 10.5% to 7.7% of deploys over six months" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="38" y1="490" x2="940" y2="490"/><line x1="38" y1="376.5" x2="940" y2="376.5"/><line x1="38" y1="263" x2="940" y2="263"/><line x1="38" y1="149.5" x2="940" y2="149.5"/><line x1="38" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="30" y="493.5" text-anchor="end">0%</text><text x="30" y="380" text-anchor="end">25%</text><text x="30" y="266.5" text-anchor="end">50%</text><text x="30" y="153" text-anchor="end">75%</text><text x="30" y="39.5" text-anchor="end">100%</text></g><line class="gc-axis" x1="38" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="38" y="506" text-anchor="middle">Jan 2026</text><text x="223.2" y="506" text-anchor="middle">Feb</text><text x="390.4" y="506" text-anchor="middle">Mar</text><text x="575.6" y="506" text-anchor="middle">Apr</text><text x="754.8" y="506" text-anchor="middle">May</text><text x="940" y="506" text-anchor="middle">Jun</text></g><text class="gc-axis-label" x="38" y="26" text-anchor="start">Deploys (% of total)</text><g class="gc-series" data-series="succeeded" style="--sc:var(--cat-0)"><path class="gc-area" d="M38 100.9L223.2 94.3L390.4 95.8L575.6 91.2L754.8 91.2L940 86L940 490L754.8 490L575.6 490L390.4 490L223.2 490L38 490Z"/></g><g class="gc-series" data-series="rolled_back" style="--sc:var(--cat-1)"><path class="gc-area" d="M38 53.3L223.2 52.7L390.4 51.5L575.6 52.4L754.8 53L940 51.2L940 86L754.8 91.2L575.6 91.2L390.4 95.8L223.2 94.3L38 100.9Z"/></g><g class="gc-series" data-series="failed" style="--sc:var(--cat-2)"><path class="gc-area" d="M38 36L223.2 36L390.4 36L575.6 36L754.8 36L940 36L940 51.2L754.8 53L575.6 52.4L390.4 51.5L223.2 52.7L38 53.3Z"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><rect class="gc-hit" x="38" y="36" width="902" height="454" fill="none" pointer-events="all"/></g></svg>
+    </div>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
+    <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">month</th><th scope="col">Succeeded</th><th scope="col">Rolled back</th><th scope="col">Failed</th></tr></thead><tbody><tr><th scope="row">2026-01</th><td>180</td><td>22</td><td>8</td></tr><tr><th scope="row">2026-02</th><td>190</td><td>20</td><td>8</td></tr><tr><th scope="row">2026-03</th><td>178</td><td>20</td><td>7</td></tr><tr><th scope="row">2026-04</th><td>195</td><td>19</td><td>8</td></tr><tr><th scope="row">2026-05</th><td>188</td><td>18</td><td>8</td></tr><tr><th scope="row">2026-06</th><td>186</td><td>16</td><td>7</td></tr></tbody></table>
+    <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="succeeded" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-0)"></span>Succeeded</button><button type="button" data-series="rolled_back" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-1)"></span>Rolled back</button><button type="button" data-series="failed" aria-pressed="true"><span class="gc-swatch" data-mark="area" style="--sw:var(--cat-2)"></span>Failed</button></div>
+    <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
+  </div>
+  <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Clean deploys rose from 85.7% to 89.0% of the total; rollbacks fell from 10.5% to 7.7%.</li><li>Outright failures barely moved, from 3.8% to 3.3%.</li><li>Deploy volume stayed within a narrow band (205–222 per month), so these shares reflect real changes in outcome rather than a shifting denominator.</li></ul></section></div>
+</div>
+<div class="gc-tooltip" id="gc-tooltip" role="status"></div>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Rollbacks fell from 10.5% to 7.7% of deploys over six months","unit":"deploys","xType":"time","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[38,223.2,390.4,575.6,754.8,940],"xLabels":["Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026"],"table":{"headers":["month","Succeeded","Rolled back","Failed"],"rows":[["2026-01",180,22,8],["2026-02",190,20,8],["2026-03",178,20,7],["2026-04",195,19,8],["2026-05",188,18,8],["2026-06",186,16,7]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"succeeded","label":"Succeeded","mark":"area","color":"var(--cat-0)","values":[180,190,178,195,188,186],"formatted":["85.7% (180 deploys)","87.2% (190 deploys)","86.8% (178 deploys)","87.8% (195 deploys)","87.9% (188 deploys)","89.0% (186 deploys)"],"pixels":[-327.2,-372.6,-318.1,-395.3,-363.5,-354.4],"stats":{"min":178,"max":195,"mean":186.16666666666666,"last":186,"count":6}},{"id":"rolled_back","label":"Rolled back","mark":"area","color":"var(--cat-1)","values":[22,20,20,19,18,16],"formatted":["10.5% (22 deploys)","9.2% (20 deploys)","9.8% (20 deploys)","8.6% (19 deploys)","8.4% (18 deploys)","7.7% (16 deploys)"],"pixels":[390.1,399.2,399.2,403.7,408.3,417.4],"stats":{"min":16,"max":22,"mean":19.166666666666668,"last":16,"count":6}},{"id":"failed","label":"Failed","mark":"area","color":"var(--cat-2)","values":[8,8,7,8,8,7],"formatted":["3.8% (8 deploys)","3.7% (8 deploys)","3.4% (7 deploys)","3.6% (8 deploys)","3.7% (8 deploys)","3.3% (7 deploys)"],"pixels":[453.7,453.7,458.2,453.7,453.7,458.2],"stats":{"min":7,"max":8,"mean":7.666666666666667,"last":7,"count":6}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"}}</script>
+<script>
+(function () {
+  'use strict';
+  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
+  var root = document.documentElement;
+  var svg = document.querySelector('svg.gc-chart');
+  var plot = payload.plot;
+  var hidden = {};
+  var focusId = null;
+  var activeView = null;
+  var zoom = null; // [i0, i1] data-index window, or null
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function slug() {
+    return String(payload.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'chart';
+  }
+
+  // ---------------------------------------------------------- deep links
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+      var i = kv.indexOf('=');
+      if (i > 0) out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+    });
+    return out;
+  }
+  function writeHash() {
+    var parts = [];
+    var theme = root.getAttribute('data-theme');
+    if (theme !== 'auto') parts.push('theme=' + theme);
+    if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
+    var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
+    if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
+    if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
+    if (activeView) parts.push('view=' + encodeURIComponent(activeView));
+    history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
+  }
+
+  // -------------------------------------------------------------- theme
+  document.getElementById('gc-theme').addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    if (current === 'auto') {
+      current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    writeHash();
+  });
+
+  var isAxis = payload.hover === 'axis';
+
+  // ------------------------------------------------------------- legend
+  var legend = document.querySelector('.gc-legend');
+  function applyHidden(id) {
+    var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(id) + '"]');
+    if (g) g.classList.toggle('gc-off', !!hidden[id]);
+    if (legend) {
+      var btn = legend.querySelector('button[data-series="' + CSS.escape(id) + '"]');
+      if (btn) btn.setAttribute('aria-pressed', hidden[id] ? 'false' : 'true');
+    }
+  }
+  if (legend && payload.legendToggle && isAxis) {
+    legend.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-series]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-series');
+      hidden[id] = !hidden[id];
+      applyHidden(id);
+      if (focusId === id && hidden[id]) setFocus(null);
+      hideTip();
+      writeHash();
+    });
+    legend.addEventListener('dblclick', function (e) {
+      var btn = e.target.closest('button[data-series]');
+      if (!btn) return;
+      setFocus(btn.getAttribute('data-series'));
+      writeHash();
+    });
+  } else if (legend) {
+    legend.setAttribute('data-static', '');
+  }
+
+  // ------------------------------------------------------ data passport
+  // Passport, zoom, and crosshair are axis-family features. Element-hover
+  // families (distribution, proportion, matrix) read per-mark instead.
+  var passport = document.getElementById('gc-passport');
+  function setFocus(id) {
+    focusId = id && !hidden[id] ? id : null;
+    payload.series.forEach(function (s) {
+      var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
+      if (g) g.classList.toggle('gc-dim', !!focusId && s.id !== focusId);
+    });
+    if (!focusId) {
+      passport.removeAttribute('data-open');
+      passport.innerHTML = '';
+      return;
+    }
+    var s = payload.series.find(function (x) { return x.id === focusId; });
+    var st = s.stats || {};
+    var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var L = payload.i18n;
+    passport.innerHTML =
+      '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
+      '<dl><div><dt>' + esc(L['stat.min']) + '</dt><dd>' + fmt(st.min) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.max']) + '</dt><dd>' + fmt(st.max) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.mean']) + '</dt><dd>' + fmt(st.mean) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.last']) + '</dt><dd>' + fmt(st.last) + u + '</dd></div>' +
+      '<div><dt>' + esc(L['stat.points']) + '</dt><dd>' + (st.count || 0) + '</dd></div></dl>' +
+      '<button class="gc-btn gc-pp-close" type="button">' + esc(L['ui.close']) + '</button>';
+    passport.setAttribute('data-open', '');
+    passport.querySelector('.gc-pp-close').addEventListener('click', function () {
+      setFocus(null);
+      writeHash();
+    });
+  }
+  function fmt(v) {
+    if (v === null || v === undefined) return '—';
+    var r = Math.round(v * 100) / 100;
+    return String(r).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  svg.addEventListener('click', function (e) {
+    if (!isAxis) return;
+    var g = e.target.closest('.gc-series');
+    if (g) {
+      var id = g.getAttribute('data-series');
+      setFocus(focusId === id ? null : id);
+      writeHash();
+    }
+  });
+
+  // --------------------------------------------------------- brush zoom
+  // Zoom is an affine remap of original x pixels; y never rescales, so the
+  // reading stays honest. Only line marks over time/linear x support it.
+  var resetBtn = document.getElementById('gc-reset');
+  var brushRect = svg.querySelector('.gc-brush-rect');
+  function zoomX(ox) {
+    if (!zoom) return ox;
+    var a = payload.xPixels[zoom[0]];
+    var b = payload.xPixels[zoom[1]];
+    return plot.left + ((ox - a) / (b - a)) * (plot.right - plot.left);
+  }
+  function visibleRange() {
+    return zoom ? zoom : [0, payload.xPixels.length - 1];
+  }
+  function applyZoom() {
+    var r = visibleRange();
+    payload.series.forEach(function (s) {
+      if (s.mark !== 'line') return;
+      var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
+      if (!g) return;
+      var d = '';
+      var pen = false;
+      for (var i = r[0]; i <= r[1]; i++) {
+        if (s.pixels[i] === null) { pen = false; continue; }
+        d += (pen ? 'L' : 'M') + zoomX(payload.xPixels[i]).toFixed(1) + ' ' + s.pixels[i];
+        pen = true;
+      }
+      g.querySelector('.gc-line').setAttribute('d', d || 'M0 0');
+      var pts = g.querySelectorAll('.gc-point');
+      var pi = 0;
+      for (var j = 0; j < s.pixels.length; j++) {
+        if (s.pixels[j] === null) continue;
+        var c = pts[pi++];
+        if (!c) break;
+        if (j < r[0] || j > r[1]) { c.style.display = 'none'; }
+        else {
+          c.style.display = '';
+          c.setAttribute('cx', zoomX(payload.xPixels[j]).toFixed(1));
+        }
+      }
+    });
+    svg.querySelectorAll('.gc-annotations [data-ox]').forEach(function (el) {
+      var ox = Number(el.getAttribute('data-ox'));
+      var nx = zoomX(ox);
+      var inside = nx >= plot.left - 0.5 && nx <= plot.right + 0.5;
+      el.toggleAttribute('data-gone', !inside);
+      if (el.tagName === 'line') { el.setAttribute('x1', nx); el.setAttribute('x2', nx); }
+      else el.setAttribute('x', nx + 5);
+    });
+    rebuildXTicks();
+    resetBtn.toggleAttribute('data-on', !!zoom);
+  }
+  function rebuildXTicks() {
+    var g = xtickGroup;
+    if (!g) return;
+    if (!zoom) { g.innerHTML = originalTicks; return; }
+    var r = visibleRange();
+    var count = Math.min(7, r[1] - r[0] + 1);
+    var html = '';
+    for (var k = 0; k < count; k++) {
+      var i = r[0] + Math.round((k * (r[1] - r[0])) / Math.max(1, count - 1));
+      html += '<text x="' + zoomX(payload.xPixels[i]).toFixed(1) + '" y="' + (plot.bottom + 16) +
+        '" text-anchor="middle">' + esc(payload.xLabels[i]) + '</text>';
+    }
+    g.innerHTML = html;
+  }
+  var xtickGroup = svg.querySelector('.gc-xticks');
+  var originalTicks = xtickGroup ? xtickGroup.innerHTML : '';
+  function setZoom(i0, i1) {
+    zoom = (i0 !== null && i1 - i0 >= 1) ? [i0, i1] : null;
+    applyZoom();
+    writeHash();
+  }
+  resetBtn.addEventListener('click', function () { setZoom(null); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setZoom(null); setFocus(null); writeHash(); }
+  });
+
+  // ------------------------------------------------- tooltip + pointer
+  var tooltip = document.getElementById('gc-tooltip');
+  var crosshair = svg.querySelector('.gc-crosshair');
+  var hit = svg.querySelector('.gc-hit');
+  var dots = {};
+  svg.querySelectorAll('.gc-hover-dot').forEach(function (d) { dots[d.getAttribute('data-for')] = d; });
+
+  function svgX(evt) {
+    var rect = svg.getBoundingClientRect();
+    return (evt.clientX - rect.left) * (payload.width / rect.width);
+  }
+  function nearest(x) {
+    var r = visibleRange();
+    var best = r[0];
+    var bd = Infinity;
+    for (var i = r[0]; i <= r[1]; i++) {
+      var d = Math.abs(zoomX(payload.xPixels[i]) - x);
+      if (d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
+  function hideTip() {
+    tooltip.style.display = 'none';
+    if (!crosshair) return;
+    crosshair.style.display = 'none';
+    Object.keys(dots).forEach(function (k) { dots[k].style.display = 'none'; });
+  }
+  function showTip(evt) {
+    showTipAt(nearest(svgX(evt)), evt.clientX, evt.clientY);
+  }
+  function showTipAt(i, clientX, clientY) {
+    var px = zoomX(payload.xPixels[i]);
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var html = '<div class="gc-tt-x">' + esc(payload.xLabels[i]) + '</div>';
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      var v = s.formatted[i];
+      html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+        + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
+        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
+  }
+  if (isAxis && payload.tooltip !== 'off' && hit) {
+    hit.addEventListener('pointermove', function (evt) { if (!brushing) showTip(evt); });
+    hit.addEventListener('pointerleave', hideTip);
+  }
+
+  // Element hover: any mark carrying data-tip describes itself.
+  if (!isAxis) {
+    svg.addEventListener('pointerover', function (evt) {
+      var el = evt.target.closest('[data-tip]');
+      if (!el) return;
+      var spec = JSON.parse(el.getAttribute('data-tip'));
+      var html = '<div class="gc-tt-x">' + esc(spec.title) + '</div>';
+      spec.rows.forEach(function (r) {
+        html += '<div class="gc-tt-row">' + esc(r.label) +
+          '<span class="gc-tt-val">' + esc(r.value) + '</span></div>';
+      });
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      moveTip(evt);
+      el.classList.add('gc-hot');
+    });
+    svg.addEventListener('pointermove', function (evt) {
+      if (tooltip.style.display === 'block') moveTip(evt);
+    });
+    svg.addEventListener('pointerout', function (evt) {
+      var el = evt.target.closest('[data-tip]');
+      if (el) el.classList.remove('gc-hot');
+      tooltip.style.display = 'none';
+    });
+  }
+  function moveTip(evt) { moveTipTo(evt.clientX, evt.clientY); }
+  function moveTipTo(clientX, clientY) {
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
+  }
+
+  // Brush drag on the hit rect.
+  var brushing = null;
+  if (payload.brush === 'x' && hit && brushRect) {
+    hit.addEventListener('pointerdown', function (evt) {
+      brushing = svgX(evt);
+      hit.setPointerCapture(evt.pointerId);
+      hideTip();
+    });
+    hit.addEventListener('pointermove', function (evt) {
+      if (brushing === null) return;
+      var x = svgX(evt);
+      var a = Math.max(plot.left, Math.min(brushing, x));
+      var b = Math.min(plot.right, Math.max(brushing, x));
+      brushRect.setAttribute('x', a);
+      brushRect.setAttribute('y', plot.top);
+      brushRect.setAttribute('width', Math.max(0, b - a));
+      brushRect.setAttribute('height', plot.bottom - plot.top);
+      brushRect.style.display = 'block';
+    });
+    hit.addEventListener('pointerup', function (evt) {
+      if (brushing === null) return;
+      var x = svgX(evt);
+      var a = Math.min(brushing, x);
+      var b = Math.max(brushing, x);
+      brushing = null;
+      brushRect.style.display = 'none';
+      if (b - a < 8) return; // a click, not a brush
+      var i0 = nearest(a);
+      var i1 = nearest(b);
+      if (i1 > i0) setZoom(i0, i1);
+    });
+  }
+
+  // ------------------------------------------------------------ exports
+  var exportBtn = document.getElementById('gc-export-btn');
+  var exportMenu = document.getElementById('gc-export-menu');
+  exportBtn.addEventListener('click', function () {
+    var open = exportMenu.toggleAttribute('data-open');
+    exportBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.gc-toolbar')) {
+      exportMenu.removeAttribute('data-open');
+      exportBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  var TOKENS = ['--bg', '--panel', '--ink', '--muted', '--grid', '--border', '--axis',
+    '--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--cat-5',
+    '--role-primary', '--role-comparison', '--role-positive', '--role-negative', '--role-neutral', '--role-highlight',
+    '--seq-0', '--seq-1', '--seq-2', '--seq-3', '--seq-4', '--seq-5',
+    '--seq-ink-0', '--seq-ink-1', '--seq-ink-2', '--seq-ink-3', '--seq-ink-4', '--seq-ink-5',
+    '--div-0', '--div-1', '--div-2', '--div-3', '--div-4', '--div-5',
+    '--div-ink-0', '--div-ink-1', '--div-ink-2', '--div-ink-3', '--div-ink-4', '--div-ink-5'];
+  var SVG_CSS = 'text{font-family:system-ui,-apple-system,sans-serif}' +
+    '.gc-grid line{stroke:var(--grid)}.gc-axis{stroke:var(--axis)}' +
+    '.gc-yticks text,.gc-xticks text{fill:var(--muted);font-size:11px}' +
+    '.gc-axis-label{fill:var(--muted);font-size:11.5px;font-weight:600}' +
+    '.gc-series rect{fill:var(--sc)}' +
+    '.gc-line{fill:none;stroke:var(--sc);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}' +
+    '.gc-point{fill:var(--sc)}' +
+    '.gc-annotations line{stroke:var(--muted);stroke-dasharray:4 3}' +
+    '.gc-annotations text{fill:var(--muted);font-size:10.5px}' +
+    '.gc-dot{fill:var(--sc);fill-opacity:.78}.gc-bin{fill:var(--sc)}' +
+    '.gc-area{fill:var(--sc);fill-opacity:.55;stroke:var(--sc);stroke-width:1.5;stroke-linejoin:round}' +
+    '.gc-box .gc-box-body{fill:var(--sc);fill-opacity:.45;stroke:var(--sc);stroke-width:1.5}' +
+    '.gc-box .gc-whisker,.gc-box .gc-cap{stroke:var(--sc);stroke-width:1.5}' +
+    '.gc-box .gc-median{stroke:var(--sc);stroke-width:2.5}.gc-box .gc-outlier{fill:var(--sc);fill-opacity:.7}' +
+    '.gc-slice{fill:var(--sc);stroke:var(--panel);stroke-width:1.5}' +
+    '.gc-slice-label{fill:#f8fafc;font-size:11px;font-weight:700}' +
+    '.gc-donut-total{fill:var(--ink);font-size:20px;font-weight:700}.gc-donut-unit{fill:var(--muted);font-size:11px}' +
+    '.gc-cell{fill:var(--sc)}.gc-cell-empty{fill:var(--grid)}' +
+    '.gc-cell-label{fill:var(--ci);font-size:10.5px;font-weight:600}' +
+    '.gc-row-label{fill:var(--muted);font-size:11px}' +
+    '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
+
+  // Canonical export: full authored chart at rest — no hover layer, no
+  // hidden/dimmed series, no zoom remap.
+  function exportSvgString() {
+    var clone = svg.cloneNode(true);
+    var hover = clone.querySelector('.gc-hover');
+    if (hover) hover.remove();
+    clone.querySelectorAll('.gc-off, .gc-dim').forEach(function (el) {
+      el.classList.remove('gc-off', 'gc-dim');
+    });
+    if (zoom) {
+      var ct = clone.querySelector('.gc-xticks');
+      if (ct) ct.innerHTML = originalTicks;
+      // Re-render marks at rest by rebuilding from payload.
+      payload.series.forEach(function (s) {
+        if (s.mark !== 'line') return;
+        var g = clone.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
+        if (!g) return;
+        var d = '';
+        var pen = false;
+        for (var i = 0; i < s.pixels.length; i++) {
+          if (s.pixels[i] === null) { pen = false; continue; }
+          d += (pen ? 'L' : 'M') + payload.xPixels[i] + ' ' + s.pixels[i];
+          pen = true;
+        }
+        g.querySelector('.gc-line').setAttribute('d', d);
+        var pts = g.querySelectorAll('.gc-point');
+        var pi = 0;
+        for (var j = 0; j < s.pixels.length; j++) {
+          if (s.pixels[j] === null) continue;
+          var c = pts[pi++];
+          if (c) { c.style.display = ''; c.setAttribute('cx', payload.xPixels[j]); }
+        }
+      });
+      clone.querySelectorAll('.gc-annotations [data-ox]').forEach(function (el) {
+        var ox = Number(el.getAttribute('data-ox'));
+        el.removeAttribute('data-gone');
+        if (el.tagName === 'line') { el.setAttribute('x1', ox); el.setAttribute('x2', ox); }
+        else el.setAttribute('x', ox + 5);
+      });
+    }
+    var cs = getComputedStyle(root);
+    var tokens = TOKENS.map(function (t) { return t + ':' + cs.getPropertyValue(t).trim(); }).join(';');
+    var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = 'svg{' + tokens + '}' + SVG_CSS;
+    clone.insertBefore(style, clone.firstChild);
+    clone.setAttribute('width', payload.width);
+    clone.setAttribute('height', payload.height);
+    return new XMLSerializer().serializeToString(clone);
+  }
+  function download(name, blob) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function svgToCanvas(scale, cb) {
+    var img = new Image();
+    var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = payload.width * scale;
+      canvas.height = payload.height * scale;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      cb(canvas);
+    };
+    img.src = url;
+  }
+  function csvString() {
+    var esc2 = function (v) {
+      if (v === null || v === undefined) return '';
+      var s = String(v);
+      return /[",\n]/.test(s) ? '"' + s.replaceAll('"', '""') + '"' : s;
+    };
+    var lines = [payload.table.headers.map(esc2).join(',')];
+    payload.table.rows.forEach(function (row) { lines.push(row.map(esc2).join(',')); });
+    return lines.join('\n') + '\n';
+  }
+  exportMenu.addEventListener('click', function (e) {
+    var kind = e.target.closest('button[data-export]');
+    if (!kind) return;
+    kind = kind.getAttribute('data-export');
+    exportMenu.removeAttribute('data-open');
+    if (kind === 'svg') {
+      download(slug() + '.svg', new Blob([exportSvgString()], { type: 'image/svg+xml' }));
+    } else if (kind === 'csv') {
+      download(slug() + '.csv', new Blob([csvString()], { type: 'text/csv' }));
+    } else if (kind === 'png') {
+      svgToCanvas(2, function (canvas) {
+        canvas.toBlob(function (b) { download(slug() + '.png', b); }, 'image/png');
+      });
+    } else if (kind === 'card') {
+      svgToCanvas(2, function (chart) {
+        var cs = getComputedStyle(root);
+        var canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 630;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = cs.getPropertyValue('--bg').trim();
+        ctx.fillRect(0, 0, 1200, 630);
+        ctx.fillStyle = cs.getPropertyValue('--ink').trim();
+        ctx.font = '700 30px system-ui, sans-serif';
+        ctx.fillText(payload.title, 48, 64);
+        var boxW = 1104;
+        var boxH = 630 - 100 - 32;
+        var s = Math.min(boxW / chart.width, boxH / chart.height);
+        var w = chart.width * s;
+        var h = chart.height * s;
+        ctx.drawImage(chart, (1200 - w) / 2, 100 + (boxH - h) / 2, w, h);
+        canvas.toBlob(function (b) { download(slug() + '-share.png', b); }, 'image/png');
+      });
+    }
+  });
+
+  // ------------------------------------------------- keyboard navigation
+  // The chart is focusable and arrow keys walk the data points, so the
+  // reading does not depend on a pointer. Each step announces the value
+  // through the live region for screen readers.
+  var figure = document.getElementById('gc-figure');
+  var live = document.getElementById('gc-live');
+  var cursor = null;
+  if (isAxis && figure) {
+    figure.setAttribute('tabindex', '0');
+    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+    figure.addEventListener('keydown', function (e) {
+      var r = visibleRange();
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (cursor === null) cursor = r[0];
+        else cursor += (e.key === 'ArrowRight' ? 1 : -1);
+        cursor = Math.max(r[0], Math.min(r[1], cursor));
+        showAt(cursor);
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        cursor = e.key === 'Home' ? r[0] : r[1];
+        showAt(cursor);
+      }
+    });
+    figure.addEventListener('blur', function () { cursor = null; hideTip(); });
+  }
+  // Renders the crosshair, markers, and a spoken sentence for one index.
+  function showAt(i) {
+    var px = zoomX(payload.xPixels[i]);
+    crosshair.setAttribute('x1', px);
+    crosshair.setAttribute('x2', px);
+    crosshair.style.display = '';
+    var parts = [payload.xLabels[i]];
+    payload.series.forEach(function (s) {
+      if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
+      parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
+        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (dots[s.id]) {
+        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        else {
+          dots[s.id].setAttribute('cx', px);
+          dots[s.id].setAttribute('cy', s.pixels[i]);
+          dots[s.id].style.display = '';
+        }
+      }
+    });
+    if (live) live.textContent = parts.join(', ');
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / payload.width;
+    showTipAt(i, rect.left + px * scale, rect.top + rect.height / 2);
+  }
+
+  // Element families (distribution, proportion, matrix) walk their marks
+  // rather than an x axis, but the keyboard contract is identical.
+  if (!isAxis && figure) {
+    var marks = [].slice.call(svg.querySelectorAll('[data-tip]'));
+    var mi = -1;
+    var focusMark = function () {
+      marks.forEach(function (m) { m.classList.remove('gc-hot'); });
+      var el = marks[mi];
+      if (!el) return;
+      el.classList.add('gc-hot');
+      var spec = JSON.parse(el.getAttribute('data-tip'));
+      var html = '<div class="gc-tt-x">' + esc(spec.title) + '</div>';
+      var spoken = [spec.title];
+      spec.rows.forEach(function (rw) {
+        html += '<div class="gc-tt-row">' + esc(rw.label) +
+          '<span class="gc-tt-val">' + esc(rw.value) + '</span></div>';
+        spoken.push(rw.label + ' ' + rw.value);
+      });
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      var b = el.getBoundingClientRect();
+      moveTipTo(b.left + b.width / 2, b.top + b.height / 2);
+      if (live) live.textContent = spoken.join(', ');
+    };
+    if (marks.length) {
+      figure.setAttribute('tabindex', '0');
+      figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+      figure.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); mi = Math.min(marks.length - 1, mi + 1); focusMark(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); mi = Math.max(0, mi - 1); focusMark(); }
+        else if (e.key === 'Home') { e.preventDefault(); mi = 0; focusMark(); }
+        else if (e.key === 'End') { e.preventDefault(); mi = marks.length - 1; focusMark(); }
+      });
+      figure.addEventListener('blur', function () {
+        marks.forEach(function (m) { m.classList.remove('gc-hot'); });
+        tooltip.style.display = 'none';
+        mi = -1;
+      });
+    }
+  }
+
+  // ----------------------------------------------------- guided views
+  var viewStrip = document.querySelector('.gc-views');
+  var viewNote = document.getElementById('gc-view-note');
+  function applyView(id) {
+    var v = (payload.views || []).find(function (x) { return x.id === id; });
+    if (viewStrip) {
+      viewStrip.querySelectorAll('button[data-view]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-view') === id && id ? 'true' : 'false');
+      });
+    }
+    if (!v) {
+      if (viewNote) viewNote.textContent = '';
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+      setZoom(null);
+      activeView = null;
+      writeHash();
+      return;
+    }
+    activeView = id;
+    if (viewNote) viewNote.textContent = v.note || '';
+    if (v.focus && v.focus.length) {
+      payload.series.forEach(function (s) {
+        hidden[s.id] = v.focus.indexOf(s.id) === -1;
+        applyHidden(s.id);
+      });
+      setFocus(v.focus.length === 1 ? v.focus[0] : null);
+    } else {
+      Object.keys(hidden).forEach(function (k) { hidden[k] = false; applyHidden(k); });
+      setFocus(null);
+    }
+    if (v.brush) setZoom(v.brush[0], v.brush[1]);
+    else setZoom(null);
+    writeHash();
+  }
+  if (viewStrip) {
+    viewStrip.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-view]');
+      if (!b) return;
+      var id = b.getAttribute('data-view');
+      applyView(id === activeView ? '' : id);
+    });
+  }
+
+  // -------------------------------------------------- restore deep link
+  var h = readHash();
+  if (h.theme === 'dark' || h.theme === 'light') root.setAttribute('data-theme', h.theme);
+  if (h.hidden && isAxis) {
+    h.hidden.split(',').forEach(function (id) {
+      if (payload.series.some(function (s) { return s.id === id; })) {
+        hidden[id] = true;
+        applyHidden(id);
+      }
+    });
+  }
+  if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
+  if (h.brush && payload.brush === 'x') {
+    var m = /^(\d+)~(\d+)$/.exec(h.brush);
+    if (m) {
+      var i0 = Math.max(0, Math.min(+m[1], payload.xPixels.length - 1));
+      var i1 = Math.max(0, Math.min(+m[2], payload.xPixels.length - 1));
+      if (i1 > i0) { zoom = [i0, i1]; applyZoom(); }
+    }
+  }
+})();
+</script>
+</body>
+</html>
