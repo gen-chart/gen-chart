@@ -239,6 +239,28 @@ test('palette deep link recolors role-authored series on initial load', { skip }
   assert.ok(['rgb(231, 76, 60)', '#E74C3C'].includes(r.renderedColor));
 });
 
+const COMPACT_PALETTE_PROBE = `async function () {
+  function boxColors() {
+    return Array.from(document.querySelectorAll('.gc-box'))
+      .map(function (box) { return getComputedStyle(box.querySelector('.gc-box-body')).fill; });
+  }
+  var out = {
+    size: document.documentElement.getAttribute('data-palette-size'),
+    classic: boxColors()
+  };
+  document.querySelector('[data-palette="warm"]').click();
+  out.warm = boxColors();
+  return out;
+}`;
+
+test('charts with up to three colors use the compact three-color palette', { skip }, () => {
+  const r = run(examplesDir + 'build-times.html', COMPACT_PALETTE_PROBE);
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.size, 'three');
+  assert.deepEqual(r.classic, ['rgb(89, 150, 231)', 'rgb(138, 167, 245)', 'rgb(246, 217, 133)']);
+  assert.deepEqual(r.warm, ['rgb(245, 208, 108)', 'rgb(238, 148, 75)', 'rgb(208, 56, 40)']);
+});
+
 // SVG and CSV are produced synchronously, so they are always observable.
 // PNG and the share card need real image decoding, which --virtual-time-budget
 // does not wait for: virtual time can expire mid-decode and Chrome dumps the

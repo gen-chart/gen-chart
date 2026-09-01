@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="auto" data-palette="classic">
+<html lang="zh-CN" data-theme="auto" data-palette="classic" data-palette-size="three">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,9 +41,13 @@
   }
 }
 :root[data-palette="classic"] { --cat-0: #A2C9FB; --cat-1: #5996E7; --cat-2: #D5C4FC; --cat-3: #7563DB; --cat-4: #F6D147; --cat-5: #FBF19F; }
+:root[data-palette="classic"][data-palette-size="three"] { --cat-0: #5996E7; --cat-1: #8AA7F5; --cat-2: #F6D985; }
 :root[data-palette="cool"] { --cat-0: #CCE7C1; --cat-1: #AAD7BA; --cat-2: #88C7C6; --cat-3: #68ACCD; --cat-4: #5494C0; --cat-5: #417AB3; }
+:root[data-palette="cool"][data-palette-size="three"] { --cat-0: #AAD7BA; --cat-1: #68ACCD; --cat-2: #417AB3; }
 :root[data-palette="warm"] { --cat-0: #F6E287; --cat-1: #F8DB82; --cat-2: #F2B75C; --cat-3: #EE944B; --cat-4: #E85E38; --cat-5: #D03828; }
+:root[data-palette="warm"][data-palette-size="three"] { --cat-0: #F5D06C; --cat-1: #EE944B; --cat-2: #D03828; }
 :root[data-palette="primary"] { --cat-0: #E74C3C; --cat-1: #F06A5B; --cat-2: #F4D03F; --cat-3: #F7DC6F; --cat-4: #3498DB; --cat-5: #5DADE2; }
+:root[data-palette="primary"][data-palette-size="three"] { --cat-0: #E74C3C; --cat-1: #F4D03F; --cat-2: #3498DB; }
 * { box-sizing: border-box; margin: 0; }
 body {
   background: var(--bg); color: var(--ink);
@@ -616,13 +620,20 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     colorBtn.setAttribute('aria-expanded', 'false');
     if (restoreFocus) colorBtn.focus();
   }
-  function paletteToken(index) {
-    return 'var(--cat-' + (index % 6) + ')';
+  function paletteColorCount() {
+    if (Array.isArray(payload.series) && payload.series.length) return payload.series.length;
+    return svg.querySelectorAll('.gc-series[data-series], .gc-box, .gc-slice').length;
+  }
+  function paletteToken(index, colorCount) {
+    var cycle = colorCount > 0 && colorCount <= 3 ? 3 : 6;
+    return 'var(--cat-' + (index % cycle) + ')';
   }
   function applyPaletteToChart() {
+    var colorCount = paletteColorCount();
+    root.setAttribute('data-palette-size', colorCount > 0 && colorCount <= 3 ? 'three' : 'six');
     if (Array.isArray(payload.series) && payload.series.length) {
       payload.series.forEach(function (series, index) {
-        var color = paletteToken(index);
+        var color = paletteToken(index, colorCount);
         series.color = color;
         svg.querySelectorAll(
           '.gc-series[data-series="' + CSS.escape(series.id) + '"], .gc-hover-dot[data-for="' + CSS.escape(series.id) + '"]'
@@ -632,11 +643,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       // Element-hover families do not carry a runtime series array. Their
       // repeated marks are already in display order, so override them there.
       svg.querySelectorAll('.gc-series[data-series], .gc-box, .gc-slice').forEach(function (element, index) {
-        element.style.setProperty('--sc', paletteToken(index));
+        element.style.setProperty('--sc', paletteToken(index, colorCount));
       });
     }
     document.querySelectorAll('.gc-legend .gc-swatch').forEach(function (swatch, index) {
-      swatch.style.setProperty('--sw', paletteToken(index));
+      swatch.style.setProperty('--sw', paletteToken(index, colorCount));
     });
     if (focusId) setFocus(focusId);
     hideTip();

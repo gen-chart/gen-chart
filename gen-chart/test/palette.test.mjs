@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   DEFAULT_PALETTE,
   PALETTES,
+  paletteColors,
   paletteCss,
   paletteIds,
   resolvePaletteId,
@@ -40,8 +41,12 @@ test('palette ids fall back safely and generated CSS maps all categorical tokens
   const css = paletteCss();
   for (const id of paletteIds()) {
     assert.ok(css.includes(`:root[data-palette="${id}"]`), id);
+    assert.ok(css.includes(`:root[data-palette="${id}"][data-palette-size="three"]`), `${id} compact`);
     for (let i = 0; i < 6; i++) assert.ok(css.includes(`--cat-${i}: ${PALETTES[id].six[i]}`));
   }
+  assert.equal(paletteColors('classic', 3), PALETTES.classic.three);
+  assert.equal(paletteColors('classic', 4), PALETTES.classic.six);
+  assert.equal(paletteColors('unknown', 2), PALETTES.classic.three);
 });
 
 test('categorical token resolution follows the palette while roles follow the theme', () => {

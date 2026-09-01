@@ -216,7 +216,7 @@ Everything below is already in the file — no extra authoring:
 | Switch theme | Theme, or follow `prefers-color-scheme` |
 | Export | PNG, standalone SVG, the underlying CSV, or a 1200×630 share card |
 
-Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush=`, `#view=`. The HTML toolbar includes a Color picker for Classic, Cool, Warm, and Primary palettes; an explicit choice recolors every displayed series in order, including role-authored series. Exports capture the selected theme and palette on the canonical chart at rest — hover, dimming, and zoom never leak into them.
+Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush=`, `#view=`. The HTML toolbar includes a Color picker for Classic, Cool, Warm, and Primary palettes; an explicit choice recolors every displayed series in order, including role-authored series. Charts with up to three colors use the palette's three-color set; larger charts use all six. Exports capture the selected theme and palette on the canonical chart at rest — hover, dimming, and zoom never leak into them.
 
 **Accessibility.** Every chart carries a visually hidden data table with the exact values, keyboard walking for every family with live-region announcements, non-colour state cues, and semantic-role and heatmap colors checked against WCAG AA in both themes. Selectable categorical palette hardening remains tracked in the feature plan. Below 700px the chart holds a legible minimum width and scrolls inside its own panel rather than shrinking its type.
 

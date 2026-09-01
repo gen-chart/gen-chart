@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { join, resolve } from 'node:path';
 import { parseThemeTokens } from '../renderers/shared/contrast.mjs';
 import { escapeXml } from '../renderers/shared/format.mjs';
-import { DEFAULT_PALETTE, PALETTES } from '../renderers/shared/palette.mjs';
+import { DEFAULT_PALETTE, paletteColors } from '../renderers/shared/palette.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const docs = fileURLToPath(new URL('../../docs/', import.meta.url));
@@ -58,16 +58,22 @@ function escapeRegExp(value) {
 // same transformation at build time instead of showing the authored baseline.
 export function applyDefaultPalette(svg, spec) {
   if (spec.chart_type === 'matrix') return svg;
+  const colorCount = spec.chart_type === 'cartesian'
+    ? spec.series.length
+    : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
+  const colors = paletteColors(DEFAULT_PALETTE, colorCount);
+  const declarations = colors.map((color, index) => `--cat-${index}:${color}`).join(';');
+  const themed = svg.replace(/<svg(?=\s|>)/, `<svg style="${declarations}"`);
   if (spec.chart_type === 'cartesian') {
     return spec.series.reduce((out, series, index) => {
       const id = escapeRegExp(escapeXml(series.id));
       const re = new RegExp(`(<g class="gc-series" data-series="${id}" style=")--sc:[^"]+`, 'g');
-      return out.replace(re, `$1--sc:var(--cat-${index % 6})`);
-    }, svg);
+      return out.replace(re, `$1--sc:var(--cat-${index % colors.length})`);
+    }, themed);
   }
   let index = 0;
-  return svg.replace(/(<(?:g|path) class="(?:gc-series|gc-box|gc-slice)"[^>]*style=")--sc:[^"]+/g,
-    (_, prefix) => `${prefix}--sc:var(--cat-${index++ % 6})`);
+  return themed.replace(/(<(?:g|path) class="(?:gc-series|gc-box|gc-slice)"[^>]*style=")--sc:[^"]+/g,
+    (_, prefix) => `${prefix}--sc:var(--cat-${index++ % colors.length})`);
 }
 
 // The mark rules live in the viewer template; lifting them keeps the gallery
@@ -98,9 +104,10 @@ function tokenBlock(tokens, selector) {
   return `${selector} {\n${decls}\n}`;
 }
 
-export function withDefaultPaletteTokens(tokens) {
+export function withDefaultPaletteTokens(tokens, colorCount = 6) {
   const merged = { ...tokens };
-  PALETTES[DEFAULT_PALETTE].six.forEach((color, index) => { merged[`--cat-${index}`] = color; });
+  paletteColors(DEFAULT_PALETTE, colorCount)
+    .forEach((color, index) => { merged[`--cat-${index}`] = color; });
   return merged;
 }
 

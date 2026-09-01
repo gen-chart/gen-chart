@@ -15,6 +15,7 @@ test('gallery builder applies Classic tokens and remaps role-authored series by 
     '</svg>';
   const spec = { chart_type: 'cartesian', series: [{ id: 'first' }, { id: 'second' }] };
   const preview = applyDefaultPalette(svg, spec);
+  assert.match(preview, /<svg style="--cat-0:#5996E7;--cat-1:#8AA7F5;--cat-2:#F6D985"/);
   assert.match(preview, /data-series="first" style="--sc:var\(--cat-0\)"/);
   assert.match(preview, /data-series="second" style="--sc:var\(--cat-1\)"/);
 });
@@ -31,4 +32,5 @@ test('committed gallery thumbnails match the Classic standalone viewer default',
   ]) {
     assert.match(html, new RegExp(`data-series="${id}" style="--sc:var\\(--cat-${index}\\)"`), id);
   }
+  assert.match(html, /<svg style="--cat-0:#5996E7;--cat-1:#8AA7F5;--cat-2:#F6D985"[^>]+aria-label="CI Build Duration by Pipeline"/);
 });
