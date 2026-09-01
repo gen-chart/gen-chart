@@ -103,9 +103,9 @@ series order or meaning.
 | **Warm** | A yellow through amber and orange to red progression | Energetic charts where warmth suits the subject |
 | **Primary** | Red, yellow, and blue pairs | Categorical charts using familiar primary-color families |
 
-The six-color arrays map in order to `--cat-0`…`--cat-5`. The three-color
-arrays are the abbreviated swatches shown in the palette picker; they do not
-change chart rendering.
+Charts with up to three displayed colors use the `three` array. Charts with
+four or more use the `six` array, mapped in order to `--cat-0`…`--cat-5`.
+The picker preview uses the same three-color array.
 
 ```js
 const palettes = {
@@ -128,9 +128,11 @@ const palettes = {
 };
 ```
 
-Selecting a palette remaps only categorical series: declared semantic roles,
-positive/negative meaning, annotations, and sequential or diverging heatmap
-ramps do not change.
+Selecting a palette is an explicit viewer override: it assigns the applicable
+three- or six-color set to displayed series in order, including series that
+have an authored semantic role. The role metadata and its validation meaning
+do not change. Annotations and sequential or diverging heatmap ramps are
+unaffected.
 
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against

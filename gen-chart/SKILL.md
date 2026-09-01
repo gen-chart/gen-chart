@@ -138,7 +138,8 @@ receipt shapes, exit codes, and the repair loop in detail.
 
 Generated HTML already contains: dark/light theme toggle honoring
 `prefers-color-scheme`, a Color picker for Classic, Cool, Warm, and Primary
-categorical palettes, crosshair tooltip with formatted values and units,
+chart palettes (applied to every displayed series in order), crosshair
+tooltip with formatted values and units,
 legend series toggling (auto when ≥2 series), click-to-focus Data Passport
 with render-time stats, deep links (`#theme=`, `#palette=`, `#focus=`,
 `#hidden=`, `#brush=`), and an Export menu (PNG 2×, standalone SVG,

@@ -16,7 +16,8 @@ const CATEGORICAL = ['--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--c
 export const DEFAULT_PALETTE = 'classic';
 
 // One registry feeds renderer analysis, generated viewer CSS, picker
-// previews, and tests. `six` is the chart cycle; `three` is UI preview only.
+// previews, and tests. Charts with up to three displayed colors use `three`;
+// larger charts use the full `six` cycle.
 export const PALETTES = Object.freeze({
   classic: Object.freeze({
     six: Object.freeze(['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F']),
@@ -44,6 +45,11 @@ export function resolvePaletteId(id) {
   return Object.hasOwn(PALETTES, id) ? id : DEFAULT_PALETTE;
 }
 
+export function paletteColors(id, colorCount = 6) {
+  const palette = PALETTES[resolvePaletteId(id)];
+  return colorCount > 0 && colorCount <= 3 ? palette.three : palette.six;
+}
+
 // Embedded after the theme blocks. Palette selection therefore changes only
 // categorical tokens and survives light/dark theme changes.
 export function paletteCss() {
@@ -51,7 +57,11 @@ export function paletteCss() {
     const declarations = PALETTES[id].six
       .map((color, i) => `--cat-${i}: ${color}`)
       .join('; ');
-    return `:root[data-palette="${id}"] { ${declarations}; }`;
+    const compact = PALETTES[id].three
+      .map((color, i) => `--cat-${i}: ${color}`)
+      .join('; ');
+    return `:root[data-palette="${id}"] { ${declarations}; }\n` +
+      `:root[data-palette="${id}"][data-palette-size="three"] { ${compact}; }`;
   }).join('\n');
 }
 

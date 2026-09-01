@@ -12,9 +12,9 @@
 
 Add a **Color** button immediately after **Theme** in every generated HTML
 chart. It opens an accessible palette picker where the reader can apply one
-of four categorical palettes — **Classic**, **Cool**, **Warm**, or
-**Primary** — without changing the chart's data, series order, semantic
-roles, or theme.
+of four chart palettes — **Classic**, **Cool**, **Warm**, or **Primary** —
+without changing the chart's data, series order, authored role metadata, or
+theme.
 
 Classic is the default. The selected palette is reflected in the chart,
 legend, tooltip, Data Passport, deep link, and visual exports.
@@ -25,8 +25,8 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 
 - A Color toolbar button and compact palette popover.
 - Four named palettes in this order: Classic, Cool, Warm, Primary.
-- Six chart colors and three picker-preview colors per palette, as specified
-  in `DESIGN.md`.
+- Six-color and compact three-color chart sets per palette, with the compact
+  set also used by picker previews, as specified in `DESIGN.md`.
 - Immediate preview and application while the popover remains open.
 - Reset to Classic.
 - Keyboard and screen-reader behavior.
@@ -40,7 +40,7 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 
 - Raw hex or author-defined brand palettes.
 - Adding a palette field to chart JSON schemas.
-- Recoloring declared semantic roles such as `positive` and `negative`.
+- Changing authored semantic-role metadata or its validation meaning.
 - Recoloring sequential or diverging heatmap ramps.
 - Persisting a preference across unrelated HTML files or browser sessions.
 - Changing CSV data exports, which contain data rather than presentation.
@@ -75,9 +75,11 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 
 ### Palette application
 
-- The six colors map in order to `--cat-0` through `--cat-5`.
-- Palette selection changes categorical tokens only.
-- Series with an authored semantic role continue to use `--role-*` tokens.
+- Charts with up to three displayed colors use the palette's `three` array;
+  charts with four or more use its `six` array.
+- Palette selection assigns the applicable categorical tokens to displayed
+  series in order, including series authored with semantic roles.
+- Authored role metadata remains available to validation and does not change.
 - Heatmaps continue to use `--seq-*` or `--div-*` tokens.
 - Theme changes do not reset the palette.
 - Classic is applied before first paint and is used when state is missing or
@@ -105,7 +107,7 @@ Example:
 
 ### One source of truth
 
-Keep palette ids, order, six-color arrays, three-color previews, and the
+Keep palette ids, order, six- and three-color arrays, picker previews, and the
 Classic default in `gen-chart/renderers/shared/palette.mjs`. Do not copy the
 palette arrays independently into tests and viewer JavaScript.
 
@@ -132,10 +134,10 @@ Update `gen-chart/assets/template.html` to add:
 - palette state, popover, keyboard, reset, and hash logic;
 - mutual exclusion between the Export and Color popovers.
 
-Applying a palette should update categorical CSS custom properties on the
-root rather than rewriting SVG nodes. Existing marks, legend swatches,
-tooltip dots, and Data Passport swatches already refer to `var(--cat-*)`, so
-they should update together.
+Applying a palette updates categorical CSS custom properties on the root and
+maps each displayed series to the corresponding token. Marks, legend
+swatches, tooltip dots, and Data Passport swatches update together, including
+when their authored baseline color came from a semantic role.
 
 ### Exports
 
@@ -293,8 +295,8 @@ No schema or generated-validator files should change.
 - Color appears immediately after Theme in every generated artifact.
 - All four options use the exact approved palette registry and correct
   three-swatch previews.
-- Selection updates every categorical color consumer immediately.
-- Semantic roles and heatmap ramps never change with the picker.
+- Selection updates every displayed series color consumer immediately.
+- Semantic role metadata and heatmap ramps never change with the picker.
 - Reset, keyboard navigation, focus, menu closing, and invalid-state fallback
   work without uncaught errors.
 - Deep links restore a valid palette and preserve all other viewer state.

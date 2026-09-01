@@ -37,7 +37,7 @@ segments verified perceptually distinguishable via CIEDE2000.
 
 **The viewer.** One self-contained HTML file, offline, no CDN: crosshair
 tooltips, legend toggling, click-to-focus Data Passport with render-time
-statistics, a Color picker for Classic, Cool, Warm, and Primary categorical
+statistics, a Color picker for Classic, Cool, Warm, and Primary chart
 palettes, opt-in brush zoom that never rescales y, up to five authored guided
 views, deep links, and exports (PNG, standalone SVG, provenance CSV, 1200×630
 share card) that always capture the canonical chart at rest.

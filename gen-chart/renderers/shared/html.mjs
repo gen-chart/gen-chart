@@ -95,10 +95,15 @@ export function assembleHtml(spec, svg, payload, legend = null) {
   };
   // `</` must not appear un-escaped inside the JSON script block.
   const payloadJson = JSON.stringify(withStrings).replaceAll('</', '<\\/');
+  const colorCount = Array.isArray(payload.series) && payload.series.length
+    ? payload.series.length
+    : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
+  const paletteSize = colorCount > 0 && colorCount <= 3 ? 'three' : 'six';
 
   let html = template
     .replaceAll('{{LANG}}', locale)
     .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
+    .replaceAll('{{PALETTE_SIZE}}', paletteSize)
     .replace('{{PALETTE_CSS}}', paletteCss())
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('{{SUBTITLE_BLOCK}}', subtitle)
