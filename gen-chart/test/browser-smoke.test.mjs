@@ -261,6 +261,31 @@ test('charts with up to three colors use the compact three-color palette', { ski
   assert.deepEqual(r.warm, ['rgb(245, 208, 108)', 'rgb(238, 148, 75)', 'rgb(208, 56, 40)']);
 });
 
+const HEATMAP_PALETTE_PROBE = `async function () {
+  var cell = document.querySelector('.gc-cell');
+  var label = document.querySelector('.gc-cell-label');
+  var out = {
+    before: getComputedStyle(cell).fill,
+    beforeInk: getComputedStyle(label).fill
+  };
+  document.querySelector('[data-palette="primary"]').click();
+  out.after = getComputedStyle(cell).fill;
+  out.afterInk = getComputedStyle(label).fill;
+  out.palette = document.documentElement.getAttribute('data-palette');
+  return out;
+}`;
+
+test('palette switching recolors heatmap buckets and their label ink', { skip }, () => {
+  const r = run(examplesDir + 'support-load.html', HEATMAP_PALETTE_PROBE);
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.palette, 'primary');
+  assert.notEqual(r.before, r.after);
+  assert.ok(['rgb(117, 99, 219)', '#7563DB'].includes(r.before));
+  assert.ok(['rgb(247, 220, 111)', '#F7DC6F'].includes(r.after));
+  assert.ok(r.beforeInk.length > 0);
+  assert.ok(r.afterInk.length > 0);
+});
+
 // SVG and CSV are produced synchronously, so they are always observable.
 // PNG and the share card need real image decoding, which --virtual-time-budget
 // does not wait for: virtual time can expire mid-decode and Chrome dumps the

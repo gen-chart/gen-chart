@@ -48,7 +48,7 @@ so the CLI and tests stay family-agnostic.
 npm test
 ```
 
-172 tests via `node --test`, no framework. The suite covers scale and tick
+173 tests via `node --test`, no framework. The suite covers scale and tick
 maths, statistics against published reference values, every honesty rule in
 both directions, golden byte-stable output, CLI receipts, atomic delivery,
 WCAG AA contrast, CIEDE2000 against the Sharma test vectors, and real-browser

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { join, resolve } from 'node:path';
 import { parseThemeTokens } from '../renderers/shared/contrast.mjs';
 import { escapeXml } from '../renderers/shared/format.mjs';
-import { DEFAULT_PALETTE, paletteColors } from '../renderers/shared/palette.mjs';
+import { DEFAULT_PALETTE, paletteColors, paletteInk } from '../renderers/shared/palette.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const docs = fileURLToPath(new URL('../../docs/', import.meta.url));
@@ -108,6 +108,12 @@ export function withDefaultPaletteTokens(tokens, colorCount = 6) {
   const merged = { ...tokens };
   paletteColors(DEFAULT_PALETTE, colorCount)
     .forEach((color, index) => { merged[`--cat-${index}`] = color; });
+  paletteColors(DEFAULT_PALETTE, 6).forEach((color, index) => {
+    for (const kind of ['seq', 'div']) {
+      merged[`--${kind}-${index}`] = color;
+      merged[`--${kind}-ink-${index}`] = paletteInk(color);
+    }
+  });
   return merged;
 }
 

@@ -130,9 +130,10 @@ const palettes = {
 
 Selecting a palette is an explicit viewer override: it assigns the applicable
 three- or six-color set to displayed series in order, including series that
-have an authored semantic role. The role metadata and its validation meaning
-do not change. Annotations and sequential or diverging heatmap ramps are
-unaffected.
+have an authored semantic role. Heatmaps map the six colors onto their ordered
+sequential or diverging buckets and choose contrasting black or white cell
+labels. Role metadata and its validation meaning do not change; annotations
+are unaffected.
 
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against

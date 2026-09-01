@@ -41,7 +41,6 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 - Raw hex or author-defined brand palettes.
 - Adding a palette field to chart JSON schemas.
 - Changing authored semantic-role metadata or its validation meaning.
-- Recoloring sequential or diverging heatmap ramps.
 - Persisting a preference across unrelated HTML files or browser sessions.
 - Changing CSV data exports, which contain data rather than presentation.
 
@@ -80,7 +79,8 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 - Palette selection assigns the applicable categorical tokens to displayed
   series in order, including series authored with semantic roles.
 - Authored role metadata remains available to validation and does not change.
-- Heatmaps continue to use `--seq-*` or `--div-*` tokens.
+- Heatmaps continue to use `--seq-*` or `--div-*` tokens, but palette
+  selection updates those six bucket values and their contrast-aware inks.
 - Theme changes do not reset the palette.
 - Classic is applied before first paint and is used when state is missing or
   invalid.
@@ -210,7 +210,7 @@ pie/donut marks.
 - Add the four ordered palette definitions and Classic default to
   `renderers/shared/palette.mjs`.
 - Add token resolution/generation helpers.
-- Ensure existing semantic-role and heatmap helpers are unchanged.
+- Preserve semantic-role helpers and map heatmap helpers to palette tokens.
 
 ### 2. Build localized picker markup
 
@@ -296,7 +296,8 @@ No schema or generated-validator files should change.
 - All four options use the exact approved palette registry and correct
   three-swatch previews.
 - Selection updates every displayed series color consumer immediately.
-- Semantic role metadata and heatmap ramps never change with the picker.
+- Semantic role metadata remains intact; heatmap ramps and label inks update
+  with the picker.
 - Reset, keyboard navigation, focus, menu closing, and invalid-state fallback
   work without uncaught errors.
 - Deep links restore a valid palette and preserve all other viewer state.
