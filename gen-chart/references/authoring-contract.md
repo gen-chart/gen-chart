@@ -17,7 +17,11 @@ diagnostic catalog, or repair rules.
   circles on line vertices — use it when the reader should see individual
   observations (≤ ~30 points). `scatter` needs a linear or time x, never
   `band`. `area` fills to the baseline, so like `bar` it requires a zero y.
-- `stack` (boolean, top level): parts adding to a total. Requires at least
+- `stack` (top level): `true` for parts adding to a total, or `"percent"`
+  to normalise each position to 100%. Percent mode fixes the axis at 0–100,
+  appends "(% of total)" to the caption, keeps absolute values in the
+  tooltip, and warns when the underlying total shifts by more than 25%,
+  since normalising hides that. Otherwise: Requires at least
   two series, one shared mark (`bar` or `area`), non-negative values, and
   adjacent segments distinguishable by colour. The y domain becomes the
   stacked total, not the largest single series.
@@ -104,6 +108,8 @@ diagnostic catalog, or repair rules.
 | `semantic/stack-unsupported-mark` | error | only bar and area stack |
 | `semantic/stack-single-series` | error | a stack needs at least two parts |
 | `composition/stack-depth` | warning | more than 6 stacked segments |
+| `honesty/percent-zero-total` | error | a position sums to zero and cannot be normalised |
+| `composition/percent-hides-total` | warning | normalising conceals a shifting denominator |
 | `composition/adjacent-color` | error | touching segments are perceptually confusable (CIEDE2000) |
 | `composition/series-count` | warning | more than 5 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "stack": "percent",
+  "meta": {
+    "title": "Rollbacks fell from 10.5% to 7.7% of deploys over six months",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      { "id": "month", "type": "date", "values": ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06"] },
+      { "id": "succeeded", "type": "number", "unit": "deploys", "values": [180, 190, 178, 195, 188, 186] },
+      { "id": "rolled_back", "type": "number", "unit": "deploys", "values": [22, 20, 20, 19, 18, 16] },
+      { "id": "failed", "type": "number", "unit": "deploys", "values": [8, 8, 7, 8, 8, 7] }
+    ]
+  },
+  "encoding": {
+    "x": { "column": "month", "scale": "time" },
+    "y": { "label": "Deploys" }
+  },
+  "series": [
+    { "id": "succeeded", "mark": "area", "y": "succeeded", "label": "Succeeded" },
+    { "id": "rolled_back", "mark": "area", "y": "rolled_back", "label": "Rolled back" },
+    { "id": "failed", "mark": "area", "y": "failed", "label": "Failed" }
+  ],
+  "cards": [
+    {
+      "title": "What the numbers show",
+      "items": [
+        "Clean deploys rose from 85.7% to 89.0% of the total; rollbacks fell from 10.5% to 7.7%.",
+        "Outright failures barely moved, from 3.8% to 3.3%.",
+        "Deploy volume stayed within a narrow band (205–222 per month), so these shares reflect real changes in outcome rather than a shifting denominator."
+      ]
+    }
+  ]
+}

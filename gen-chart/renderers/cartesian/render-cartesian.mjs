@@ -190,7 +190,9 @@ export function analyzeCartesian(spec) {
     return { diagnostics };
   }
 
-  const stacked = spec.stack === true;
+  let layoutTotals = null;
+  const stacked = spec.stack === true || spec.stack === 'percent';
+  const percent = spec.stack === 'percent';
   if (stacked) {
     const marks = new Set(spec.series.map((s2) => s2.mark));
     if (marks.size > 1) {
@@ -260,6 +262,43 @@ export function analyzeCartesian(spec) {
     }
     if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
+    if (percent) {
+      const totals = [];
+      const rows = columns.get(spec.series[0].y).values.length;
+      for (let i = 0; i < rows; i++) {
+        let t = 0;
+        for (const s2 of spec.series) {
+          const v = columns.get(s2.y).values[i];
+          if (v !== null) t += v;
+        }
+        totals.push(t);
+      }
+      const zeroRow = totals.findIndex((t) => t === 0);
+      if (zeroRow !== -1) {
+        diagnostics.push(diag('honesty/percent-zero-total', 'error', '/stack',
+          `position ${zeroRow} sums to zero, so its shares cannot be computed`, {
+            evidence: { index: zeroRow },
+            supportedFixes: ['remove the empty position', 'use "stack": true to show absolute values']
+          }));
+        return { diagnostics };
+      }
+      // A 100% chart normalises every column to the same height, so a growing
+      // or collapsing total becomes invisible. Say so when it moved a lot.
+      const lo = Math.min(...totals);
+      const hi = Math.max(...totals);
+      if (hi / lo > 1.25) {
+        diagnostics.push(diag('composition/percent-hides-total', 'warning', '/stack',
+          `every column is normalised to 100%, but the underlying total ranges from ${fmtValue(lo)} to ${fmtValue(hi)} (${(hi / lo).toFixed(1)}×); that change is invisible here`, {
+            evidence: { minTotal: lo, maxTotal: hi, ratio: Number((hi / lo).toFixed(2)) },
+            supportedFixes: [
+              'state the totals in a card so the reader is not misled',
+              'use "stack": true to show absolute values instead'
+            ]
+          }));
+      }
+      layoutTotals = totals;
+    }
+
     if (spec.series.length > 6) {
       diagnostics.push(diag('composition/stack-depth', 'warning', '/series',
         `${spec.series.length} stacked segments are hard to compare: only the bottom band shares a common baseline`, {
@@ -308,11 +347,18 @@ export function analyzeCartesian(spec) {
       }));
     return { diagnostics };
   }
+  if (percent) {
+    yMin = 0;
+    yMax = 100;
+  }
   // A log axis spans its own data decades; nice-linear rounding does not apply.
-  const yTickValues = isLog ? logTicks(yMin, yMax) : niceLinearTicks(yMin, yMax, 5).ticks;
-  const yNice = isLog
-    ? { ticks: yTickValues, min: Math.min(yMin, yTickValues[0]), max: Math.max(yMax, yTickValues[yTickValues.length - 1]) }
-    : niceLinearTicks(yMin, yMax, 5);
+  const yTickValues = percent ? [0, 25, 50, 75, 100]
+    : isLog ? logTicks(yMin, yMax) : niceLinearTicks(yMin, yMax, 5).ticks;
+  const yNice = percent
+    ? { ticks: yTickValues, min: 0, max: 100 }
+    : isLog
+      ? { ticks: yTickValues, min: Math.min(yMin, yTickValues[0]), max: Math.max(yMax, yTickValues[yTickValues.length - 1]) }
+      : niceLinearTicks(yMin, yMax, 5);
 
   // ---- frame and margins
   const W = spec.meta.width ?? 960;
@@ -500,7 +546,7 @@ export function analyzeCartesian(spec) {
       W, H, margin, plotLeft, plotRight, plotTop, plotBottom,
       xCenters, xTicks, rotated, thinnedEvery, band,
       yTicks: yNice.ticks, yScale, yMin: yNice.min, yMax: yNice.max,
-      unit: unit ?? null, annotations, isLog, stacked
+      unit: unit ?? null, annotations, isLog, stacked, percent, totals: layoutTotals
     }
   };
 }
@@ -528,7 +574,8 @@ export function renderSvg(spec, analysis) {
   out.push('<g class="gc-yticks">');
   for (const t of yTicks) {
     const y = round(yScale(t));
-    out.push(`<text x="${plotLeft - 8}" y="${y + 3.5}" text-anchor="end">${escapeXml(fmtTick(t))}</text>`);
+    const label = layout.percent ? `${fmtTick(t)}%` : fmtTick(t);
+    out.push(`<text x="${plotLeft - 8}" y="${y + 3.5}" text-anchor="end">${escapeXml(label)}</text>`);
   }
   out.push('</g>');
 
@@ -548,7 +595,9 @@ export function renderSvg(spec, analysis) {
   out.push('</g>');
 
   // axis labels
-  const yCaption = (enc.y.label ?? '') + (layout.isLog ? (enc.y.label ? ' ' : '') + '(log scale)' : '');
+  const yCaption = (enc.y.label ?? '')
+    + (layout.isLog ? (enc.y.label ? ' ' : '') + '(log scale)' : '')
+    + (layout.percent ? (enc.y.label ? ' ' : '') + '(% of total)' : '');
   if (yCaption) {
     out.push(`<text class="gc-axis-label" x="${plotLeft}" y="${plotTop - 10}" text-anchor="start">${escapeXml(yCaption)}</text>`);
   }
@@ -559,6 +608,8 @@ export function renderSvg(spec, analysis) {
   // Running baseline per x index; stacked marks sit on the total below them.
   const stacked = layout.stacked;
   const baseline = stacked ? new Array(layout.xCenters.length).fill(0) : null;
+  // In percent mode a segment's height is its share of the column total.
+  const share = (v, i) => (layout.percent ? (v / layout.totals[i]) * 100 : v);
 
   // bars first (lines draw above bars)
   const barSeries = spec.series.filter((s) => s.mark === 'bar');
@@ -573,7 +624,7 @@ export function renderSvg(spec, analysis) {
       const x = round(stacked ? band.left(i) : band.left(i) + bi * slot + (slot - barW) / 2);
       if (stacked) {
         const bottom = yScale(baseline[i]);
-        baseline[i] += v;
+        baseline[i] += share(v, i);
         const top = yScale(baseline[i]);
         out.push(`<rect x="${x}" y="${round(top)}" width="${round(barW)}" height="${round(Math.max(0.5, bottom - top))}" rx="1.5"/>`);
       } else {
@@ -597,12 +648,12 @@ export function renderSvg(spec, analysis) {
     let pen = false;
     values.forEach((v, i) => {
       if (v === null) { pen = false; return; }
-      const upper = stacked ? areaBase[i] + v : v;
+      const upper = stacked ? areaBase[i] + share(v, i) : v;
       top += `${pen ? 'L' : 'M'}${round(xCenters[i])} ${round(yScale(upper))}`;
       bottomPts.push([xCenters[i], stacked ? yScale(areaBase[i]) : zeroY]);
       pen = true;
     });
-    if (stacked) values.forEach((v, i) => { if (v !== null) areaBase[i] += v; });
+    if (stacked) values.forEach((v, i) => { if (v !== null) areaBase[i] += share(v, i); });
     let d = top;
     for (let i = bottomPts.length - 1; i >= 0; i--) {
       d += `L${round(bottomPts[i][0])} ${round(bottomPts[i][1])}`;
@@ -712,13 +763,15 @@ export function buildPayload(spec, analysis) {
     height: layout.H,
     series: spec.series.map((s) => {
       const values = columns.get(s.y).values;
+      const pct = (v, i) => (v === null ? null
+        : `${((v / analysis.layout.totals[i]) * 100).toFixed(1)}% (${fmtValue(v)}${layout.unit ? ' ' + layout.unit : ''})`);
       return {
         id: s.id,
         label: s.label,
         mark: s.mark,
         color: colors.get(s.id),
         values,
-        formatted: values.map(fmtValue),
+        formatted: layout.percent ? values.map(pct) : values.map(fmtValue),
         pixels: values.map((v) => (v === null ? null : Number(layout.yScale(v).toFixed(1)))),
         stats: seriesStats(values)
       };
