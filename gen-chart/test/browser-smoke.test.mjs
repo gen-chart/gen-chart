@@ -128,6 +128,59 @@ test('every family is keyboard navigable and announces its values', { skip }, ()
   }
 });
 
+const PALETTE_PROBE = `async function () {
+  var out = {};
+  var exportBtn = document.getElementById('gc-export-btn');
+  var colorBtn = document.getElementById('gc-color-btn');
+  var exportMenu = document.getElementById('gc-export-menu');
+  var colorMenu = document.getElementById('gc-color-menu');
+  exportBtn.click();
+  colorBtn.click();
+  out.colorOpen = colorMenu.hasAttribute('data-open');
+  out.exportClosed = !exportMenu.hasAttribute('data-open');
+  colorBtn.click();
+
+  colorBtn.focus();
+  colorBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  out.openedByKeyboard = colorMenu.hasAttribute('data-open');
+  out.initialFocus = document.activeElement.getAttribute('data-palette');
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+  out.endFocus = document.activeElement.getAttribute('data-palette');
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+  out.selected = document.documentElement.getAttribute('data-palette');
+  out.selectedColor = getComputedStyle(document.documentElement).getPropertyValue('--cat-0').trim();
+  out.selectedAria = document.activeElement.getAttribute('aria-selected');
+  out.hashAfterSelect = location.hash;
+  document.getElementById('gc-theme').click();
+  out.afterTheme = document.documentElement.getAttribute('data-palette');
+  document.getElementById('gc-color-reset').click();
+  out.afterReset = document.documentElement.getAttribute('data-palette');
+  out.hashAfterReset = location.hash;
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  out.closedByEscape = !colorMenu.hasAttribute('data-open');
+  out.focusReturned = document.activeElement === colorBtn;
+  return out;
+}`;
+
+test('palette picker supports menus, keyboard selection, reset, theme, and hash state', { skip }, () => {
+  const r = run(examplesDir + 'storage-mix.html', PALETTE_PROBE);
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.colorOpen, true);
+  assert.equal(r.exportClosed, true);
+  assert.equal(r.openedByKeyboard, true);
+  assert.equal(r.initialFocus, 'classic');
+  assert.equal(r.endFocus, 'primary');
+  assert.equal(r.selected, 'primary');
+  assert.ok(['#E74C3C', 'rgb(231, 76, 60)'].includes(r.selectedColor));
+  assert.equal(r.selectedAria, 'true');
+  assert.match(r.hashAfterSelect, /palette=primary/);
+  assert.equal(r.afterTheme, 'primary');
+  assert.equal(r.afterReset, 'classic');
+  assert.doesNotMatch(r.hashAfterReset, /palette=/);
+  assert.equal(r.closedByEscape, true);
+  assert.equal(r.focusReturned, true);
+});
+
 // SVG and CSV are produced synchronously, so they are always observable.
 // PNG and the share card need real image decoding, which --virtual-time-budget
 // does not wait for: virtual time can expire mid-decode and Chrome dumps the
@@ -146,6 +199,9 @@ const EXPORT_PROBE = `async function () {
   }
   var out = { kinds: {}, pngCaptured: false };
 
+  document.querySelector('[data-palette="warm"]').click();
+  out.selectedCat0 = getComputedStyle(document.documentElement).getPropertyValue('--cat-0').trim();
+
   document.querySelector('[data-export="svg"]').click();
   document.querySelector('[data-export="csv"]').click();
   for (var i = 0; i < captured.length; i++) {
@@ -153,7 +209,8 @@ const EXPORT_PROBE = `async function () {
     if (b.type === 'text/csv') out.kinds.csv = { size: b.size, head: (await b.text()).split('\\n')[0] };
     else if (b.type === 'image/svg+xml') {
       var t = await b.text();
-      out.kinds.svg = { size: b.size, opensWithSvg: t.indexOf('<svg') === 0 };
+      var token = /--cat-0:([^;}]+)/.exec(t);
+      out.kinds.svg = { size: b.size, opensWithSvg: t.indexOf('<svg') === 0, cat0: token && token[1] };
     }
   }
   publish(out);
@@ -189,6 +246,7 @@ test('exports produce valid SVG, CSV, and PNG blobs', { skip }, () => {
     // Synchronous exports: always asserted.
     assert.ok(r.kinds.svg?.opensWithSvg, `${name} SVG export is not an SVG document`);
     assert.ok(r.kinds.svg.size > 500, `${name} SVG export is suspiciously small`);
+    assert.equal(r.kinds.svg.cat0, r.selectedCat0, `${name} SVG export lost the selected palette`);
     assert.ok(r.kinds.csv?.head.includes(','), `${name} CSV export has no header row`);
     // Rasterized exports: asserted whenever the decode completed in time.
     if (r.pngCaptured) {

@@ -88,6 +88,26 @@ test('M3 viewer features are present: brush plumbing, exports, deep links', () =
   assert.equal(payload.table.headers[0], spec.encoding.x.column);
 });
 
+test('palette picker is generated after Theme with Classic selected by default', () => {
+  const { html } = renderExample('storage-mix.cartesian.json');
+  const exportAt = html.indexOf('id="gc-export-btn"');
+  const themeAt = html.indexOf('id="gc-theme"');
+  const colorAt = html.indexOf('id="gc-color-btn"');
+  assert.ok(exportAt < themeAt && themeAt < colorAt, 'toolbar order is Export, Theme, Color');
+  assert.match(html, /<html[^>]+data-palette="classic"/);
+  assert.ok(html.includes('id="gc-color-menu"'));
+  assert.ok(html.includes('role="listbox"'));
+  const options = [...html.matchAll(/class="gc-palette-option"[^>]+data-palette="([^"]+)"/g)]
+    .map((m) => m[1]);
+  assert.deepEqual(options, ['classic', 'cool', 'warm', 'primary']);
+  assert.match(html, /data-palette="classic" aria-selected="true"/);
+  assert.ok(html.includes(':root[data-palette="warm"]'));
+
+  const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
+  assert.deepEqual(Object.keys(payload.palettes), ['classic', 'cool', 'warm', 'primary']);
+  assert.deepEqual(payload.palettes.primary.three, ['#E74C3C', '#F4D03F', '#3498DB']);
+});
+
 test('payload JSON in the artifact parses and mirrors the data', () => {
   const { spec, html } = renderExample('mau-trend.cartesian.json');
   const m = /<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html);

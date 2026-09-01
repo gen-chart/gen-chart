@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
 import { t, templateStrings, resolveLocale } from './i18n.mjs';
+import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds } from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
@@ -63,6 +64,19 @@ function viewsHtml(payload, locale) {
     '<p class="gc-view-note" id="gc-view-note" aria-live="polite"></p>';
 }
 
+function paletteOptionsHtml(locale) {
+  return paletteIds().map((id) => {
+    const preview = PALETTES[id].three.map((color) =>
+      `<span class="gc-palette-swatch" style="--preview:${color}"></span>`
+    ).join('');
+    return `<button class="gc-palette-option" type="button" role="option" data-palette="${id}" ` +
+      `aria-selected="${id === DEFAULT_PALETTE ? 'true' : 'false'}" tabindex="${id === DEFAULT_PALETTE ? '0' : '-1'}">` +
+      `<span class="gc-palette-preview" aria-hidden="true">${preview}</span>` +
+      `<span>${escapeXml(t(locale, `ui.palette.${id}`))}</span>` +
+      '<span class="gc-palette-check" aria-hidden="true">✓</span></button>';
+  }).join('');
+}
+
 export function assembleHtml(spec, svg, payload, legend = null) {
   const template = readFileSync(templatePath, 'utf8');
   const locale = resolveLocale(spec.meta.locale);
@@ -70,16 +84,26 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
   // The viewer builds some strings itself; ship them with the payload.
-  const withStrings = { ...payload, locale, i18n: templateStrings(locale) };
+  const withStrings = {
+    ...payload,
+    locale,
+    i18n: templateStrings(locale),
+    palettes: Object.fromEntries(paletteIds().map((id) => [id, {
+      six: [...PALETTES[id].six],
+      three: [...PALETTES[id].three]
+    }]))
+  };
   // `</` must not appear un-escaped inside the JSON script block.
   const payloadJson = JSON.stringify(withStrings).replaceAll('</', '<\\/');
 
   let html = template
     .replaceAll('{{LANG}}', locale)
     .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
+    .replace('{{PALETTE_CSS}}', paletteCss())
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('{{SUBTITLE_BLOCK}}', subtitle)
     .replace('{{VIEWS}}', viewsHtml(payload, locale))
+    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale))
     .replace('{{SVG}}', svg)
     .replace('{{LEGEND}}', legendHtml(legend, locale))
     .replace('{{DATA_TABLE}}', tableHtml(payload, locale))
