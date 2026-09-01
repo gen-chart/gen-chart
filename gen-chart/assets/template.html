@@ -409,8 +409,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var html = '';
     for (var k = 0; k < count; k++) {
       var i = r[0] + Math.round((k * (r[1] - r[0])) / Math.max(1, count - 1));
-      html += '<text x="' + zoomX(payload.xPixels[i]).toFixed(1) + '" y="' + (plot.bottom + 16) +
-        '" text-anchor="middle">' + esc(payload.xLabels[i]) + '</text>';
+      var tx = zoomX(payload.xPixels[i]);
+      // Edge ticks sit exactly on the plot bounds; a centred anchor would
+      // push half the label outside the viewBox and clip it.
+      var anchor = tx <= plot.left + 26 ? 'start' : (tx >= plot.right - 26 ? 'end' : 'middle');
+      html += '<text x="' + tx.toFixed(1) + '" y="' + (plot.bottom + 16) +
+        '" text-anchor="' + anchor + '">' + esc(payload.xLabels[i]) + '</text>';
     }
     g.innerHTML = html;
   }
