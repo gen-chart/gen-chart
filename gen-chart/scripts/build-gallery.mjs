@@ -6,9 +6,10 @@
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { parseThemeTokens } from '../renderers/shared/contrast.mjs';
 import { escapeXml } from '../renderers/shared/format.mjs';
+import { DEFAULT_PALETTE, PALETTES } from '../renderers/shared/palette.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const docs = fileURLToPath(new URL('../../docs/', import.meta.url));
@@ -48,6 +49,27 @@ function stripInteractive(svg) {
   return svg.replace(/<g class="gc-hover"[\s\S]*?<\/g>\s*(?=<\/svg>)/, '');
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Standalone viewers apply Classic in JavaScript so role-authored series are
+// overridden by display order. Gallery previews are static SVG, so mirror the
+// same transformation at build time instead of showing the authored baseline.
+export function applyDefaultPalette(svg, spec) {
+  if (spec.chart_type === 'matrix') return svg;
+  if (spec.chart_type === 'cartesian') {
+    return spec.series.reduce((out, series, index) => {
+      const id = escapeRegExp(escapeXml(series.id));
+      const re = new RegExp(`(<g class="gc-series" data-series="${id}" style=")--sc:[^"]+`, 'g');
+      return out.replace(re, `$1--sc:var(--cat-${index % 6})`);
+    }, svg);
+  }
+  let index = 0;
+  return svg.replace(/(<(?:g|path) class="(?:gc-series|gc-box|gc-slice)"[^>]*style=")--sc:[^"]+/g,
+    (_, prefix) => `${prefix}--sc:var(--cat-${index++ % 6})`);
+}
+
 // The mark rules live in the viewer template; lifting them keeps the gallery
 // previews in sync with the renderer instead of duplicating a stylesheet that
 // would silently drift.
@@ -76,6 +98,12 @@ function tokenBlock(tokens, selector) {
   return `${selector} {\n${decls}\n}`;
 }
 
+export function withDefaultPaletteTokens(tokens) {
+  const merged = { ...tokens };
+  PALETTES[DEFAULT_PALETTE].six.forEach((color, index) => { merged[`--cat-${index}`] = color; });
+  return merged;
+}
+
 function build() {
   const examplesDir = join(root, 'examples');
   const specs = readdirSync(examplesDir).filter((f) => SPEC_RE.test(f)).sort();
@@ -101,7 +129,7 @@ function build() {
     cards.push(`
     <article class="card">
       <a class="preview" href="gallery/${htmlName}" aria-label="Open ${escapeXml(spec.meta.title)}">
-        ${stripInteractive(svg)}
+        ${applyDefaultPalette(stripInteractive(svg), spec)}
       </a>
       <div class="meta">
         <span class="family">${escapeXml(FAMILY_LABEL[spec.chart_type])}</span>
@@ -114,17 +142,17 @@ function build() {
   }
 
   const page = `<!doctype html>
-<html lang="en" data-theme="auto">
+<html lang="en" data-theme="auto" data-palette="classic">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>gen-chart — gallery</title>
 <meta name="description" content="Every chart gen-chart can produce, rendered from a typed JSON spec and validated before delivery.">
 <style>
-${tokenBlock(themes.light, ':root')}
-${tokenBlock(themes.dark, ':root[data-theme="dark"]')}
+${tokenBlock(withDefaultPaletteTokens(themes.light), ':root')}
+${tokenBlock(withDefaultPaletteTokens(themes.dark), ':root[data-theme="dark"]')}
 @media (prefers-color-scheme: dark) {
-${tokenBlock(themes['auto-dark'], '  :root[data-theme="auto"]').split('\n').map((l) => '  ' + l).join('\n')}
+${tokenBlock(withDefaultPaletteTokens(themes['auto-dark']), '  :root[data-theme="auto"]').split('\n').map((l) => '  ' + l).join('\n')}
 }
 ${chartCss}
 * { box-sizing: border-box; margin: 0; }
@@ -192,5 +220,7 @@ footer a { color: var(--role-primary); }
   return specs.length;
 }
 
-const n = build();
-console.log(`built docs/ gallery from ${n} examples`);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const n = build();
+  console.log(`built docs/ gallery from ${n} examples`);
+}
