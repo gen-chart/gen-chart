@@ -14,7 +14,7 @@ import { guide } from '../renderers/shared/guide.mjs';
 import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
 import { runVisualCheck } from '../renderers/shared/visual-check.mjs';
 
-const VERSION = '0.8.0';
+const VERSION = '0.9.0';
 
 function usage() {
   return `gen-chart v${VERSION}

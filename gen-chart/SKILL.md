@@ -11,7 +11,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.8"
+  version: "0.9"
   author: sses79
 ---
 
@@ -61,7 +61,8 @@ the family you routed to.
 
    A non-zero exit is never success. A failed delivery preserves the previous
    output file. Delivery reports SHA-256 and byte counts for spec and
-   artifact; include them in your handoff.
+   artifact — keep them for provenance, but see **Output** for when they
+   belong in the reply.
 7. After delivery, collect bounded visual evidence without modifying the
    trusted HTML:
 
@@ -69,11 +70,14 @@ the family you routed to.
    node bin/gen-chart.mjs visual-check <output.html> --json
    ```
 
-   Exit 0 means containment and captures passed; 2 means no Chrome was
-   available — continue and say the check was skipped. The receipt reports
-   `visualReview: "pending"`: inspect the screenshots yourself before
-   describing the chart as polished, and never claim inspection you did
-   not perform.
+   Exit 0 means every checked viewport was contained and the screenshots
+   were captured; 2 means no Chrome was available — say the check was
+   skipped and continue.
+
+   `visual-check` measures **horizontal containment**. It does not judge
+   whether the chart reads well, so its result is never "visual QA passed"
+   or "verified in light and dark". If you opened a screenshot, say what you
+   saw. If you did not, say only that containment was measured.
 
 ## Type router
 
@@ -162,7 +166,36 @@ not hand-write substitute HTML.
 
 ## Output
 
-Return the delivered HTML path, the validation receipt summary (errors,
-warnings, quality profile), and the spec/artifact SHA-256 pair. Report
-failures with their diagnostics; never describe a non-zero exit as success,
-and never claim visual review you did not perform.
+Lead with the chart, not the receipt. The reader wants to know what it shows
+and where it is; hashes and per-viewport measurements are provenance, and
+provenance is noise until someone asks for it.
+
+**Default handoff — three things:**
+
+- one sentence on what the chart shows, in the data's own terms
+- the path to the HTML file
+- one short line on checking, e.g. `Validated at showcase quality — 0 errors,
+  0 warnings.`
+
+**Add the rest only when asked, when something failed, or when the caller is
+automation rather than a person:** SHA-256 receipts, per-viewport containment
+numbers, and full diagnostics.
+
+A good handoff:
+
+> Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%. The chart is at
+> `revenue-q2.html` — open it for hover values and CSV export. Validated at
+> showcase quality, and contained at all four desktop sizes.
+
+Not this:
+
+> Validation: 0 errors, 0 warnings; showcase quality. Visual QA: passed in
+> light/dark themes across four viewport sizes. Spec SHA-256: 2a0144de…
+> HTML SHA-256: 27a4fa5e…
+
+The second buries the finding, and its "Visual QA: passed" claims a judgement
+`visual-check` never makes.
+
+On failure, lead with what failed and quote the diagnostics. Never describe a
+non-zero exit as success, and never claim a visual review you did not
+perform.

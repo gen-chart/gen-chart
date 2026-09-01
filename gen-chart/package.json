@@ -1,6 +1,6 @@
 {
   "name": "gen-chart",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "type": "module",
   "description": "Typed JSON chart spec \u2192 deterministic, validated, self-contained interactive HTML charts.",
