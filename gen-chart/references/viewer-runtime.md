@@ -16,9 +16,10 @@ beyond the spec fields named here.
   unit. Stats are computed at render time from the authored values, never
   in the viewer. Other series dim; Close or Esc clears.
 - **Color palette** — Color follows Theme in the toolbar. Its picker applies
-  Classic (the default), Cool, Warm, or Primary to categorical series and
-  leaves semantic roles and heatmap ramps unchanged. Reset restores Classic.
-  Arrow keys move through choices; Enter or Space selects; Escape closes.
+  Classic (the default), Cool, Warm, or Primary to every displayed series in
+  order, including role-authored series. Role metadata and validation meaning
+  remain intact; heatmap ramps are unchanged. Reset restores Classic. Arrow
+  keys move through choices; Enter or Space selects; Escape closes.
 - **Brush zoom** — `interactions.brush: "x"`, valid only for line marks
   over a time or linear x (validation enforces this). Drag selects an index
   window; the viewer re-projects marks with an affine x remap. The y axis

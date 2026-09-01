@@ -24,7 +24,7 @@ const SPEC_RE = /\.(cartesian|distribution|proportion|matrix)\.json$/;
 const examples = readdirSync(examplesDir).filter((f) => SPEC_RE.test(f))
   .map((f) => f.replace(SPEC_RE, '.html'));
 
-function run(htmlPath, script, { width = 1440, height = 900, budget = 4000, retried = false } = {}) {
+function run(htmlPath, script, { width = 1440, height = 900, budget = 4000, retried = false, hash = '' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-smoke-'));
   const probePath = join(dir, 'probe.html');
   const wrapper = `<script>
@@ -48,14 +48,14 @@ window.addEventListener('load', function () {
       '--headless=new', '--disable-gpu', '--hide-scrollbars',
       '--no-sandbox', '--disable-dev-shm-usage',
       `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
-      '--dump-dom', `file://${probePath}`
+      '--dump-dom', `file://${probePath}${hash}`
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', openSync(stderrPath, 'w')], timeout: 60000 });
   } catch (e) {
     crash = `chrome exited: ${e.message}`;
   }
   const m = /data-probe="([^"]+)"/.exec(dom);
   if (!m) {
-    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true });
+    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true, hash });
     let err = '';
     try { err = readFileSync(stderrPath, 'utf8').trim().split('\n').slice(-6).join(' | '); } catch {}
     assert.fail(`probe never ran for ${htmlPath} (budget ${budget}ms). ${crash} chrome stderr: ${err || '(empty)'}`);
@@ -179,6 +179,64 @@ test('palette picker supports menus, keyboard selection, reset, theme, and hash 
   assert.doesNotMatch(r.hashAfterReset, /palette=/);
   assert.equal(r.closedByEscape, true);
   assert.equal(r.focusReturned, true);
+});
+
+const ROLE_PALETTE_PROBE = `async function () {
+  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
+  function renderedColors() {
+    return payload.series.map(function (series) {
+      var group = document.querySelector('.gc-series[data-series="' + CSS.escape(series.id) + '"]');
+      var line = group && group.querySelector('.gc-line');
+      var mark = line || (group && group.querySelector('rect, path, circle'));
+      return mark ? (line ? getComputedStyle(mark).stroke : getComputedStyle(mark).fill) : '';
+    });
+  }
+  var out = {};
+  out.before = renderedColors();
+  document.querySelector('[data-palette="primary"]').click();
+  out.after = renderedColors();
+  out.runtimeColors = payload.series.map(function (series) {
+    var group = document.querySelector('.gc-series[data-series="' + CSS.escape(series.id) + '"]');
+    return group ? group.style.getPropertyValue('--sc').trim() : '';
+  });
+  out.legend = Array.from(document.querySelectorAll('.gc-legend .gc-swatch'))
+    .map(function (swatch) { return getComputedStyle(swatch).backgroundColor; });
+  return out;
+}`;
+
+test('palette override recolors every role-authored series in the reported charts', { skip }, () => {
+  for (const name of ['revenue-by-region.html', 'signups-vs-target.html', 'mau-trend.html']) {
+    const r = run(examplesDir + name, ROLE_PALETTE_PROBE);
+    assert.deepEqual(r.errors, [], `${name}: ${r.errors.join('; ')}`);
+    assert.equal(r.before.length, r.after.length, name);
+    assert.ok(r.before.length > 0, `${name} exposed no series`);
+    for (let i = 0; i < r.before.length; i++) {
+      assert.notEqual(r.before[i], r.after[i], `${name} series ${i} did not change color`);
+      assert.equal(r.runtimeColors[i], `var(--cat-${i % 6})`, `${name} runtime series ${i}`);
+    }
+    assert.equal(r.legend.length, r.after.length, `${name} legend did not track every series`);
+  }
+});
+
+const PALETTE_HASH_PROBE = `async function () {
+  var first = document.querySelector('.gc-series[data-series]');
+  var mark = first && (first.querySelector('.gc-line') || first.querySelector('rect, path, circle'));
+  return {
+    theme: document.documentElement.getAttribute('data-theme'),
+    palette: document.documentElement.getAttribute('data-palette'),
+    seriesToken: first && first.style.getPropertyValue('--sc').trim(),
+    renderedColor: mark && (mark.classList.contains('gc-line') ? getComputedStyle(mark).stroke : getComputedStyle(mark).fill)
+  };
+}`;
+
+test('palette deep link recolors role-authored series on initial load', { skip }, () => {
+  const r = run(examplesDir + 'mau-trend.html', PALETTE_HASH_PROBE,
+    { hash: '#theme=light&palette=primary' });
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.theme, 'light');
+  assert.equal(r.palette, 'primary');
+  assert.equal(r.seriesToken, 'var(--cat-0)');
+  assert.ok(['rgb(231, 76, 60)', '#E74C3C'].includes(r.renderedColor));
 });
 
 // SVG and CSV are produced synchronously, so they are always observable.

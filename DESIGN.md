@@ -128,9 +128,10 @@ const palettes = {
 };
 ```
 
-Selecting a palette remaps only categorical series: declared semantic roles,
-positive/negative meaning, annotations, and sequential or diverging heatmap
-ramps do not change.
+Selecting a palette is an explicit viewer override: it assigns the six
+palette colors to displayed series in order, including series that have an
+authored semantic role. The role metadata and its validation meaning do not
+change. Annotations and sequential or diverging heatmap ramps are unaffected.
 
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against

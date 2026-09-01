@@ -613,9 +613,35 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     colorBtn.setAttribute('aria-expanded', 'false');
     if (restoreFocus) colorBtn.focus();
   }
+  function paletteToken(index) {
+    return 'var(--cat-' + (index % 6) + ')';
+  }
+  function applyPaletteToChart() {
+    if (Array.isArray(payload.series) && payload.series.length) {
+      payload.series.forEach(function (series, index) {
+        var color = paletteToken(index);
+        series.color = color;
+        svg.querySelectorAll(
+          '.gc-series[data-series="' + CSS.escape(series.id) + '"], .gc-hover-dot[data-for="' + CSS.escape(series.id) + '"]'
+        ).forEach(function (element) { element.style.setProperty('--sc', color); });
+      });
+    } else {
+      // Element-hover families do not carry a runtime series array. Their
+      // repeated marks are already in display order, so override them there.
+      svg.querySelectorAll('.gc-series[data-series], .gc-box, .gc-slice').forEach(function (element, index) {
+        element.style.setProperty('--sc', paletteToken(index));
+      });
+    }
+    document.querySelectorAll('.gc-legend .gc-swatch').forEach(function (swatch, index) {
+      swatch.style.setProperty('--sw', paletteToken(index));
+    });
+    if (focusId) setFocus(focusId);
+    hideTip();
+  }
   function setPalette(id, updateHash) {
     currentPalette = paletteIds.indexOf(id) === -1 ? 'classic' : id;
     root.setAttribute('data-palette', currentPalette);
+    applyPaletteToChart();
     paletteOptions.forEach(function (option) {
       var selected = option.getAttribute('data-palette') === currentPalette;
       option.setAttribute('aria-selected', selected ? 'true' : 'false');
