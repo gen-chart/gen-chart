@@ -4,8 +4,6 @@
 
 An Agent Skill (Claude Code, Cursor, Codex CLI, OpenCode) plus a zero-dependency Node.js rendering and validation system. The agent authors a typed JSON chart spec; gen-chart deterministically compiles it into one self-contained interactive HTML file (inline SVG, embedded data, no CDN) — and refuses dishonest charts by construction.
 
-Sibling project in spirit to [Archify](https://github.com/tt-a1i/archify) (system diagrams); gen-chart focuses on data visualization.
-
 ## Status
 
 **Feature complete (M1–M5).** Four chart families, honesty-enforcing
@@ -15,9 +13,8 @@ visual checks, and deterministic packaging.
 
 See the working documents:
 
-- [gen-chart-plan.md](gen-chart-plan.md) — full skill plan (IR design, honesty engine, viewer runtime, milestones)
+- [ROADMAP.md](ROADMAP.md) — what is shipped and what is planned
 - [DESIGN.md](DESIGN.md) — the design system ("The Honest Ledger") and its named rules
-- [archify-analysis.md](archify-analysis.md) — analysis of Archify's architecture and the lessons carried over
 
 ## Layout
 

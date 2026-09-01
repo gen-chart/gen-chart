@@ -172,3 +172,47 @@ test('the rule only applies to stacked charts, where segments touch', () => {
   spec.series[1].role = 'neutral';
   assert.ok(!codes(spec).includes('composition/adjacent-color'));
 });
+
+// ------------------------------------------------------- percent stacking
+
+test('percent stacking normalises to 0–100 and discloses it on the axis', () => {
+  const spec = load('deploy-outcomes.cartesian.json');
+  const a = cartesian.analyze(spec);
+  assert.deepEqual(a.diagnostics, []);
+  assert.equal(a.layout.percent, true);
+  assert.deepEqual(a.layout.yTicks, [0, 25, 50, 75, 100]);
+  const svg = cartesian.renderSvg(spec, a);
+  assert.match(svg, /\(% of total\)/, 'the axis must say it is normalised');
+  assert.match(svg, /text-anchor="end">\d+%</, 'ticks carry the unit');
+});
+
+test('normalising never hides the absolute value: the tooltip keeps both', () => {
+  const spec = load('deploy-outcomes.cartesian.json');
+  const a = cartesian.analyze(spec);
+  const p = cartesian.buildPayload(spec, a);
+  assert.match(p.series[1].formatted[0], /^\d+\.\d% \(\d+ deploys\)$/);
+  // The CSV export still carries raw counts, not shares.
+  assert.equal(p.table.rows[0][1], spec.data.columns[1].values[0]);
+});
+
+test('a shifting denominator is disclosed, since 100% charts hide it', () => {
+  const spec = load('storage-mix.cartesian.json');
+  spec.stack = 'percent';
+  const d = cartesian.analyze(spec).diagnostics.find((x) => x.code === 'composition/percent-hides-total');
+  assert.ok(d, 'storage totals grow 3.7x; normalising conceals that');
+  assert.equal(d.severity, 'warning');
+  assert.ok(d.evidence.ratio > 1.25);
+  assert.ok(d.supportedFixes.some((f) => f.includes('absolute')));
+});
+
+test('a stable denominator raises no warning', () => {
+  assert.deepEqual(codes(load('deploy-outcomes.cartesian.json')), []);
+});
+
+test('honesty: a column summing to zero cannot be normalised', () => {
+  const spec = load('deploy-outcomes.cartesian.json');
+  for (const c of spec.data.columns.slice(1)) c.values[2] = 0;
+  const d = cartesian.analyze(spec).diagnostics.find((x) => x.code === 'honesty/percent-zero-total');
+  assert.ok(d);
+  assert.equal(d.evidence.index, 2);
+});

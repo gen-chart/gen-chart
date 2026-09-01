@@ -220,7 +220,11 @@
       "$ref": "common.schema.json#/$defs/cards"
     },
     "stack": {
-      "type": "boolean"
+      "enum": [
+        true,
+        false,
+        "percent"
+      ]
     }
   }
 }
