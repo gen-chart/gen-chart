@@ -296,12 +296,12 @@
       "source": "gallery/sources/traffic-sources.proportion.json",
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
-        "source": 769,
-        "artifact": 60422
+        "source": 785,
+        "artifact": 60438
       },
       "sha256": {
-        "source": "58e8e2153625b685e8a9b534adca2cb24722783ccf4fe9a4feab744ffc1a72ed",
-        "artifact": "c21f9dbbd2e9854216a669b27faa24557f2300179e5add4fd1fb2e20d1327a63"
+        "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
+        "artifact": "ef3ea6c923c8be1ca82fff980f138a9ac14a6c41cbca54fde6c590b4c01a718b"
       },
       "validation": {
         "quality": "showcase",

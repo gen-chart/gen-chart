@@ -94,6 +94,24 @@ test('proportion: example analyzes clean and shares sum to one', () => {
   assert.ok(Math.abs(total - 1) < 1e-9);
 });
 
+test('proportion: example takeaway agrees with the supplied values', () => {
+  const spec = load('traffic-sources.proportion.json');
+  const [categories, values] = spec.data.columns.map((column) => column.values);
+  const total = values.reduce((sum, value) => sum + value, 0);
+  const organicIndex = categories.indexOf('Organic search');
+  const organicShare = (values[organicIndex] / total * 100).toFixed(1);
+  const named = categories.map((category, index) => ({ category, value: values[index] }))
+    .filter(({ category }) => category !== 'Other')
+    .sort((a, b) => a.value - b.value);
+
+  assert.equal(organicShare, '45.0');
+  assert.deepEqual(named[0], { category: 'Email', value: 610 });
+  assert.equal(spec.cards[0].items[0],
+    'Organic search brings 45.0% of signups — more than Referral, Paid social, and Email combined.');
+  assert.equal(spec.cards[0].items[1],
+    'Email is the smallest named channel outside the Other bucket at 610 signups (5.7%).');
+});
+
 test('honesty: negative parts are rejected', () => {
   const spec = load('traffic-sources.proportion.json');
   spec.data.columns[1].values[2] = -100;
