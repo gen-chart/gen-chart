@@ -50,6 +50,12 @@ export function paletteColors(id, colorCount = 6) {
   return colorCount > 0 && colorCount <= 3 ? palette.three : palette.six;
 }
 
+export function paletteInk(color) {
+  return contrastRatio(color, '#000000') >= contrastRatio(color, '#ffffff')
+    ? '#000000'
+    : '#ffffff';
+}
+
 // Embedded after the theme blocks. Palette selection therefore changes only
 // categorical tokens and survives light/dark theme changes.
 export function paletteCss() {
@@ -60,7 +66,11 @@ export function paletteCss() {
     const compact = PALETTES[id].three
       .map((color, i) => `--cat-${i}: ${color}`)
       .join('; ');
-    return `:root[data-palette="${id}"] { ${declarations}; }\n` +
+    const heatmap = PALETTES[id].six.flatMap((color, i) => [
+      `--seq-${i}: ${color}`, `--seq-ink-${i}: ${paletteInk(color)}`,
+      `--div-${i}: ${color}`, `--div-ink-${i}: ${paletteInk(color)}`
+    ]).join('; ');
+    return `:root[data-palette="${id}"] { ${declarations}; ${heatmap}; }\n` +
       `:root[data-palette="${id}"][data-palette-size="three"] { ${compact}; }`;
   }).join('\n');
 }
@@ -102,7 +112,7 @@ export function resolveSeriesColors(series) {
 
 // Resolves a series' colour token to the hex it renders as, per theme, so
 // composition checks can reason about what a reader actually sees.
-import { parseThemeTokens } from './contrast.mjs';
+import { contrastRatio, parseThemeTokens } from './contrast.mjs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 

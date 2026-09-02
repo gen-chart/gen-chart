@@ -71,6 +71,37 @@ semantics — light and dark are lighting conditions, never different charts.
 - Interaction reveals detail that already exists; it never adds meaning.
 - Exports capture the canonical chart at rest, free of viewer state.
 
+## Instruction gallery
+
+The project homepage is an executable lesson, not a screenshot wall. Its
+information order is fixed:
+
+```text
+01 Install skill → 02 Copy prompt → 03 Inspect typed JSON IR → 04 Open chart
+```
+
+The install panel offers Cursor, Codex, Claude Code, and OpenCode commands for
+the same Skill. Global installation is the primary path; repository-only
+installation is a secondary disclosure. The page does not ask visitors to
+choose between pasted data and repository data because both paths converge on
+the same typed IR.
+
+Every example begins with the question it answers and keeps its renderer SVG
+as the preview. Prompt text, source links, artifact links, showcase counts,
+and digests come from the deterministic gallery build. JavaScript may switch
+agent commands, filter families, restore links, and copy text, but it never
+creates lesson content or verification claims. Without JavaScript, the
+universal install command, every prompt, and every source/artifact link remain
+usable.
+
+**The Proof Beside the Claim Rule.** A verification label is only rendered
+from the same delivery receipt and exact bytes recorded in the gallery
+manifest. Never hand-author a passing badge.
+
+**The Reproduction Prompt Rule.** A gallery prompt contains exact data derived
+from the published IR, but it is not described as historical provenance and
+does not promise byte-identical LLM output.
+
 ## Colors
 
 Six semantic roles plus a neutral ladder. Series without a declared role
@@ -130,9 +161,10 @@ const palettes = {
 
 Selecting a palette is an explicit viewer override: it assigns the applicable
 three- or six-color set to displayed series in order, including series that
-have an authored semantic role. The role metadata and its validation meaning
-do not change. Annotations and sequential or diverging heatmap ramps are
-unaffected.
+have an authored semantic role. Heatmaps map the six colors onto their ordered
+sequential or diverging buckets and choose contrasting black or white cell
+labels. Role metadata and its validation meaning do not change; annotations
+are unaffected.
 
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against

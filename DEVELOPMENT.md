@@ -32,8 +32,8 @@ gen-chart/                    the skill package — everything that ships
 │                             i18n, diagnostics, html, registry
 ├── references/               authoring, delivery, and viewer contracts
 ├── assets/template.html      the viewer runtime
-├── examples/                 specs and their rendered artifacts
-├── scripts/                  validator, gallery, package, example builds
+├── examples/                 specs, rendered artifacts, gallery case registry
+├── scripts/                  validator, staged gallery/template, package builds
 └── test/                     node --test suites
 docs/                         generated gallery (do not edit by hand)
 ```
@@ -48,17 +48,18 @@ so the CLI and tests stay family-agnostic.
 npm test
 ```
 
-172 tests via `node --test`, no framework. The suite covers scale and tick
+181 tests via `node --test`, no framework. The suite covers scale and tick
 maths, statistics against published reference values, every honesty rule in
 both directions, golden byte-stable output, CLI receipts, atomic delivery,
 WCAG AA contrast, CIEDE2000 against the Sharma test vectors, and real-browser
 behaviour.
 
-**Browser suites.** `test/browser-smoke.test.mjs` drives each artifact in
-headless Chrome: no uncaught errors, a positioned tooltip, keyboard
-navigation per family, valid export blobs, and phone-viewport containment.
-They skip cleanly when no browser is found, so CI without Chrome stays
-green. Override discovery with `GEN_CHART_CHROME=/path/to/chrome`.
+**Browser suites.** `test/browser-smoke.test.mjs` drives each artifact and the
+instruction gallery in headless Chrome: no uncaught errors, a positioned
+tooltip, keyboard navigation per family, valid export blobs, palette and
+gallery URL state, exact clipboard behavior, and compact-viewport containment.
+They skip cleanly when no browser is found, so CI without Chrome stays green.
+Override discovery with `GEN_CHART_CHROME=/path/to/chrome`.
 
 They exist because structural assertions cannot catch a runtime error in the
 viewer script — the DOM is often already mutated before the throw. A broken
@@ -89,6 +90,12 @@ npm run build:gallery         # after either of the above
 
 The validators are precompiled so the shipped skill needs no npm install.
 `npm test` runs `check:validators` first, so schema drift fails fast.
+
+The gallery registry is `examples/gallery-cases.mjs`; every typed example must
+appear there exactly once. `build:gallery` delivers each case through the CLI
+at showcase quality, checks its committed HTML golden, generates
+`docs/gallery/manifest.json`, and builds the complete site in a sibling stage
+directory. Validation failure leaves the last-good `docs/` tree untouched.
 
 ## Adding a chart family
 

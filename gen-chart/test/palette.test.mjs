@@ -6,6 +6,7 @@ import {
   paletteColors,
   paletteCss,
   paletteIds,
+  paletteInk,
   resolvePaletteId,
   resolveTokenHex
 } from '../renderers/shared/palette.mjs';
@@ -43,6 +44,12 @@ test('palette ids fall back safely and generated CSS maps all categorical tokens
     assert.ok(css.includes(`:root[data-palette="${id}"]`), id);
     assert.ok(css.includes(`:root[data-palette="${id}"][data-palette-size="three"]`), `${id} compact`);
     for (let i = 0; i < 6; i++) assert.ok(css.includes(`--cat-${i}: ${PALETTES[id].six[i]}`));
+    for (let i = 0; i < 6; i++) {
+      assert.ok(css.includes(`--seq-${i}: ${PALETTES[id].six[i]}`), `${id} sequential ${i}`);
+      assert.ok(css.includes(`--div-${i}: ${PALETTES[id].six[i]}`), `${id} diverging ${i}`);
+      assert.ok(contrastRatio(paletteInk(PALETTES[id].six[i]), PALETTES[id].six[i]) >= 4.5,
+        `${id} heatmap ink ${i}`);
+    }
   }
   assert.equal(paletteColors('classic', 3), PALETTES.classic.three);
   assert.equal(paletteColors('classic', 4), PALETTES.classic.six);

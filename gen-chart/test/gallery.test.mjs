@@ -25,6 +25,8 @@ test('committed gallery thumbnails match the Classic standalone viewer default',
   assert.match(html, /<html[^>]+data-palette="classic"/);
   assert.match(html, /--cat-0: #A2C9FB/);
   assert.match(html, /--cat-5: #FBF19F/);
+  assert.match(html, /--seq-0: #A2C9FB/);
+  assert.match(html, /--seq-5: #FBF19F/);
   for (const [id, index] of [
     ['q1', 0], ['q2', 1],
     ['signups', 0], ['target', 1],
