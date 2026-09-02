@@ -1541,7 +1541,15 @@ Requirements
     var details = card.querySelector('.prompt-details');
     if (details) details.open = true;
     var heading = card.querySelector('h2 a');
-    if (heading) requestAnimationFrame(function () { heading.focus({ preventScroll: true }); });
+    if (heading) {
+      if (document.readyState === 'complete') {
+        heading.focus({ preventScroll: true });
+      } else {
+        window.addEventListener('load', function () {
+          heading.focus({ preventScroll: true });
+        }, { once: true });
+      }
+    }
   }
 
   function fallbackCopy(text) {
