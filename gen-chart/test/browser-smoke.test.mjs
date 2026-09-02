@@ -375,7 +375,8 @@ const GALLERY_PROBE = `async function () {
   await new Promise(function (resolve) { requestAnimationFrame(resolve); });
   out.initialAgent = document.querySelector('input[name="agent"]:checked').value;
   out.initialFamily = document.querySelector('[data-family-filter][aria-pressed="true"]').dataset.familyFilter;
-  out.hashPromptOpen = document.querySelector('#example-build-times .prompt-details').open;
+  var initialPrompt = document.querySelector('#example-build-times .prompt-panel');
+  out.hashPromptVisible = Boolean(initialPrompt && getComputedStyle(initialPrompt).display !== 'none');
   out.hashFocused = document.activeElement.closest && document.activeElement.closest('#example-build-times') !== null;
 
   document.getElementById('agent-cursor').click();
@@ -420,6 +421,16 @@ const GALLERY_PROBE = `async function () {
   return out;
 }`;
 
+const GALLERY_CARD_HEIGHT_PROBE = `async function () {
+  var left = document.getElementById('example-deploy-outcomes').getBoundingClientRect();
+  var right = document.getElementById('example-latency-distribution').getBoundingClientRect();
+  return {
+    sameRow: Math.round(left.top) === Math.round(right.top),
+    leftHeight: Math.round(left.height),
+    rightHeight: Math.round(right.height)
+  };
+}`;
+
 test('instruction gallery supports agent install, filters, hashes, and honest copying', { skip }, () => {
   const r = run(galleryPage, GALLERY_PROBE, {
     width: 390,
@@ -430,7 +441,7 @@ test('instruction gallery supports agent install, filters, hashes, and honest co
   assert.deepEqual(r.errors, [], r.errors.join('; '));
   assert.equal(r.initialAgent, 'codex');
   assert.equal(r.initialFamily, 'distribution', 'the valid case hash should override an incompatible filter');
-  assert.equal(r.hashPromptOpen, true);
+  assert.equal(r.hashPromptVisible, true);
   assert.equal(r.hashFocused, true);
   assert.match(r.globalCommand, /--agent cursor --global/);
   assert.match(r.projectCommand, /--agent cursor --copy --yes$/);
@@ -444,4 +455,11 @@ test('instruction gallery supports agent install, filters, hashes, and honest co
   assert.match(r.failureStatus, /Copy failed/);
   assert.equal(r.fallbackCopied, r.expected);
   assert.equal(r.pageOverflow, false);
+});
+
+test('instruction gallery keeps paired desktop cards the same height', { skip }, () => {
+  const r = run(galleryPage, GALLERY_CARD_HEIGHT_PROBE, { width: 1440, height: 900 });
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.sameRow, true);
+  assert.equal(r.leftHeight, r.rightHeight);
 });

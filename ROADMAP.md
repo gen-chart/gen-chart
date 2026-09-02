@@ -59,7 +59,7 @@ deterministic package build, and CI across Node 22 and 24.
 all 12 examples at showcase quality before replacing the published site. The
 homepage provides four-agent installation commands and teaches the complete
 Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
-example binds a data-bearing reproduction prompt, exact source/artifact bytes,
+example binds a concise data-bearing message prompt, exact source/artifact bytes,
 validation counts, and SHA-256 digests through a generated audit manifest.
 
 ## Planned

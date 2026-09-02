@@ -4,19 +4,13 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { GALLERY_CASES } from '../examples/gallery-cases.mjs';
-import { formatGalleryPrompt } from '../scripts/gallery-prompt.mjs';
+import { formatGalleryPrompt, formatPromptData } from '../scripts/gallery-prompt.mjs';
 import { validateGalleryRegistry } from '../scripts/build-gallery.mjs';
 
 const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
 
 function specFor(entry) {
   return JSON.parse(readFileSync(examplesDir + entry.spec, 'utf8'));
-}
-
-function dataFromPrompt(prompt) {
-  const match = /\nData\n```json\n([\s\S]*?)\n```\n/.exec(prompt);
-  assert.ok(match, 'prompt must contain one fenced JSON data block');
-  return JSON.parse(match[1]);
 }
 
 test('gallery registry has exact one-to-one coverage and one featured case', () => {
@@ -42,17 +36,27 @@ test('registry rejects invalid ids, paths, duplicates, and missing teaching copy
   });
 });
 
-test('every prompt is deterministic and its data block deep-equals spec.data', () => {
+test('every prompt is a deterministic human message carrying its exact formatted data', () => {
   for (const entry of GALLERY_CASES) {
     const spec = specFor(entry);
     const first = formatGalleryPrompt(entry, spec);
     const second = formatGalleryPrompt(entry, spec);
     assert.equal(first, second, entry.id);
-    assert.deepEqual(dataFromPrompt(first), spec.data, entry.id);
-    assert.match(first, /typed gen-chart JSON IR/);
+    assert.ok(first.endsWith(`${formatPromptData(spec)}\n`), `${entry.id} prompt data drifted`);
+    assert.doesNotMatch(first, /\n(?:Question|Request|Data|Requirements)\n|```json/);
     assert.ok(first.endsWith('\n'), `${entry.id} prompt needs a trailing newline`);
-    if (entry.id === 'zh-revenue') assert.match(first, /各渠道的季度营收如何变化/);
+    if (entry.id === 'zh-revenue') assert.match(first, /^使用 gen-chart 创建图表。/);
+    else assert.match(first, /^Use gen-chart to /);
   }
+});
+
+test('the featured boxplot prompt uses compact grouped rows', () => {
+  const entry = GALLERY_CASES.find((candidate) => candidate.id === 'build-times');
+  const prompt = formatGalleryPrompt(entry, specFor(entry));
+  assert.match(prompt, /^Use gen-chart to compare build durations across our pipelines/);
+  assert.match(prompt, /^unit:\s+42 45 47 48 50 51 53 55 58 71$/m);
+  assert.match(prompt, /^integration:\s+118 124 131 136 140 145 152 158 166 210$/m);
+  assert.match(prompt, /^e2e:\s+295 312 328 341 355 370 388 402 425 610$/m);
 });
 
 test('changing source data changes the prompt and its digest', () => {

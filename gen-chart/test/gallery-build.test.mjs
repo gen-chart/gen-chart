@@ -55,7 +55,9 @@ test('committed gallery manifest binds prompts, sources, artifacts, and page car
     const prompt = new RegExp(`<code id="prompt-${entry.id}">([\\s\\S]*?)<\\/code>`).exec(page);
     assert.ok(prompt, `${entry.id} page prompt missing`);
     assert.equal(decodeHtml(prompt[1]), entry.prompt, `${entry.id} page prompt drifted from manifest`);
+    assert.match(page, new RegExp(`<article[^>]+id="example-${entry.id}"[\\s\\S]*?class="prompt-panel"`));
   }
+  assert.doesNotMatch(page, /class="prompt-details"/);
 });
 
 test('transactional docs commit replaces the whole tree, including stale files', () => {
