@@ -15,14 +15,24 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-181-0891b2?style=flat-square)
 
-**[Gallery](https://sses79.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
+**[Project page](https://sses79.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
-The gallery is also the quickest start: choose Cursor, Codex, Claude Code, or
+The project page is also the quickest start: choose Cursor, Codex, Claude Code, or
 OpenCode, copy the matching install command, then use any verified example to
 follow **prompt → typed JSON IR → interactive chart**. Each example publishes
 its showcase receipt and exact source/artifact digests.
 
 ---
+
+```bash
+npx skills add sses79/gen-chart -g
+```
+
+Using Cursor? Open the [agent-aware quick start](https://sses79.github.io/gen-chart/?agent=cursor#install) for exact global and project commands.
+
+**No repository is required:** describe the chart and include its data in any agent chat.
+
+## Quick start
 
 ## 01 · Install the skill
 
@@ -150,12 +160,12 @@ Validation caps a pie at 7 slices, so instead of quietly producing an unreadable
 
 ## Choose the right chart
 
-| Family | Marks | Best for | Include in your prompt |
-|---|---|---|---|
-| **Cartesian** | line, bar, grouped, stacked, 100%-stacked, area, scatter | trends, comparisons, composition over time | the dimension, the series, the unit |
-| **Distribution** | histogram, boxplot | spread, outliers, shape | the raw observations, not a summary |
-| **Proportion** | pie, donut | parts of a whole (max 7) | the categories and their values |
-| **Matrix** | heatmap | two categories × intensity | rows, columns, and the value |
+| Family           | Marks                                                    | Best for                                   | Include in your prompt              |
+| ---------------- | -------------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, scatter | trends, comparisons, composition over time | the dimension, the series, the unit |
+| **Distribution** | histogram, boxplot                                       | spread, outliers, shape                    | the raw observations, not a summary |
+| **Proportion**   | pie, donut                                               | parts of a whole (max 7)                   | the categories and their values     |
+| **Matrix**       | heatmap                                                  | two categories × intensity                 | rows, columns, and the value        |
 
 Not sure? Ask the router — it also argues against bad fits:
 
@@ -184,14 +194,14 @@ Plus composition checks for tick collisions, annotation overlap, stack depth, an
 
 ## How it works
 
-| Step | What happens |
-|---|---|
-| **Route** | `guide` picks the family from your question, or argues for a better one |
-| **Profile** | `inspect-data` returns typed column profiles, so numbers are never retyped from memory |
-| **Author** | The agent writes a typed JSON spec with your data embedded verbatim |
-| **Validate** | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts |
-| **Deliver** | Renders, checks, and atomically commits the HTML with SHA-256 receipts — a failed delivery leaves the previous file intact |
-| **Verify** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots |
+| Step         | What happens                                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Route**    | `guide` picks the family from your question, or argues for a better one                                                    |
+| **Profile**  | `inspect-data` returns typed column profiles, so numbers are never retyped from memory                                     |
+| **Author**   | The agent writes a typed JSON spec with your data embedded verbatim                                                        |
+| **Validate** | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts                        |
+| **Deliver**  | Renders, checks, and atomically commits the HTML with SHA-256 receipts — a failed delivery leaves the previous file intact |
+| **Verify**   | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                              |
 
 ```bash
 node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
@@ -211,15 +221,15 @@ Also available: `render`, `visual-check`, `guide`, `demo`, and `doctor`.
 
 Everything below is already in the file — no extra authoring:
 
-| Action | How |
-|---|---|
-| Read exact values | hover, or focus the chart and use <kbd>←</kbd> <kbd>→</kbd> <kbd>Home</kbd> <kbd>End</kbd> |
-| Show or hide a series | click the legend; double-click to isolate |
-| See series statistics | click a series for min, max, mean, last, count |
-| Zoom a time window | drag across the chart (opt-in), <kbd>Esc</kbd> to reset |
-| Replay an authored reading | the guided-views strip |
-| Switch theme | Theme, or follow `prefers-color-scheme` |
-| Export | PNG, standalone SVG, the underlying CSV, or a 1200×630 share card |
+| Action                     | How                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| Read exact values          | hover, or focus the chart and use <kbd>←</kbd> <kbd>→</kbd> <kbd>Home</kbd> <kbd>End</kbd> |
+| Show or hide a series      | click the legend; double-click to isolate                                                  |
+| See series statistics      | click a series for min, max, mean, last, count                                             |
+| Zoom a time window         | drag across the chart (opt-in), <kbd>Esc</kbd> to reset                                    |
+| Replay an authored reading | the guided-views strip                                                                     |
+| Switch theme               | Theme, or follow `prefers-color-scheme`                                                    |
+| Export                     | PNG, standalone SVG, the underlying CSV, or a 1200×630 share card                          |
 
 Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush=`, `#view=`. The HTML toolbar includes a Color picker for Classic, Cool, Warm, and Primary palettes; an explicit choice recolors every displayed series in order, including role-authored series and heatmap buckets. Charts with up to three colors use the palette's three-color set; larger charts and heatmaps use all six. Exports capture the selected theme and palette on the canonical chart at rest — hover, dimming, and zoom never leak into them.
 
