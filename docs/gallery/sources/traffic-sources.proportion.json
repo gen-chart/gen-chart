@@ -17,6 +17,6 @@
     "value": { "column": "signups" }
   },
   "cards": [
-    { "title": "Takeaway", "items": ["Organic search brings 44% of signups — more than paid social, email, and referral combined.", "Paid social is the smallest tracked channel outside the Other bucket."] }
+    { "title": "Takeaway", "items": ["Organic search brings 45.0% of signups — more than Referral, Paid social, and Email combined.", "Email is the smallest named channel outside the Other bucket at 610 signups (5.7%)."] }
   ]
 }
