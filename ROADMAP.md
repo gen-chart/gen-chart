@@ -53,8 +53,14 @@ authored content is never translated.
 **Tooling.** `validate` / `render` / `deliver` with atomic commits and
 SHA-256 receipts, `guide` for routing, `inspect-data` for typed column
 profiles, `visual-check` for containment evidence, `demo`, `doctor`, a
-deterministic package build, a generated gallery, and CI across Node 22
-and 24.
+deterministic package build, and CI across Node 22 and 24.
+
+**Interactive instruction gallery.** One staged, deterministic build delivers
+all 12 examples at showcase quality before replacing the published site. The
+homepage provides four-agent installation commands and teaches the complete
+Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
+example binds a data-bearing reproduction prompt, exact source/artifact bytes,
+validation counts, and SHA-256 digests through a generated audit manifest.
 
 ## Planned
 

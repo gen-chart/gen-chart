@@ -13,9 +13,14 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
 ![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-160-0891b2?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-181-0891b2?style=flat-square)
 
 **[Gallery](https://sses79.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
+
+The gallery is also the quickest start: choose Cursor, Codex, Claude Code, or
+OpenCode, copy the matching install command, then use any verified example to
+follow **prompt → typed JSON IR → interactive chart**. Each example publishes
+its showcase receipt and exact source/artifact digests.
 
 ---
 

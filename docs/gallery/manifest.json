@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "generator": "gen-chart/scripts/build-gallery.mjs",
+  "generatorVersion": "0.9.0",
+  "entryCount": 12,
+  "entries": [
+    {
+      "id": "build-times",
+      "title": "CI Build Duration by Pipeline",
+      "question": "How do build times and outliers differ by pipeline?",
+      "family": "distribution",
+      "marks": [
+        "boxplot"
+      ],
+      "featured": true,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow do build times and outliers differ by pipeline?\n\nRequest\nCompare CI build durations by pipeline as a boxplot in seconds.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"pipeline\",\n      \"type\": \"string\",\n      \"values\": [\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"unit\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"integration\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\",\n        \"e2e\"\n      ]\n    },\n    {\n      \"id\": \"seconds\",\n      \"type\": \"number\",\n      \"unit\": \"s\",\n      \"label\": \"Duration\",\n      \"values\": [\n        42,\n        45,\n        47,\n        48,\n        50,\n        51,\n        53,\n        55,\n        58,\n        71,\n        118,\n        124,\n        131,\n        136,\n        140,\n        145,\n        152,\n        158,\n        166,\n        210,\n        295,\n        312,\n        328,\n        341,\n        355,\n        370,\n        388,\n        402,\n        425,\n        610\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Show the grouped raw distributions, whiskers, and outliers.\n- Explain which pipeline is slowest and most variable.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "c35a582a9fe0110258e7169239240423d1a5f985c5b5f323cb35ac4addf89c03",
+      "source": "gallery/sources/build-times.distribution.json",
+      "artifact": "gallery/build-times.html",
+      "bytes": {
+        "source": 1234,
+        "artifact": 60424
+      },
+      "sha256": {
+        "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
+        "artifact": "f97e909b1c4b33d5e5d865fa921f74bd5799511fea85102668375bfe62d35835"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "deploy-outcomes",
+      "title": "Rollbacks fell from 10.5% to 7.7% of deploys over six months",
+      "question": "How did the composition of deployment outcomes change over six months?",
+      "family": "cartesian",
+      "marks": [
+        "area",
+        "100% stacked"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow did the composition of deployment outcomes change over six months?\n\nRequest\nShow deployment outcomes over time as a 100%-stacked area chart.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"month\",\n      \"type\": \"date\",\n      \"values\": [\n        \"2026-01\",\n        \"2026-02\",\n        \"2026-03\",\n        \"2026-04\",\n        \"2026-05\",\n        \"2026-06\"\n      ]\n    },\n    {\n      \"id\": \"succeeded\",\n      \"type\": \"number\",\n      \"unit\": \"deploys\",\n      \"values\": [\n        180,\n        190,\n        178,\n        195,\n        188,\n        186\n      ]\n    },\n    {\n      \"id\": \"rolled_back\",\n      \"type\": \"number\",\n      \"unit\": \"deploys\",\n      \"values\": [\n        22,\n        20,\n        20,\n        19,\n        18,\n        16\n      ]\n    },\n    {\n      \"id\": \"failed\",\n      \"type\": \"number\",\n      \"unit\": \"deploys\",\n      \"values\": [\n        8,\n        8,\n        7,\n        8,\n        8,\n        7\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep the months in chronological order and compare clean, rolled-back, and failed deployments.\n- Explain the change in outcome shares without hiding the deployment totals.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "0b413630017e38594d648a2276ff61cf5fecd34a518097c29c10e1b6de909546",
+      "source": "gallery/sources/deploy-outcomes.cartesian.json",
+      "artifact": "gallery/deploy-outcomes.html",
+      "bytes": {
+        "source": 1449,
+        "artifact": 60829
+      },
+      "sha256": {
+        "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
+        "artifact": "934893cce17cc65bb99738c4ed1dbeec440a0c072dbbe452778f80c7f158c4ad"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "latency-distribution",
+      "title": "API Response Time Distribution",
+      "question": "What is the shape and right tail of API response times?",
+      "family": "distribution",
+      "marks": [
+        "histogram"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nWhat is the shape and right tail of API response times?\n\nRequest\nPlot the raw API response-time observations as a histogram in milliseconds.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"latency\",\n      \"type\": \"number\",\n      \"unit\": \"ms\",\n      \"label\": \"Response time\",\n      \"values\": [\n        42,\n        48,\n        51,\n        55,\n        58,\n        59,\n        61,\n        62,\n        63,\n        64,\n        65,\n        66,\n        67,\n        68,\n        68,\n        69,\n        70,\n        71,\n        71,\n        72,\n        73,\n        74,\n        74,\n        75,\n        76,\n        77,\n        78,\n        79,\n        80,\n        81,\n        82,\n        83,\n        85,\n        86,\n        88,\n        90,\n        92,\n        95,\n        98,\n        101,\n        104,\n        108,\n        112,\n        118,\n        125,\n        134,\n        148,\n        167,\n        195,\n        240\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Disclose the histogram bins.\n- Call out the typical range and the long right tail.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "2b3c08aa072e7dd97c06b49a847556cc5e0104e7e3dc33fd6f4a5a9289b88903",
+      "source": "gallery/sources/latency-distribution.distribution.json",
+      "artifact": "gallery/latency-distribution.html",
+      "bytes": {
+        "source": 848,
+        "artifact": 61415
+      },
+      "sha256": {
+        "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
+        "artifact": "9cce8097d6da9c5839f55a7d7995121254a887cb782e1a7a78b11f75fcebccf8"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "mau-trend",
+      "title": "Monthly Active Users",
+      "question": "How did monthly active and paying users change around the v2 launch?",
+      "family": "cartesian",
+      "marks": [
+        "line",
+        "3 guided views",
+        "brush zoom"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow did monthly active and paying users change around the v2 launch?\n\nRequest\nCompare monthly active users and paying users as two time-series lines.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"month\",\n      \"type\": \"date\",\n      \"values\": [\n        \"2025-09\",\n        \"2025-10\",\n        \"2025-11\",\n        \"2025-12\",\n        \"2026-01\",\n        \"2026-02\",\n        \"2026-03\",\n        \"2026-04\",\n        \"2026-05\",\n        \"2026-06\",\n        \"2026-07\",\n        \"2026-08\"\n      ]\n    },\n    {\n      \"id\": \"mau\",\n      \"type\": \"number\",\n      \"unit\": \"users\",\n      \"values\": [\n        8200,\n        8900,\n        9400,\n        9100,\n        10500,\n        12300,\n        13800,\n        14600,\n        15900,\n        17400,\n        18100,\n        19700\n      ]\n    },\n    {\n      \"id\": \"paying\",\n      \"type\": \"number\",\n      \"unit\": \"users\",\n      \"values\": [\n        610,\n        700,\n        780,\n        760,\n        940,\n        1180,\n        1420,\n        1560,\n        1810,\n        2050,\n        2230,\n        2540\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Annotate the February 2026 v2 launch and enable x-axis brush zoom.\n- Include the full-year, post-launch, and paying-only guided views from the evidence.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "5903b37e759a3cf782debbe65a6105e6580447abe3295b628275e8a047021ac9",
+      "source": "gallery/sources/mau-trend.cartesian.json",
+      "artifact": "gallery/mau-trend.html",
+      "bytes": {
+        "source": 2710,
+        "artifact": 63038
+      },
+      "sha256": {
+        "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
+        "artifact": "cdb7d25860cb54bd1b20184182e87ee9b404eb09b7d0704ee17949a9c64cc11c"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "plan-mix",
+      "title": "Accounts grew 52%, and the paid tiers grew fastest",
+      "question": "How did the account mix change as paid plans grew?",
+      "family": "cartesian",
+      "marks": [
+        "area",
+        "stacked"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow did the account mix change as paid plans grew?\n\nRequest\nShow Free, Pro, and Enterprise account counts over time as a stacked area chart.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"month\",\n      \"type\": \"date\",\n      \"values\": [\n        \"2026-01\",\n        \"2026-02\",\n        \"2026-03\",\n        \"2026-04\",\n        \"2026-05\",\n        \"2026-06\"\n      ]\n    },\n    {\n      \"id\": \"free\",\n      \"type\": \"number\",\n      \"unit\": \"accounts\",\n      \"values\": [\n        6200,\n        6800,\n        7100,\n        7400,\n        7600,\n        7900\n      ]\n    },\n    {\n      \"id\": \"pro\",\n      \"type\": \"number\",\n      \"unit\": \"accounts\",\n      \"values\": [\n        1800,\n        2100,\n        2500,\n        2900,\n        3400,\n        3900\n      ]\n    },\n    {\n      \"id\": \"enterprise\",\n      \"type\": \"number\",\n      \"unit\": \"accounts\",\n      \"values\": [\n        240,\n        300,\n        380,\n        470,\n        590,\n        720\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep the values as absolute account counts rather than normalizing them to percentages.\n- Explain both total growth and the changing share of paid tiers.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "85f07d362460d4224287564bc1a96a05fb857a5696cd4ddd7f412e4c28fe1210",
+      "source": "gallery/sources/plan-mix.cartesian.json",
+      "artifact": "gallery/plan-mix.html",
+      "bytes": {
+        "source": 1370,
+        "artifact": 60442
+      },
+      "sha256": {
+        "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
+        "artifact": "47f80936f50d9e2fdc63bfadf07b45fcae5b6be87e6d61ffd0839badee680b07"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "request-growth",
+      "title": "Requests rose 34,000× in six years, but yearly growth is easing",
+      "question": "How can six years of request growth be shown without flattening the early years?",
+      "family": "cartesian",
+      "marks": [
+        "line",
+        "log axis"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow can six years of request growth be shown without flattening the early years?\n\nRequest\nPlot monthly request volume over time as a line chart with a logarithmic y-axis.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"year\",\n      \"type\": \"date\",\n      \"values\": [\n        \"2020\",\n        \"2021\",\n        \"2022\",\n        \"2023\",\n        \"2024\",\n        \"2025\"\n      ]\n    },\n    {\n      \"id\": \"requests\",\n      \"type\": \"number\",\n      \"unit\": \"requests/month\",\n      \"values\": [\n        12000,\n        140000,\n        1500000,\n        9800000,\n        64000000,\n        410000000\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Disclose prominently that the y-axis is logarithmic.\n- Explain why a log scale is necessary and what the curve says about the growth rate.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "a8cbd3ecbfbd7dc04a631c9c103d5fbc251ed0c77afc66c5739a0a2776770d45",
+      "source": "gallery/sources/request-growth.cartesian.json",
+      "artifact": "gallery/request-growth.html",
+      "bytes": {
+        "source": 1192,
+        "artifact": 59261
+      },
+      "sha256": {
+        "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
+        "artifact": "7bc6d34fa19625ff74e3d1eb5a41391cd80cfa7bb6a41ef29aa43b9050eaf574"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "revenue-by-region",
+      "title": "Q2 Revenue by Region",
+      "question": "How does Q2 revenue compare with Q1 across regions?",
+      "family": "cartesian",
+      "marks": [
+        "bar"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nHow does Q2 revenue compare with Q1 across regions?\n\nRequest\nCompare Q1 and Q2 revenue by region with grouped bars.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"region\",\n      \"type\": \"string\",\n      \"values\": [\n        \"North America\",\n        \"Europe\",\n        \"Asia-Pacific\",\n        \"Latin America\",\n        \"Middle East & Africa\"\n      ]\n    },\n    {\n      \"id\": \"q2\",\n      \"type\": \"number\",\n      \"unit\": \"USD k\",\n      \"values\": [\n        1840,\n        1420,\n        990,\n        410,\n        260\n      ]\n    },\n    {\n      \"id\": \"q1\",\n      \"type\": \"number\",\n      \"unit\": \"USD k\",\n      \"values\": [\n        1650,\n        1380,\n        820,\n        380,\n        250\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep the USD-thousands unit and a zero baseline.\n- Highlight the fastest-growing region and the largest contributor.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "e0adf2766a23415cf151b1ba9253373701f296eb64746d2af824b746cc0b0738",
+      "source": "gallery/sources/revenue-by-region.cartesian.json",
+      "artifact": "gallery/revenue-by-region.html",
+      "bytes": {
+        "source": 998,
+        "artifact": 59727
+      },
+      "sha256": {
+        "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
+        "artifact": "24078aa9b22914052eefd527355445f4fd126bad403315b0308061fc9d6f0e15"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "signups-vs-target",
+      "title": "Weekly Signups vs Target",
+      "question": "Which weeks beat the signup target, and is the gap changing?",
+      "family": "cartesian",
+      "marks": [
+        "bar",
+        "line"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nWhich weeks beat the signup target, and is the gap changing?\n\nRequest\nCompare weekly signups with the weekly target using bars for actuals and a line for target.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"week\",\n      \"type\": \"string\",\n      \"values\": [\n        \"W27\",\n        \"W28\",\n        \"W29\",\n        \"W30\",\n        \"W31\",\n        \"W32\",\n        \"W33\",\n        \"W34\"\n      ]\n    },\n    {\n      \"id\": \"signups\",\n      \"type\": \"number\",\n      \"unit\": \"signups\",\n      \"values\": [\n        312,\n        298,\n        351,\n        389,\n        344,\n        412,\n        458,\n        471\n      ]\n    },\n    {\n      \"id\": \"target\",\n      \"type\": \"number\",\n      \"unit\": \"signups\",\n      \"values\": [\n        320,\n        330,\n        340,\n        350,\n        360,\n        370,\n        380,\n        390\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Use one signup unit and keep the bar axis at zero.\n- Explain how often actuals beat target and call out the W31 dip.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "ef0e93ab98282c1743a3fbd8a9e1bdde8e6177e5cee987cb839ccdd1941d0573",
+      "source": "gallery/sources/signups-vs-target.cartesian.json",
+      "artifact": "gallery/signups-vs-target.html",
+      "bytes": {
+        "source": 1126,
+        "artifact": 60902
+      },
+      "sha256": {
+        "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
+        "artifact": "d2b046834bde6cf9e8c12819ab8fc3f4596199afb8604d8bc7aade066c4f40f5"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "storage-mix",
+      "title": "Storage grew 3.7× in five quarters, four-fifths of it cold archive",
+      "question": "Which storage tier drove growth over the last five quarters?",
+      "family": "cartesian",
+      "marks": [
+        "bar",
+        "stacked"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nWhich storage tier drove growth over the last five quarters?\n\nRequest\nShow Hot, Warm, and Cold storage over time as stacked bars in terabytes.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"quarter\",\n      \"type\": \"string\",\n      \"values\": [\n        \"2025 Q3\",\n        \"2025 Q4\",\n        \"2026 Q1\",\n        \"2026 Q2\",\n        \"2026 Q3\"\n      ]\n    },\n    {\n      \"id\": \"hot\",\n      \"type\": \"number\",\n      \"unit\": \"TB\",\n      \"values\": [\n        42,\n        48,\n        51,\n        55,\n        58\n      ]\n    },\n    {\n      \"id\": \"warm\",\n      \"type\": \"number\",\n      \"unit\": \"TB\",\n      \"values\": [\n        38,\n        47,\n        61,\n        74,\n        86\n      ]\n    },\n    {\n      \"id\": \"cold\",\n      \"type\": \"number\",\n      \"unit\": \"TB\",\n      \"values\": [\n        30,\n        62,\n        118,\n        190,\n        264\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep the values as absolute terabytes with a zero baseline.\n- Explain total growth and how much of the increase came from cold archive.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "7baed0a4780cd9f9cf9aa25f599459c0c48a594b0f34a749b390bfa7313e89b5",
+      "source": "gallery/sources/storage-mix.cartesian.json",
+      "artifact": "gallery/storage-mix.html",
+      "bytes": {
+        "source": 1806,
+        "artifact": 60828
+      },
+      "sha256": {
+        "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
+        "artifact": "db200f9377e8221db81cc228c3e54f90507d452aac6915181fed4265fcc30640"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "support-load",
+      "title": "Support Tickets by Day and Shift",
+      "question": "Which day and shift combinations create the heaviest support load?",
+      "family": "matrix",
+      "marks": [
+        "heatmap",
+        "sequential scale"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nWhich day and shift combinations create the heaviest support load?\n\nRequest\nPlot support tickets by day and shift as a sequential heatmap.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"shift\",\n      \"type\": \"string\",\n      \"values\": [\n        \"Morning\",\n        \"Morning\",\n        \"Morning\",\n        \"Morning\",\n        \"Morning\",\n        \"Morning\",\n        \"Morning\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Afternoon\",\n        \"Night\",\n        \"Night\",\n        \"Night\",\n        \"Night\",\n        \"Night\",\n        \"Night\",\n        \"Night\"\n      ]\n    },\n    {\n      \"id\": \"day\",\n      \"type\": \"string\",\n      \"values\": [\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\",\n        \"Sun\",\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\",\n        \"Sun\",\n        \"Mon\",\n        \"Tue\",\n        \"Wed\",\n        \"Thu\",\n        \"Fri\",\n        \"Sat\",\n        \"Sun\"\n      ]\n    },\n    {\n      \"id\": \"tickets\",\n      \"type\": \"number\",\n      \"unit\": \"tickets\",\n      \"values\": [\n        48,\n        41,\n        39,\n        37,\n        44,\n        12,\n        9,\n        62,\n        55,\n        51,\n        49,\n        58,\n        18,\n        14,\n        21,\n        17,\n        15,\n        16,\n        24,\n        8,\n        6\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep the day and shift ordering and the ticket unit.\n- Identify the weekday peak and the weekend pattern.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "d32d1500039647e5b1e9a9bf6903463f5633f2d92fdaf993561e7f4e4db064f3",
+      "source": "gallery/sources/support-load.matrix.json",
+      "artifact": "gallery/support-load.html",
+      "bytes": {
+        "source": 1369,
+        "artifact": 66673
+      },
+      "sha256": {
+        "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
+        "artifact": "ccac59360d792cee4e1d5318fe91a9c7cd5c0e34aca66a94086f11fd400cb1dd"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "traffic-sources",
+      "title": "Signup Traffic by Source",
+      "question": "What share of signups comes from each traffic source?",
+      "family": "proportion",
+      "marks": [
+        "donut"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\nWhat share of signups comes from each traffic source?\n\nRequest\nShow signup traffic sources as a donut chart.\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"source\",\n      \"type\": \"string\",\n      \"values\": [\n        \"Organic search\",\n        \"Direct\",\n        \"Referral\",\n        \"Paid social\",\n        \"Email\",\n        \"Other\"\n      ]\n    },\n    {\n      \"id\": \"signups\",\n      \"type\": \"number\",\n      \"unit\": \"signups\",\n      \"values\": [\n        4820,\n        2310,\n        1640,\n        980,\n        610,\n        340\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- Keep all six categories and the signup unit.\n- Explain the largest source and compare the smaller tracked channels.\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "3210955971fd617ee02a186fbf191ed48a6d2c226ab9c050b5ebb157871775c7",
+      "source": "gallery/sources/traffic-sources.proportion.json",
+      "artifact": "gallery/traffic-sources.html",
+      "bytes": {
+        "source": 769,
+        "artifact": 60422
+      },
+      "sha256": {
+        "source": "58e8e2153625b685e8a9b534adca2cb24722783ccf4fe9a4feab744ffc1a72ed",
+        "artifact": "c21f9dbbd2e9854216a669b27faa24557f2300179e5add4fd1fb2e20d1327a63"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "zh-revenue",
+      "title": "各渠道季度营收",
+      "question": "各渠道的季度营收如何变化？",
+      "family": "cartesian",
+      "marks": [
+        "bar"
+      ],
+      "featured": false,
+      "prompt": "Create a chart with gen-chart.\n\nQuestion\n各渠道的季度营收如何变化？\n\nRequest\n使用分组柱状图比较直销与渠道伙伴的季度营收。\n\nData\n```json\n{\n  \"columns\": [\n    {\n      \"id\": \"quarter\",\n      \"type\": \"string\",\n      \"values\": [\n        \"第一季度\",\n        \"第二季度\",\n        \"第三季度\",\n        \"第四季度\"\n      ]\n    },\n    {\n      \"id\": \"direct\",\n      \"type\": \"number\",\n      \"unit\": \"万元\",\n      \"values\": [\n        1240,\n        1380,\n        1510,\n        1720\n      ]\n    },\n    {\n      \"id\": \"partner\",\n      \"type\": \"number\",\n      \"unit\": \"万元\",\n      \"values\": [\n        860,\n        910,\n        1040,\n        1180\n      ]\n    }\n  ]\n}\n```\n\nRequirements\n- 保留中文标题、标签、结论和人民币百万元单位，并将查看器界面设为简体中文。\n- 说明第四季度总营收以及两种渠道的全年增速。\n- Preserve labels, values, nulls, dates, and units exactly as supplied.\n- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.\n",
+      "promptSha256": "aa27bed80b7e6b7a84cf50a17eba7de85559b56284907d8e2fd89cacc32823bb",
+      "source": "gallery/sources/zh-revenue.cartesian.json",
+      "artifact": "gallery/zh-revenue.html",
+      "bytes": {
+        "source": 1100,
+        "artifact": 59626
+      },
+      "sha256": {
+        "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
+        "artifact": "b5e7b2cfa9fd74259f46d0645e3f3c59eb46b89237dd22b9d3d2bfb286546017"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    }
+  ]
+}

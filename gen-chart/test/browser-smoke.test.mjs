@@ -20,11 +20,12 @@ import { findChrome } from '../renderers/shared/visual-check.mjs';
 const chrome = findChrome();
 const skip = chrome ? false : 'no Chrome/Chromium found';
 const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
+const galleryPage = fileURLToPath(new URL('../../docs/index.html', import.meta.url));
 const SPEC_RE = /\.(cartesian|distribution|proportion|matrix)\.json$/;
 const examples = readdirSync(examplesDir).filter((f) => SPEC_RE.test(f))
   .map((f) => f.replace(SPEC_RE, '.html'));
 
-function run(htmlPath, script, { width = 1440, height = 900, budget = 4000, retried = false, hash = '' } = {}) {
+function run(htmlPath, script, { width = 1440, height = 900, budget = 4000, retried = false, query = '', hash = '' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-smoke-'));
   const probePath = join(dir, 'probe.html');
   const wrapper = `<script>
@@ -48,14 +49,14 @@ window.addEventListener('load', function () {
       '--headless=new', '--disable-gpu', '--hide-scrollbars',
       '--no-sandbox', '--disable-dev-shm-usage',
       `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
-      '--dump-dom', `file://${probePath}${hash}`
+      '--dump-dom', `file://${probePath}${query}${hash}`
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', openSync(stderrPath, 'w')], timeout: 60000 });
   } catch (e) {
     crash = `chrome exited: ${e.message}`;
   }
   const m = /data-probe="([^"]+)"/.exec(dom);
   if (!m) {
-    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true, hash });
+    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true, query, hash });
     let err = '';
     try { err = readFileSync(stderrPath, 'utf8').trim().split('\n').slice(-6).join(' | '); } catch {}
     assert.fail(`probe never ran for ${htmlPath} (budget ${budget}ms). ${crash} chrome stderr: ${err || '(empty)'}`);
@@ -367,4 +368,80 @@ test('exports produce valid SVG, CSV, and PNG blobs', { skip }, () => {
   // rasterized, PNG export is genuinely broken rather than merely slow.
   assert.ok(rasterized > 0,
     'no example produced a PNG export — rasterization appears broken, not just slow');
+});
+
+const GALLERY_PROBE = `async function () {
+  var out = {};
+  await new Promise(function (resolve) { requestAnimationFrame(resolve); });
+  out.initialAgent = document.querySelector('input[name="agent"]:checked').value;
+  out.initialFamily = document.querySelector('[data-family-filter][aria-pressed="true"]').dataset.familyFilter;
+  out.hashPromptOpen = document.querySelector('#example-build-times .prompt-details').open;
+  out.hashFocused = document.activeElement.closest && document.activeElement.closest('#example-build-times') !== null;
+
+  document.getElementById('agent-cursor').click();
+  out.globalCommand = document.getElementById('install-global').textContent;
+  out.projectCommand = document.getElementById('install-project').textContent;
+  out.agentQuery = new URLSearchParams(location.search).get('agent');
+
+  document.querySelector('[data-family-filter="matrix"]').click();
+  out.familyQuery = new URLSearchParams(location.search).get('family');
+  out.hashAfterFilter = location.hash;
+  out.visibleCards = Array.from(document.querySelectorAll('.card:not([hidden])')).map(function (card) { return card.id; });
+  out.resultCount = document.getElementById('result-count').textContent;
+
+  var copied = '';
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: async function (text) { copied = text; } }
+  });
+  var copy = document.querySelector('#example-support-load [data-copy-target]');
+  copy.click();
+  await new Promise(function (resolve) { setTimeout(resolve, 0); });
+  out.copied = copied;
+  out.expected = document.getElementById('prompt-support-load').textContent;
+  out.copyStatus = document.getElementById('copy-status-support-load').textContent;
+
+  navigator.clipboard.writeText = async function () { throw new Error('blocked'); };
+  copy.click();
+  await new Promise(function (resolve) { setTimeout(resolve, 0); });
+  out.failureStatus = document.getElementById('copy-status-support-load').textContent;
+
+  var fallbackCopied = '';
+  Object.defineProperty(window, 'isSecureContext', { configurable: true, value: false });
+  document.execCommand = function () {
+    var area = document.querySelector('textarea');
+    fallbackCopied = area ? area.value : '';
+    return true;
+  };
+  copy.click();
+  await new Promise(function (resolve) { setTimeout(resolve, 0); });
+  out.fallbackCopied = fallbackCopied;
+  out.pageOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+  return out;
+}`;
+
+test('instruction gallery supports agent install, filters, hashes, and honest copying', { skip }, () => {
+  const r = run(galleryPage, GALLERY_PROBE, {
+    width: 390,
+    height: 844,
+    query: '?agent=invalid&family=matrix',
+    hash: '#example-build-times'
+  });
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.initialAgent, 'codex');
+  assert.equal(r.initialFamily, 'distribution', 'the valid case hash should override an incompatible filter');
+  assert.equal(r.hashPromptOpen, true);
+  assert.equal(r.hashFocused, true);
+  assert.match(r.globalCommand, /--agent cursor --global/);
+  assert.match(r.projectCommand, /--agent cursor --copy --yes$/);
+  assert.equal(r.agentQuery, 'cursor');
+  assert.equal(r.familyQuery, 'matrix');
+  assert.equal(r.hashAfterFilter, '');
+  assert.deepEqual(r.visibleCards, ['example-support-load']);
+  assert.equal(r.resultCount, '1 verified example');
+  assert.equal(r.copied, r.expected);
+  assert.equal(r.copyStatus, 'Copied to clipboard.');
+  assert.match(r.failureStatus, /Copy failed/);
+  assert.equal(r.fallbackCopied, r.expected);
+  assert.equal(r.pageOverflow, false);
 });
