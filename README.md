@@ -32,6 +32,8 @@ Using Cursor? Open the [agent-aware quick start](https://sses79.github.io/gen-ch
 
 **No repository is required:** describe the chart and include its data in any agent chat.
 
+[![Claude Code using gen-chart with a pasted table](docs/assets/output800.gif)](https://sses79.github.io/gen-chart/)
+
 ## Quick start
 
 ## 01 · Install the skill
