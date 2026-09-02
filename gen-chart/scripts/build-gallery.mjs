@@ -237,16 +237,18 @@ function renderCard(record) {
         <h2><a href="#example-${record.id}">${escapeXml(record.title)}</a></h2>
         ${record.note ? `<p class="takeaway">${escapeXml(record.note)}</p>` : ''}
         <ul class="tags">${tags}</ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="${promptId}" aria-describedby="${statusId}">Copy prompt</button>
+          </div>
+          <pre><code id="${promptId}">${escapeXml(record.prompt)}</code></pre>
+          <span class="copy-status" id="${statusId}" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="${promptId}" aria-describedby="${statusId}">02 Copy prompt</button>
           <a class="action" href="${record.source}">03 View typed JSON IR</a>
           <a class="action" href="${record.artifact}">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="${statusId}" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="${promptId}">${escapeXml(record.prompt)}</code></pre>
-        </details>
         <p class="digests"><span>source <code>${record.sha256.source.slice(0, 12)}…</code></span><span>artifact <code>${record.sha256.artifact.slice(0, 12)}…</code></span></p>
       </div>
     </article>`;
@@ -269,7 +271,7 @@ function validateStage(stage, records, page) {
   if ((page.match(/<article class="card/g) ?? []).length !== records.length) {
     throw new Error('generated card count does not match manifest records');
   }
-  if ((page.match(/class="prompt-details"/g) ?? []).length !== records.length) {
+  if ((page.match(/class="prompt-panel"/g) ?? []).length !== records.length) {
     throw new Error('generated prompt count does not match manifest records');
   }
   for (const match of page.matchAll(/href="([^"]+)"/g)) {

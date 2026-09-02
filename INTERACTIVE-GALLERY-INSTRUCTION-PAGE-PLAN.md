@@ -25,7 +25,7 @@ reading the schemas or README.
 Every example card must expose:
 
 - an inline SVG preview extracted from the delivered artifact;
-- one complete, copyable reproduction prompt containing the example data;
+- one concise, copy-ready message containing the example data;
 - the exact checked-in typed JSON IR used by the build;
 - the exact self-contained interactive HTML delivered from that IR;
 - chart family, mark(s), and the question the chart answers;
@@ -53,7 +53,7 @@ anywhere.
 - One generated page at `docs/index.html` remains the entry point.
 - Inline SVG previews remain the default; interactive charts open as separate
   self-contained HTML files.
-- Each card adds a reproduction prompt, typed-source link, artifact link, and
+- Each card adds a copy-ready message, typed-source link, artifact link, and
   generated verification facts.
 - The start section covers Cursor, Codex, Claude Code, and OpenCode with the
   same Skill and agent-specific installation commands.
@@ -82,7 +82,7 @@ with no hand-authored status data:
 ```text
 gallery-cases.mjs ─┬─→ prompt formatter ←─ example JSON IR
                   │          │
-                  │          └─→ reproduction prompt ─┐
+                  │          └─→ copy-ready message ──┐
                   └─→ teaching metadata ───────────┤
                                                     │
 example JSON IR ─→ showcase deliver ─→ checked HTML ─→ SVG preview ─┤
@@ -149,50 +149,27 @@ Registry invariants:
 Adding an example therefore requires adding its JSON/HTML golden pair and one
 registry entry. CI fails on either an unregistered spec or a dangling entry.
 
-## 5. Reproduction prompt contract
+## 5. Copy-ready prompt contract
 
 Create `gen-chart/scripts/gallery-prompt.mjs` as a pure module. It accepts a
 validated case and parsed spec and returns one LF-normalized string.
 
-Each prompt has the same sections:
+Each prompt reads like a message a person would actually send to an agent:
 
-````text
-Create a chart with gen-chart.
+```text
+Use gen-chart to <authored request>. <authored requirements>.
 
-Question
-<authored question>
-
-Request
-<authored request>
-
-Data
-```json
-<column-oriented data block derived from spec.data.columns>
+unit:        42 45 47 48 50 51 53 55 58 71
+integration: 118 124 131 136 140 145 152 158 166 210
+e2e:         295 312 328 341 355 370 388 402 425 610
 ```
 
-Requirements
-- <authored requirement>
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and
-  deliver one self-contained interactive HTML chart.
-````
-
-The data block is a deterministic JSON serialization of only the input data:
-
-```json
-{
-  "columns": [
-    { "id": "pipeline", "type": "string", "values": ["unit", "integration"] },
-    { "id": "seconds", "type": "number", "unit": "s", "values": [42, 118] }
-  ]
-}
-```
-
-This single representation works for cartesian, histogram, boxplot,
-proportion, and matrix inputs without lossy pivoting or ambiguous Markdown
-tables. Preserve column order, value order, `null`, Unicode, labels, units,
-and date strings. Use two-space JSON indentation and a trailing newline for
-stable snapshots and hashes.
+Use grouped labelled rows for grouped two-column distributions, one labelled
+value list for a single-column distribution, and a compact Markdown table for
+ordinary cartesian, proportion, and matrix data. Preserve column order, row
+order, `null`, Unicode, labels, units, and date strings. Keep one trailing
+newline for stable snapshots and hashes. The exact typed source remains the
+next workflow step; the copy-ready prompt must not expose internal IR ceremony.
 
 Prompt rules:
 
@@ -200,9 +177,8 @@ Prompt rules:
   second stage.
 - Do not derive conclusions that are absent from the authored request or
   checked spec.
-- Preserve the example language. The `zh-revenue` question, request, and
-  requirements remain authored Chinese; only stable workflow instructions
-  may use the page language in release one.
+- Preserve the example language. The `zh-revenue` request and requirements
+  remain authored Chinese, including the short gen-chart instruction.
 - Escape only when placing prompt text into HTML. The formatter returns plain
   text and must know nothing about the DOM or clipboard.
 - Add `promptSha256` to the manifest so tests can bind copied text to the
@@ -236,7 +212,7 @@ For each registry case:
    `npm run render:examples` repair command; never silently bless stale goldens.
 8. Extract that artifact's at-rest SVG, remove viewer-only hover layers, and
    apply the existing Classic preview palette transformation.
-9. Generate the reproduction prompt from the registry entry and parsed IR.
+9. Generate the copy-ready message from the registry entry and parsed IR.
 10. Copy the original JSON bytes to `docs/gallery/sources/`; do not parse and
     reserialize them.
 11. Record all paths, receipt facts, byte counts, and hashes in the manifest
@@ -412,8 +388,8 @@ Resolved behavior:
 - Agent changes use `history.replaceState` and preserve the case hash. An
   explicit filter change clears the hash so the user's new filter choice wins.
 - A valid case hash takes priority: if its card is excluded by the current
-  family, switch to that case's family, update the URL, reveal the card, open
-  its prompt details, and move focus to the card heading.
+  family, switch to that case's family, update the URL, reveal the card, and
+  move focus to the card heading. Its copy-ready prompt is already visible.
 - Read query/hash state on load and re-apply case behavior on `hashchange`.
   Ignore an unknown case hash without changing the selected family.
 - Use `hidden` on excluded cards so visual, keyboard, and assistive-technology
@@ -432,18 +408,22 @@ Title · family · marks · showcase receipt
 
 [exact inline SVG preview]
 
-[02 Copy prompt]  [03 View typed JSON IR]  [04 Open interactive chart]
+COPY-READY PROMPT                                      COPY PROMPT
+<complete, concise, selectable message>
 
-▸ Reproduction prompt
-  <complete selectable prompt text>
+[03 View typed JSON IR]  [04 Open interactive chart]
 
 source sha256 abc123…  ·  artifact sha256 def456…
 ```
 
-Use native `<details>` for the complete prompt, but keep the primary **Copy
-prompt** button visible without expansion. Put prompt text in `<pre><code>` as
-escaped text content. Do not use `innerHTML` for prompts at build time or run
-time.
+Keep the complete prompt and **Copy prompt** button visible, with a quiet
+section label and top-right action like the Archify example. Put prompt text
+in `<pre><code>` as escaped text content. Do not use `innerHTML` for prompts at
+build time or run time.
+
+On the two-column desktop grid, stretch each pair to the taller article so
+adjacent card borders end on the same baseline. The single-column mobile grid
+keeps each article at its natural height.
 
 Each card uses `id="example-<case-id>"`; its heading link navigates to that
 stable case URL. Preview links have descriptive accessible names, and external
@@ -590,8 +570,8 @@ Node test suite. Do not create a CI-only builder or a second rendering path.
 - Add the pure prompt formatter and snapshots.
 - Add coverage/invariant tests.
 
-**Exit gate:** Every example has deterministic teaching intent and an exact
-data-bearing reproduction prompt; no generated files change yet.
+**Exit gate:** Every example has deterministic teaching intent and an exact,
+data-bearing copy-ready message; no generated files change yet.
 
 ### Slice 2 — Verified staged builder
 
@@ -608,7 +588,7 @@ source/artifact is bound to a showcase receipt and digest.
 - Extract the template literal into `gallery-template.html` with a small,
   asserted placeholder set.
 - Render the first-fold workflow, four-agent install section, filters, card
-  actions, prompt details, and verification facts on the server.
+  actions, visible copy-ready prompts, and verification facts on the server.
 - Add URL state and accessible copy as progressive enhancement.
 
 **Exit gate:** With or without JavaScript, a visitor can move from an example

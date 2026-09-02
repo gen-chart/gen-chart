@@ -236,11 +236,11 @@ a { color: inherit; }
 .command + .command, .command-details { margin-top: 0.75rem; }
 .command-bar { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; font-weight: 700; }
 .recommended { color: var(--role-positive, var(--role-primary)); }
-.command pre, .prompt-details pre { margin: 0; overflow: auto; }
+.command pre, .prompt-panel pre { margin: 0; overflow: auto; }
 .command code { display: block; padding: 0.9rem 1rem; color: var(--ink); font: 0.76rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .copy-button { min-height: 44px; padding: 0.45rem 0.75rem; border: 0; background: transparent; color: var(--role-primary); cursor: pointer; font-size: 0.75rem; font-weight: 750; }
 .command-details { border: 1px solid var(--border); border-radius: 0.75rem; }
-.command-details > summary, .prompt-details > summary { min-height: 44px; display: flex; align-items: center; padding: 0.65rem 0.85rem; cursor: pointer; color: var(--muted); font-size: 0.8rem; font-weight: 700; }
+.command-details > summary { min-height: 44px; display: flex; align-items: center; padding: 0.65rem 0.85rem; cursor: pointer; color: var(--muted); font-size: 0.8rem; font-weight: 700; }
 .command-details .command { margin: 0 0.75rem 0.75rem; }
 .install-note { margin: 0.9rem 0 0; color: var(--muted); font-size: 0.78rem; }
 .copy-status { min-height: 1.3em; display: block; margin-top: 0.4rem; color: var(--role-positive, var(--role-primary)); font-size: 0.75rem; }
@@ -251,13 +251,13 @@ a { color: inherit; }
 .filter-button { min-height: 44px; padding: 0.5rem 0.85rem; border: 1px solid var(--border); border-radius: 999px; background: var(--panel); color: var(--muted); cursor: pointer; font-size: 0.78rem; font-weight: 650; }
 .filter-button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--bg); }
 .result-count { min-height: 1.4em; margin: 0 0 0.85rem; color: var(--muted); font-size: 0.8rem; }
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
-.card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 1rem; background: var(--panel); scroll-margin-top: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: stretch; }
+.card { min-width: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: 1rem; background: var(--panel); scroll-margin-top: 1rem; }
 .card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr); }
 .card:target { border-color: var(--role-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--role-primary) 18%, transparent); }
 .preview { display: block; min-width: 0; padding: 0.9rem; background: var(--panel); }
 .preview svg { display: block; width: 100%; min-width: 0; height: auto; border-radius: 0.55rem; }
-.meta { min-width: 0; padding: 1.05rem 1.15rem 1.2rem; }
+.meta { min-width: 0; flex: 1; padding: 1.05rem 1.15rem 1.2rem; }
 .question { margin: 0 0 0.8rem; color: var(--role-primary); font-size: 0.9rem; font-weight: 700; }
 .eyebrow { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.45rem 1rem; }
 .verified { color: var(--role-positive, var(--muted)); }
@@ -270,11 +270,12 @@ a { color: inherit; }
 .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .action { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0.58rem 0.72rem; border: 1px solid var(--border); border-radius: 0.55rem; background: transparent; color: var(--ink); cursor: pointer; font-size: 0.76rem; font-weight: 700; text-align: center; text-decoration: none; }
 .action:hover { border-color: var(--role-primary); color: var(--role-primary); }
-.action-primary { border-color: var(--role-primary); background: var(--role-primary); color: white; }
-.action-primary:hover { color: white; filter: brightness(1.06); }
-.prompt-details { margin-top: 0.65rem; border: 1px solid var(--border); border-radius: 0.65rem; }
-.prompt-details pre { max-height: 24rem; border-top: 1px solid var(--border); background: var(--bg); }
-.prompt-details code { display: block; padding: 1rem; color: var(--ink); font: 0.72rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.prompt-panel { margin: 1rem 0; padding: 1rem 0; border-block: 1px solid var(--border); }
+.prompt-head { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.prompt-head > span { color: var(--muted); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.18em; text-transform: uppercase; }
+.prompt-copy { min-height: 44px; padding: 0.45rem 0; border: 0; background: transparent; color: var(--role-primary); cursor: pointer; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.prompt-panel pre { max-height: 22rem; }
+.prompt-panel code { display: block; padding: 0.45rem 0 0.2rem; color: var(--ink); font: 0.78rem/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .digests { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; margin: 0.7rem 0 0; color: var(--muted); font-size: 0.68rem; }
 .digests code { font-size: 0.95em; }
 .js-only { display: none !important; }
@@ -382,111 +383,23 @@ footer a { color: var(--role-primary); }
         <h2><a href="#example-build-times">CI Build Duration by Pipeline</a></h2>
         <p class="takeaway">End-to-end runs dominate total CI time and vary the most.</p>
         <ul class="tags"><li>boxplot</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-build-times" aria-describedby="copy-status-build-times">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-build-times">Use gen-chart to compare build durations across our pipelines as a boxplot in seconds. Show the outliers and highlight which pipeline is slowest and most variable.
+
+unit:        42 45 47 48 50 51 53 55 58 71
+integration: 118 124 131 136 140 145 152 158 166 210
+e2e:         295 312 328 341 355 370 388 402 425 610
+</code></pre>
+          <span class="copy-status" id="copy-status-build-times" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-build-times" aria-describedby="copy-status-build-times">02 Copy prompt</button>
           <a class="action" href="gallery/sources/build-times.distribution.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/build-times.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-build-times" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-build-times">Create a chart with gen-chart.
-
-Question
-How do build times and outliers differ by pipeline?
-
-Request
-Compare CI build durations by pipeline as a boxplot in seconds.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;pipeline&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;unit&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;integration&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;,
-        &quot;e2e&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;seconds&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;s&quot;,
-      &quot;label&quot;: &quot;Duration&quot;,
-      &quot;values&quot;: [
-        42,
-        45,
-        47,
-        48,
-        50,
-        51,
-        53,
-        55,
-        58,
-        71,
-        118,
-        124,
-        131,
-        136,
-        140,
-        145,
-        152,
-        158,
-        166,
-        210,
-        295,
-        312,
-        328,
-        341,
-        355,
-        370,
-        388,
-        402,
-        425,
-        610
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Show the grouped raw distributions, whiskers, and outliers.
-- Explain which pipeline is slowest and most variable.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>9accd35ba71a…</code></span><span>artifact <code>f97e909b1c4b…</code></span></p>
       </div>
     </article>
@@ -500,88 +413,28 @@ Requirements
         <h2><a href="#example-deploy-outcomes">Rollbacks fell from 10.5% to 7.7% of deploys over six months</a></h2>
         <p class="takeaway">Clean deploys rose from 85.7% to 89.0% of the total; rollbacks fell from 10.5% to 7.7%.</p>
         <ul class="tags"><li>area</li><li>100% stacked</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-deploy-outcomes" aria-describedby="copy-status-deploy-outcomes">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-deploy-outcomes">Use gen-chart to show deployment outcomes over time as a 100%-stacked area chart. Keep the months in chronological order and compare clean, rolled-back, and failed deployments. Explain the change in outcome shares without hiding the deployment totals.
+
+| month | succeeded (deploys) | rolled back (deploys) | failed (deploys) |
+| --- | --- | --- | --- |
+| 2026-01 | 180 | 22 | 8 |
+| 2026-02 | 190 | 20 | 8 |
+| 2026-03 | 178 | 20 | 7 |
+| 2026-04 | 195 | 19 | 8 |
+| 2026-05 | 188 | 18 | 8 |
+| 2026-06 | 186 | 16 | 7 |
+</code></pre>
+          <span class="copy-status" id="copy-status-deploy-outcomes" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-deploy-outcomes" aria-describedby="copy-status-deploy-outcomes">02 Copy prompt</button>
           <a class="action" href="gallery/sources/deploy-outcomes.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/deploy-outcomes.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-deploy-outcomes" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-deploy-outcomes">Create a chart with gen-chart.
-
-Question
-How did the composition of deployment outcomes change over six months?
-
-Request
-Show deployment outcomes over time as a 100%-stacked area chart.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;month&quot;,
-      &quot;type&quot;: &quot;date&quot;,
-      &quot;values&quot;: [
-        &quot;2026-01&quot;,
-        &quot;2026-02&quot;,
-        &quot;2026-03&quot;,
-        &quot;2026-04&quot;,
-        &quot;2026-05&quot;,
-        &quot;2026-06&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;succeeded&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;deploys&quot;,
-      &quot;values&quot;: [
-        180,
-        190,
-        178,
-        195,
-        188,
-        186
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;rolled_back&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;deploys&quot;,
-      &quot;values&quot;: [
-        22,
-        20,
-        20,
-        19,
-        18,
-        16
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;failed&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;deploys&quot;,
-      &quot;values&quot;: [
-        8,
-        8,
-        7,
-        8,
-        8,
-        7
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep the months in chronological order and compare clean, rolled-back, and failed deployments.
-- Explain the change in outcome shares without hiding the deployment totals.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>21fbc4633397…</code></span><span>artifact <code>934893cce17c…</code></span></p>
       </div>
     </article>
@@ -595,95 +448,22 @@ Requirements
         <h2><a href="#example-latency-distribution">API Response Time Distribution</a></h2>
         <p class="takeaway">Most requests land between 60 and 90 ms, but a right tail stretches past 200 ms.</p>
         <ul class="tags"><li>histogram</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-latency-distribution" aria-describedby="copy-status-latency-distribution">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-latency-distribution">Use gen-chart to plot the raw API response-time observations as a histogram in milliseconds. Disclose the histogram bins. Call out the typical range and the long right tail.
+
+Response time (ms):
+42 48 51 55 58 59 61 62 63 64 65 66 67 68 68 69 70 71 71 72 73 74 74 75 76 77 78 79 80 81 82 83 85 86 88 90 92 95 98 101 104 108 112 118 125 134 148 167 195 240
+</code></pre>
+          <span class="copy-status" id="copy-status-latency-distribution" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-latency-distribution" aria-describedby="copy-status-latency-distribution">02 Copy prompt</button>
           <a class="action" href="gallery/sources/latency-distribution.distribution.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/latency-distribution.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-latency-distribution" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-latency-distribution">Create a chart with gen-chart.
-
-Question
-What is the shape and right tail of API response times?
-
-Request
-Plot the raw API response-time observations as a histogram in milliseconds.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;latency&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;ms&quot;,
-      &quot;label&quot;: &quot;Response time&quot;,
-      &quot;values&quot;: [
-        42,
-        48,
-        51,
-        55,
-        58,
-        59,
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67,
-        68,
-        68,
-        69,
-        70,
-        71,
-        71,
-        72,
-        73,
-        74,
-        74,
-        75,
-        76,
-        77,
-        78,
-        79,
-        80,
-        81,
-        82,
-        83,
-        85,
-        86,
-        88,
-        90,
-        92,
-        95,
-        98,
-        101,
-        104,
-        108,
-        112,
-        118,
-        125,
-        134,
-        148,
-        167,
-        195,
-        240
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Disclose the histogram bins.
-- Call out the typical range and the long right tail.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>09452a0e9b45…</code></span><span>artifact <code>9cce8097d6da…</code></span></p>
       </div>
     </article>
@@ -697,93 +477,34 @@ Requirements
         <h2><a href="#example-mau-trend">Monthly Active Users</a></h2>
         <p class="takeaway">MAU grew 2.4× over twelve months, with growth accelerating after the v2 launch in February.</p>
         <ul class="tags"><li>line</li><li>3 guided views</li><li>brush zoom</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-mau-trend" aria-describedby="copy-status-mau-trend">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-mau-trend">Use gen-chart to compare monthly active users and paying users as two time-series lines. Annotate the February 2026 v2 launch and enable x-axis brush zoom. Include the full-year, post-launch, and paying-only guided views from the evidence.
+
+| month | mau (users) | paying (users) |
+| --- | --- | --- |
+| 2025-09 | 8200 | 610 |
+| 2025-10 | 8900 | 700 |
+| 2025-11 | 9400 | 780 |
+| 2025-12 | 9100 | 760 |
+| 2026-01 | 10500 | 940 |
+| 2026-02 | 12300 | 1180 |
+| 2026-03 | 13800 | 1420 |
+| 2026-04 | 14600 | 1560 |
+| 2026-05 | 15900 | 1810 |
+| 2026-06 | 17400 | 2050 |
+| 2026-07 | 18100 | 2230 |
+| 2026-08 | 19700 | 2540 |
+</code></pre>
+          <span class="copy-status" id="copy-status-mau-trend" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-mau-trend" aria-describedby="copy-status-mau-trend">02 Copy prompt</button>
           <a class="action" href="gallery/sources/mau-trend.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/mau-trend.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-mau-trend" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-mau-trend">Create a chart with gen-chart.
-
-Question
-How did monthly active and paying users change around the v2 launch?
-
-Request
-Compare monthly active users and paying users as two time-series lines.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;month&quot;,
-      &quot;type&quot;: &quot;date&quot;,
-      &quot;values&quot;: [
-        &quot;2025-09&quot;,
-        &quot;2025-10&quot;,
-        &quot;2025-11&quot;,
-        &quot;2025-12&quot;,
-        &quot;2026-01&quot;,
-        &quot;2026-02&quot;,
-        &quot;2026-03&quot;,
-        &quot;2026-04&quot;,
-        &quot;2026-05&quot;,
-        &quot;2026-06&quot;,
-        &quot;2026-07&quot;,
-        &quot;2026-08&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;mau&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;users&quot;,
-      &quot;values&quot;: [
-        8200,
-        8900,
-        9400,
-        9100,
-        10500,
-        12300,
-        13800,
-        14600,
-        15900,
-        17400,
-        18100,
-        19700
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;paying&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;users&quot;,
-      &quot;values&quot;: [
-        610,
-        700,
-        780,
-        760,
-        940,
-        1180,
-        1420,
-        1560,
-        1810,
-        2050,
-        2230,
-        2540
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Annotate the February 2026 v2 launch and enable x-axis brush zoom.
-- Include the full-year, post-launch, and paying-only guided views from the evidence.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>ad05cbd3d5a1…</code></span><span>artifact <code>cdb7d25860cb…</code></span></p>
       </div>
     </article>
@@ -797,88 +518,28 @@ Requirements
         <h2><a href="#example-plan-mix">Accounts grew 52%, and the paid tiers grew fastest</a></h2>
         <p class="takeaway">Total accounts rose 52%, from 8,240 to 12,520 over six months.</p>
         <ul class="tags"><li>area</li><li>stacked</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-plan-mix" aria-describedby="copy-status-plan-mix">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-plan-mix">Use gen-chart to show Free, Pro, and Enterprise account counts over time as a stacked area chart. Keep the values as absolute account counts rather than normalizing them to percentages. Explain both total growth and the changing share of paid tiers.
+
+| month | free (accounts) | pro (accounts) | enterprise (accounts) |
+| --- | --- | --- | --- |
+| 2026-01 | 6200 | 1800 | 240 |
+| 2026-02 | 6800 | 2100 | 300 |
+| 2026-03 | 7100 | 2500 | 380 |
+| 2026-04 | 7400 | 2900 | 470 |
+| 2026-05 | 7600 | 3400 | 590 |
+| 2026-06 | 7900 | 3900 | 720 |
+</code></pre>
+          <span class="copy-status" id="copy-status-plan-mix" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-plan-mix" aria-describedby="copy-status-plan-mix">02 Copy prompt</button>
           <a class="action" href="gallery/sources/plan-mix.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/plan-mix.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-plan-mix" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-plan-mix">Create a chart with gen-chart.
-
-Question
-How did the account mix change as paid plans grew?
-
-Request
-Show Free, Pro, and Enterprise account counts over time as a stacked area chart.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;month&quot;,
-      &quot;type&quot;: &quot;date&quot;,
-      &quot;values&quot;: [
-        &quot;2026-01&quot;,
-        &quot;2026-02&quot;,
-        &quot;2026-03&quot;,
-        &quot;2026-04&quot;,
-        &quot;2026-05&quot;,
-        &quot;2026-06&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;free&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;accounts&quot;,
-      &quot;values&quot;: [
-        6200,
-        6800,
-        7100,
-        7400,
-        7600,
-        7900
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;pro&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;accounts&quot;,
-      &quot;values&quot;: [
-        1800,
-        2100,
-        2500,
-        2900,
-        3400,
-        3900
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;enterprise&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;accounts&quot;,
-      &quot;values&quot;: [
-        240,
-        300,
-        380,
-        470,
-        590,
-        720
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep the values as absolute account counts rather than normalizing them to percentages.
-- Explain both total growth and the changing share of paid tiers.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>b9d3eae5c727…</code></span><span>artifact <code>47f80936f50d…</code></span></p>
       </div>
     </article>
@@ -892,62 +553,28 @@ Requirements
         <h2><a href="#example-request-growth">Requests rose 34,000× in six years, but yearly growth is easing</a></h2>
         <p class="takeaway">Volume runs from 12 thousand to 410 million requests a month — a factor of about 34,000.</p>
         <ul class="tags"><li>line</li><li>log axis</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-request-growth" aria-describedby="copy-status-request-growth">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-request-growth">Use gen-chart to plot monthly request volume over time as a line chart with a logarithmic y-axis. Disclose prominently that the y-axis is logarithmic. Explain why a log scale is necessary and what the curve says about the growth rate.
+
+| year | requests (requests/month) |
+| --- | --- |
+| 2020 | 12000 |
+| 2021 | 140000 |
+| 2022 | 1500000 |
+| 2023 | 9800000 |
+| 2024 | 64000000 |
+| 2025 | 410000000 |
+</code></pre>
+          <span class="copy-status" id="copy-status-request-growth" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-request-growth" aria-describedby="copy-status-request-growth">02 Copy prompt</button>
           <a class="action" href="gallery/sources/request-growth.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/request-growth.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-request-growth" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-request-growth">Create a chart with gen-chart.
-
-Question
-How can six years of request growth be shown without flattening the early years?
-
-Request
-Plot monthly request volume over time as a line chart with a logarithmic y-axis.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;year&quot;,
-      &quot;type&quot;: &quot;date&quot;,
-      &quot;values&quot;: [
-        &quot;2020&quot;,
-        &quot;2021&quot;,
-        &quot;2022&quot;,
-        &quot;2023&quot;,
-        &quot;2024&quot;,
-        &quot;2025&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;requests&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;requests/month&quot;,
-      &quot;values&quot;: [
-        12000,
-        140000,
-        1500000,
-        9800000,
-        64000000,
-        410000000
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Disclose prominently that the y-axis is logarithmic.
-- Explain why a log scale is necessary and what the curve says about the growth rate.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>eb9159b51461…</code></span><span>artifact <code>7bc6d34fa196…</code></span></p>
       </div>
     </article>
@@ -961,72 +588,27 @@ Requirements
         <h2><a href="#example-revenue-by-region">Q2 Revenue by Region</a></h2>
         <p class="takeaway">Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.</p>
         <ul class="tags"><li>bar</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-revenue-by-region" aria-describedby="copy-status-revenue-by-region">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-revenue-by-region">Use gen-chart to compare Q1 and Q2 revenue by region with grouped bars. Keep the USD-thousands unit and a zero baseline. Highlight the fastest-growing region and the largest contributor.
+
+| region | q2 (USD k) | q1 (USD k) |
+| --- | --- | --- |
+| North America | 1840 | 1650 |
+| Europe | 1420 | 1380 |
+| Asia-Pacific | 990 | 820 |
+| Latin America | 410 | 380 |
+| Middle East &amp; Africa | 260 | 250 |
+</code></pre>
+          <span class="copy-status" id="copy-status-revenue-by-region" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-revenue-by-region" aria-describedby="copy-status-revenue-by-region">02 Copy prompt</button>
           <a class="action" href="gallery/sources/revenue-by-region.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/revenue-by-region.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-revenue-by-region" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-revenue-by-region">Create a chart with gen-chart.
-
-Question
-How does Q2 revenue compare with Q1 across regions?
-
-Request
-Compare Q1 and Q2 revenue by region with grouped bars.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;region&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;North America&quot;,
-        &quot;Europe&quot;,
-        &quot;Asia-Pacific&quot;,
-        &quot;Latin America&quot;,
-        &quot;Middle East &amp; Africa&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;q2&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;USD k&quot;,
-      &quot;values&quot;: [
-        1840,
-        1420,
-        990,
-        410,
-        260
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;q1&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;USD k&quot;,
-      &quot;values&quot;: [
-        1650,
-        1380,
-        820,
-        380,
-        250
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep the USD-thousands unit and a zero baseline.
-- Highlight the fastest-growing region and the largest contributor.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>bd5c7ffe5bf0…</code></span><span>artifact <code>24078aa9b229…</code></span></p>
       </div>
     </article>
@@ -1040,81 +622,30 @@ Requirements
         <h2><a href="#example-signups-vs-target">Weekly Signups vs Target</a></h2>
         <p class="takeaway">Signups beat target in 5 of the last 8 weeks and the gap is widening.</p>
         <ul class="tags"><li>bar</li><li>line</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-signups-vs-target" aria-describedby="copy-status-signups-vs-target">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-signups-vs-target">Use gen-chart to compare weekly signups with the weekly target using bars for actuals and a line for target. Use one signup unit and keep the bar axis at zero. Explain how often actuals beat target and call out the W31 dip.
+
+| week | signups | target (signups) |
+| --- | --- | --- |
+| W27 | 312 | 320 |
+| W28 | 298 | 330 |
+| W29 | 351 | 340 |
+| W30 | 389 | 350 |
+| W31 | 344 | 360 |
+| W32 | 412 | 370 |
+| W33 | 458 | 380 |
+| W34 | 471 | 390 |
+</code></pre>
+          <span class="copy-status" id="copy-status-signups-vs-target" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-signups-vs-target" aria-describedby="copy-status-signups-vs-target">02 Copy prompt</button>
           <a class="action" href="gallery/sources/signups-vs-target.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/signups-vs-target.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-signups-vs-target" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-signups-vs-target">Create a chart with gen-chart.
-
-Question
-Which weeks beat the signup target, and is the gap changing?
-
-Request
-Compare weekly signups with the weekly target using bars for actuals and a line for target.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;week&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;W27&quot;,
-        &quot;W28&quot;,
-        &quot;W29&quot;,
-        &quot;W30&quot;,
-        &quot;W31&quot;,
-        &quot;W32&quot;,
-        &quot;W33&quot;,
-        &quot;W34&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;signups&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;signups&quot;,
-      &quot;values&quot;: [
-        312,
-        298,
-        351,
-        389,
-        344,
-        412,
-        458,
-        471
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;target&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;signups&quot;,
-      &quot;values&quot;: [
-        320,
-        330,
-        340,
-        350,
-        360,
-        370,
-        380,
-        390
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Use one signup unit and keep the bar axis at zero.
-- Explain how often actuals beat target and call out the W31 dip.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>80c09d20aeca…</code></span><span>artifact <code>d2b046834bde…</code></span></p>
       </div>
     </article>
@@ -1128,84 +659,27 @@ Requirements
         <h2><a href="#example-storage-mix">Storage grew 3.7× in five quarters, four-fifths of it cold archive</a></h2>
         <p class="takeaway">Total storage rose from 110 TB to 408 TB — 3.7× in five quarters.</p>
         <ul class="tags"><li>bar</li><li>stacked</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-storage-mix" aria-describedby="copy-status-storage-mix">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-storage-mix">Use gen-chart to show Hot, Warm, and Cold storage over time as stacked bars in terabytes. Keep the values as absolute terabytes with a zero baseline. Explain total growth and how much of the increase came from cold archive.
+
+| quarter | hot (TB) | warm (TB) | cold (TB) |
+| --- | --- | --- | --- |
+| 2025 Q3 | 42 | 38 | 30 |
+| 2025 Q4 | 48 | 47 | 62 |
+| 2026 Q1 | 51 | 61 | 118 |
+| 2026 Q2 | 55 | 74 | 190 |
+| 2026 Q3 | 58 | 86 | 264 |
+</code></pre>
+          <span class="copy-status" id="copy-status-storage-mix" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-storage-mix" aria-describedby="copy-status-storage-mix">02 Copy prompt</button>
           <a class="action" href="gallery/sources/storage-mix.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/storage-mix.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-storage-mix" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-storage-mix">Create a chart with gen-chart.
-
-Question
-Which storage tier drove growth over the last five quarters?
-
-Request
-Show Hot, Warm, and Cold storage over time as stacked bars in terabytes.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;quarter&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;2025 Q3&quot;,
-        &quot;2025 Q4&quot;,
-        &quot;2026 Q1&quot;,
-        &quot;2026 Q2&quot;,
-        &quot;2026 Q3&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;hot&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;TB&quot;,
-      &quot;values&quot;: [
-        42,
-        48,
-        51,
-        55,
-        58
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;warm&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;TB&quot;,
-      &quot;values&quot;: [
-        38,
-        47,
-        61,
-        74,
-        86
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;cold&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;TB&quot;,
-      &quot;values&quot;: [
-        30,
-        62,
-        118,
-        190,
-        264
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep the values as absolute terabytes with a zero baseline.
-- Explain total growth and how much of the increase came from cold archive.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>9313bf0a5f3f…</code></span><span>artifact <code>db200f9377e8…</code></span></p>
       </div>
     </article>
@@ -1219,119 +693,43 @@ Requirements
         <h2><a href="#example-support-load">Support Tickets by Day and Shift</a></h2>
         <p class="takeaway">Afternoon shifts carry the heaviest load every weekday, peaking Monday.</p>
         <ul class="tags"><li>heatmap</li><li>sequential scale</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-support-load" aria-describedby="copy-status-support-load">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-support-load">Use gen-chart to plot support tickets by day and shift as a sequential heatmap. Keep the day and shift ordering and the ticket unit. Identify the weekday peak and the weekend pattern.
+
+| shift | day | tickets |
+| --- | --- | --- |
+| Morning | Mon | 48 |
+| Morning | Tue | 41 |
+| Morning | Wed | 39 |
+| Morning | Thu | 37 |
+| Morning | Fri | 44 |
+| Morning | Sat | 12 |
+| Morning | Sun | 9 |
+| Afternoon | Mon | 62 |
+| Afternoon | Tue | 55 |
+| Afternoon | Wed | 51 |
+| Afternoon | Thu | 49 |
+| Afternoon | Fri | 58 |
+| Afternoon | Sat | 18 |
+| Afternoon | Sun | 14 |
+| Night | Mon | 21 |
+| Night | Tue | 17 |
+| Night | Wed | 15 |
+| Night | Thu | 16 |
+| Night | Fri | 24 |
+| Night | Sat | 8 |
+| Night | Sun | 6 |
+</code></pre>
+          <span class="copy-status" id="copy-status-support-load" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-support-load" aria-describedby="copy-status-support-load">02 Copy prompt</button>
           <a class="action" href="gallery/sources/support-load.matrix.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/support-load.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-support-load" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-support-load">Create a chart with gen-chart.
-
-Question
-Which day and shift combinations create the heaviest support load?
-
-Request
-Plot support tickets by day and shift as a sequential heatmap.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;shift&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Morning&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Afternoon&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;,
-        &quot;Night&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;day&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;Mon&quot;,
-        &quot;Tue&quot;,
-        &quot;Wed&quot;,
-        &quot;Thu&quot;,
-        &quot;Fri&quot;,
-        &quot;Sat&quot;,
-        &quot;Sun&quot;,
-        &quot;Mon&quot;,
-        &quot;Tue&quot;,
-        &quot;Wed&quot;,
-        &quot;Thu&quot;,
-        &quot;Fri&quot;,
-        &quot;Sat&quot;,
-        &quot;Sun&quot;,
-        &quot;Mon&quot;,
-        &quot;Tue&quot;,
-        &quot;Wed&quot;,
-        &quot;Thu&quot;,
-        &quot;Fri&quot;,
-        &quot;Sat&quot;,
-        &quot;Sun&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;tickets&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;tickets&quot;,
-      &quot;values&quot;: [
-        48,
-        41,
-        39,
-        37,
-        44,
-        12,
-        9,
-        62,
-        55,
-        51,
-        49,
-        58,
-        18,
-        14,
-        21,
-        17,
-        15,
-        16,
-        24,
-        8,
-        6
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep the day and shift ordering and the ticket unit.
-- Identify the weekday peak and the weekend pattern.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>058d54911b72…</code></span><span>artifact <code>ccac59360d79…</code></span></p>
       </div>
     </article>
@@ -1345,62 +743,28 @@ Requirements
         <h2><a href="#example-traffic-sources">Signup Traffic by Source</a></h2>
         <p class="takeaway">Organic search brings 44% of signups — more than paid social, email, and referral combined.</p>
         <ul class="tags"><li>donut</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-traffic-sources" aria-describedby="copy-status-traffic-sources">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-traffic-sources">Use gen-chart to show signup traffic sources as a donut chart. Keep all six categories and the signup unit. Explain the largest source and compare the smaller tracked channels.
+
+| source | signups |
+| --- | --- |
+| Organic search | 4820 |
+| Direct | 2310 |
+| Referral | 1640 |
+| Paid social | 980 |
+| Email | 610 |
+| Other | 340 |
+</code></pre>
+          <span class="copy-status" id="copy-status-traffic-sources" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-traffic-sources" aria-describedby="copy-status-traffic-sources">02 Copy prompt</button>
           <a class="action" href="gallery/sources/traffic-sources.proportion.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/traffic-sources.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-traffic-sources" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-traffic-sources">Create a chart with gen-chart.
-
-Question
-What share of signups comes from each traffic source?
-
-Request
-Show signup traffic sources as a donut chart.
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;source&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;Organic search&quot;,
-        &quot;Direct&quot;,
-        &quot;Referral&quot;,
-        &quot;Paid social&quot;,
-        &quot;Email&quot;,
-        &quot;Other&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;signups&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;signups&quot;,
-      &quot;values&quot;: [
-        4820,
-        2310,
-        1640,
-        980,
-        610,
-        340
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- Keep all six categories and the signup unit.
-- Explain the largest source and compare the smaller tracked channels.
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>58e8e2153625…</code></span><span>artifact <code>c21f9dbbd2e9…</code></span></p>
       </div>
     </article>
@@ -1414,69 +778,26 @@ Requirements
         <h2><a href="#example-zh-revenue">各渠道季度营收</a></h2>
         <p class="takeaway">直销与渠道伙伴营收均逐季增长，第四季度合计达 2,900 万元。</p>
         <ul class="tags"><li>bar</li></ul>
+        <div class="prompt-panel">
+          <div class="prompt-head">
+            <span>Copy-ready prompt</span>
+            <button class="prompt-copy js-only" type="button" data-copy-target="prompt-zh-revenue" aria-describedby="copy-status-zh-revenue">Copy prompt</button>
+          </div>
+          <pre><code id="prompt-zh-revenue">使用 gen-chart 创建图表。使用分组柱状图比较直销与渠道伙伴的季度营收。保留中文标题、标签、结论和人民币百万元单位，并将查看器界面设为简体中文。说明第四季度总营收以及两种渠道的全年增速。
+
+| quarter | direct (万元) | partner (万元) |
+| --- | --- | --- |
+| 第一季度 | 1240 | 860 |
+| 第二季度 | 1380 | 910 |
+| 第三季度 | 1510 | 1040 |
+| 第四季度 | 1720 | 1180 |
+</code></pre>
+          <span class="copy-status" id="copy-status-zh-revenue" role="status" aria-live="polite"></span>
+        </div>
         <div class="actions">
-          <button class="action action-primary js-only" type="button" data-copy-target="prompt-zh-revenue" aria-describedby="copy-status-zh-revenue">02 Copy prompt</button>
           <a class="action" href="gallery/sources/zh-revenue.cartesian.json">03 View typed JSON IR</a>
           <a class="action" href="gallery/zh-revenue.html">04 Open interactive chart</a>
         </div>
-        <span class="copy-status" id="copy-status-zh-revenue" role="status" aria-live="polite"></span>
-        <details class="prompt-details">
-          <summary>Reproduction prompt</summary>
-          <pre><code id="prompt-zh-revenue">Create a chart with gen-chart.
-
-Question
-各渠道的季度营收如何变化？
-
-Request
-使用分组柱状图比较直销与渠道伙伴的季度营收。
-
-Data
-```json
-{
-  &quot;columns&quot;: [
-    {
-      &quot;id&quot;: &quot;quarter&quot;,
-      &quot;type&quot;: &quot;string&quot;,
-      &quot;values&quot;: [
-        &quot;第一季度&quot;,
-        &quot;第二季度&quot;,
-        &quot;第三季度&quot;,
-        &quot;第四季度&quot;
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;direct&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;万元&quot;,
-      &quot;values&quot;: [
-        1240,
-        1380,
-        1510,
-        1720
-      ]
-    },
-    {
-      &quot;id&quot;: &quot;partner&quot;,
-      &quot;type&quot;: &quot;number&quot;,
-      &quot;unit&quot;: &quot;万元&quot;,
-      &quot;values&quot;: [
-        860,
-        910,
-        1040,
-        1180
-      ]
-    }
-  ]
-}
-```
-
-Requirements
-- 保留中文标题、标签、结论和人民币百万元单位，并将查看器界面设为简体中文。
-- 说明第四季度总营收以及两种渠道的全年增速。
-- Preserve labels, values, nulls, dates, and units exactly as supplied.
-- Author a typed gen-chart JSON IR, validate it at showcase quality, and deliver one self-contained interactive HTML chart.
-</code></pre>
-        </details>
         <p class="digests"><span>source <code>8f686b5cc667…</code></span><span>artifact <code>b5e7b2cfa9fd…</code></span></p>
       </div>
     </article>
@@ -1538,8 +859,6 @@ Requirements
       renderFamily();
       updateUrl(false);
     }
-    var details = card.querySelector('.prompt-details');
-    if (details) details.open = true;
     var heading = card.querySelector('h2 a');
     if (heading) {
       if (document.readyState === 'complete') {

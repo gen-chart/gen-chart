@@ -8,10 +8,9 @@ export const GALLERY_CASES = [
     spec: 'build-times.distribution.json',
     question: 'How do build times and outliers differ by pipeline?',
     prompt: {
-      request: 'Compare CI build durations by pipeline as a boxplot in seconds.',
+      request: 'Compare build durations across our pipelines as a boxplot in seconds.',
       requirements: [
-        'Show the grouped raw distributions, whiskers, and outliers.',
-        'Explain which pipeline is slowest and most variable.'
+        'Show the outliers and highlight which pipeline is slowest and most variable.'
       ]
     },
     featured: true
