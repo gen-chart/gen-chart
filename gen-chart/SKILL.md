@@ -43,36 +43,44 @@ the family you routed to.
 4. Artifact first: the next tool action writes or edits the candidate spec.
    Set `meta.title` to the chart's one-sentence message, keep at most two
    emphasized series, and put takeaways in `cards` instead of on the canvas.
-5. Validate after every edit:
-
-   ```bash
-   node bin/gen-chart.mjs validate <chart_type> <candidate.json> --quality showcase --json
-   ```
-
-   On failure, change only each diagnostic's `subject` and choose only from
-   its `supportedFixes` — one diagnosed repair per round. If two consecutive
-   rounds do not reduce the error count, stop and report the unresolved
-   diagnostics truthfully.
-6. Deliver once for final acceptance:
+5. Deliver the first complete candidate directly:
 
    ```bash
    node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --json
    ```
 
-   A non-zero exit is never success. A failed delivery preserves the previous
-   output file. Delivery reports SHA-256 and byte counts for spec and
-   artifact — keep them for provenance, but see **Output** for when they
+   `deliver` runs the same schema, data-integrity, semantic, honesty, and
+   composition checks as `validate`; it writes the HTML atomically only when
+   the candidate is accepted. Do not run a separate `validate` before the
+   first delivery. Successful delivery produces the self-contained HTML with
+   inline SVG and no screenshots or other image files.
+6. If delivery fails, change only each diagnostic's `subject` and choose only
+   from its `supportedFixes` — one diagnosed repair per round. Re-run
+   `deliver` after the edit; a failed delivery preserves the previous output.
+   Use `validate` separately only when you need a diagnostic-only check that
+   must not write an accepted artifact:
+
+   ```bash
+   node bin/gen-chart.mjs validate <chart_type> <candidate.json> --quality showcase --json
+   ```
+
+   If two consecutive repair rounds do not reduce the error count, stop and
+   report the unresolved diagnostics truthfully. A non-zero exit is never
+   success. Successful delivery reports SHA-256 and byte counts for the spec
+   and artifact; keep them for provenance, but see **Output** for when they
    belong in the reply.
-7. After delivery, collect bounded visual evidence without modifying the
-   trusted HTML:
+7. After successful delivery, hand off the HTML immediately. Do **not** run
+   `visual-check` or generate screenshots by default. Run it only when the
+   user asks for screenshots, visual inspection, containment evidence, or
+   release/publication verification:
 
    ```bash
    node bin/gen-chart.mjs visual-check <output.html> --json
    ```
 
-   Exit 0 means every checked viewport was contained and the screenshots
-   were captured; 2 means no Chrome was available — say the check was
-   skipped and continue.
+   This optional step does not modify the trusted HTML. Exit 0 means every
+   checked viewport was contained and the screenshots were captured; 2 means
+   no Chrome was available — say the check was skipped and continue.
 
    `visual-check` measures **horizontal containment**. It does not judge
    whether the chart reads well, so its result is never "visual QA passed"
@@ -188,7 +196,7 @@ A good handoff:
 
 > Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%. The chart is at
 > `revenue-q2.html` — open it for hover values and CSV export. Validated at
-> showcase quality, and contained at all four desktop sizes.
+> showcase quality — 0 errors, 0 warnings.
 
 Not this:
 

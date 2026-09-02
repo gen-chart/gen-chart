@@ -201,14 +201,18 @@ Plus composition checks for tick collisions, annotation overlap, stack depth, an
 | **Author**   | The agent writes a typed JSON spec with your data embedded verbatim                                                        |
 | **Validate** | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts                        |
 | **Deliver**  | Renders, checks, and atomically commits the HTML with SHA-256 receipts — a failed delivery leaves the previous file intact |
-| **Verify**   | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                              |
+| **Verify on request** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                     |
 
-```bash
-node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
-```
+For the fast default path, run `deliver` directly—it performs showcase
+validation before atomically writing the HTML. Use `validate` separately only
+when you need diagnostics without writing an accepted artifact.
 
 ```bash
 node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --json
+```
+
+```bash
+node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
 ```
 
 ```bash

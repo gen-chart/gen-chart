@@ -11,7 +11,9 @@ node bin/gen-chart.mjs validate <chart_type> <spec.json> --quality showcase --js
 ```
 
 Runs every check layer — schema, data integrity, semantics, honesty,
-composition — and writes nothing. Use it after each edit during repair.
+composition — and writes nothing. Use it for a diagnostic-only check when an
+accepted result must not write an artifact. Routine chart creation should
+start with `deliver`, which performs the same checks before writing HTML.
 
 The receipt:
 
@@ -67,6 +69,11 @@ place only after it is complete. **A failed delivery leaves any previous
 artifact untouched** — so an old file at that path is not evidence of
 success.
 
+This is the fast default path: call `deliver` on the first complete candidate
+instead of running `validate` first. On acceptance, hand off the HTML
+immediately. Delivery creates the self-contained HTML with inline SVG; it does
+not create screenshots or PNG files.
+
 Adds to the receipt:
 
 ```json
@@ -93,6 +100,10 @@ since cards sit below the chart — then captures light and dark screenshots
 at the smallest and largest sizes beside the artifact, plus a
 `.visual-check.json` sidecar.
 
+This is optional evidence, not part of routine delivery. Run it only when the
+user asks for screenshots, visual inspection, containment evidence, or
+release/publication verification.
+
 | Exit | Meaning |
 |---|---|
 | 0 | contained at every size, captures succeeded |
@@ -109,10 +120,11 @@ skipped and continue.
 
 ## The repair loop
 
-1. Validate. If it passes at the target quality, deliver.
+1. Deliver the first complete candidate; delivery already runs every check.
 2. On failure, take the first diagnostic, edit only its `subject`, and
    choose only from its `supportedFixes`.
-3. One diagnosed repair per round; re-validate after each.
+3. One diagnosed repair per round; re-run `deliver` after each. Use
+   `validate` only for a diagnostic-only iteration that must not write.
 4. Prefer semantic repairs over geometric ones: drop a redundant series
    before widening the canvas, aggregate rows before thinning labels.
 5. Never restructure data to dodge an honesty diagnostic. Those rules
@@ -123,6 +135,7 @@ skipped and continue.
 
 ## Handoff
 
-State the delivered path, the receipt summary (errors, warnings, quality),
-the spec and artifact SHA-256, and the truthful visual-review status. If
-anything failed, say what and quote the diagnostics.
+By default, state the delivered path and receipt summary (errors, warnings,
+quality). Add hashes for automation or when requested. Mention containment,
+screenshots, or visual-review status only when `visual-check` actually ran.
+If anything failed, say what and quote the diagnostics.
