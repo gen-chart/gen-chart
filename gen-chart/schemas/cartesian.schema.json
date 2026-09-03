@@ -145,6 +145,7 @@
               "line",
               "bar",
               "scatter",
+              "bubble",
               "area"
             ]
           },
@@ -159,6 +160,9 @@
           },
           "point": {
             "type": "boolean"
+          },
+          "size": {
+            "$ref": "common.schema.json#/$defs/id"
           }
         }
       }

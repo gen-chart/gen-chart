@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Higher-capacity venues occupy the strongest profit positions",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      {
+        "id": "ad_spend",
+        "type": "number",
+        "unit": "GBP k",
+        "label": "Advertising spend",
+        "values": [18, 24, 31, 39, 47, 56, 68, 75]
+      },
+      {
+        "id": "profit",
+        "type": "number",
+        "unit": "GBP k",
+        "label": "Event profit",
+        "values": [9, 14, 13, 22, 28, 31, 38, 44]
+      },
+      {
+        "id": "capacity",
+        "type": "number",
+        "unit": "seats",
+        "label": "Venue capacity",
+        "values": [350, 520, 420, 850, 1100, 950, 1600, 2100]
+      }
+    ]
+  },
+  "encoding": {
+    "x": {
+      "column": "ad_spend",
+      "scale": "linear",
+      "label": "Advertising spend (GBP k)"
+    },
+    "y": {
+      "zero": false,
+      "label": "Event profit (GBP k)"
+    }
+  },
+  "series": [
+    {
+      "id": "venues",
+      "mark": "bubble",
+      "y": "profit",
+      "size": "capacity",
+      "label": "Venue",
+      "role": "primary"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Takeaway",
+      "items": [
+        "The 2,100-seat venue has the highest observed profit at GBP 44k.",
+        "The 350-seat venue has the lowest observed profit at GBP 9k."
+      ]
+    }
+  ]
+}

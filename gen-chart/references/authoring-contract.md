@@ -13,10 +13,13 @@ diagnostic catalog, or repair rules.
   and `zero: true`, and appends "(log scale)" to its own caption so the
   reader never has to infer it. Reach for it only when the data spans
   multiple orders of magnitude.
-- `series[].mark`: `line` | `bar` | `scatter` | `area`. `point: true` draws
+- `series[].mark`: `line` | `bar` | `scatter` | `bubble` | `area`. `point: true` draws
   circles on line vertices — use it when the reader should see individual
-  observations (≤ ~30 points). `scatter` needs a linear or time x, never
-  `band`. `area` fills to the baseline, so like `bar` it requires a zero y.
+  observations (≤ ~30 points). `scatter` and `bubble` need a linear or time
+  x, never `band`. A `bubble` series also requires `size`, referencing a
+  non-negative numeric column. Bubble area represents that value; zero-size
+  rows stay in the data table but draw no circle. `area` fills to the
+  baseline, so like `bar` it requires a zero y.
 - `stack` (top level): `true` for parts adding to a total, or `"percent"`
   to normalise each position to 100%. Percent mode fixes the axis at 0–100,
   appends "(% of total)" to the caption, keeps absolute values in the
@@ -87,8 +90,9 @@ diagnostic catalog, or repair rules.
 | `schema/invalid` | error | shape violation; the subject path names the field |
 | `data/duplicate-column-id`, `data/column-length`, `data/number-parse`, `data/string-parse` | error | data integrity |
 | `data/date-parse`, `data/date-granularity-mixed`, `data/date-order`, `data/x-order` | error | date/x ordering rules |
-| `data/all-null` | error | nothing to draw |
+| `data/all-null`, `data/bubble-no-positive-size` | error | nothing visible to draw |
 | `semantic/unknown-column`, `semantic/duplicate-series-id`, `semantic/series-not-numeric` | error | reference integrity |
+| `semantic/bubble-size-required`, `semantic/size-not-numeric`, `semantic/size-unsupported-mark` | error | bubble size encoding integrity |
 | `semantic/scale-type-mismatch`, `semantic/mark-scale-mismatch` | error | scale/column/mark compatibility |
 | `semantic/brush-unsupported` | error | brush needs line marks over time/linear x |
 | `semantic/unknown-series` | error | a view focuses a series that does not exist |
@@ -103,6 +107,7 @@ diagnostic catalog, or repair rules.
 | `honesty/log-zero` | error | a log axis cannot be asked to include zero |
 | `composition/annotation-overlap` | warning | annotation labels would collide |
 | `honesty/area-zero-baseline` | error | area fills only mean something from zero |
+| `honesty/bubble-negative-size` | error | bubble area cannot represent a negative value |
 | `honesty/stack-negative` | error | a negative segment would subtract from the stack |
 | `semantic/stack-mixed-marks` | error | stacking needs one shared mark |
 | `semantic/stack-unsupported-mark` | error | only bar and area stack |

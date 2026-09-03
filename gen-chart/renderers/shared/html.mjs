@@ -12,7 +12,8 @@ import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds } from './palette.mjs
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
 // legend is one of:
-//   { kind: 'series', toggleable, items: [{id, label, color, mark}] }
+//   { kind: 'series', toggleable, items: [{id, label, color, mark}],
+//     sizes?: [{label, unit, items: [{value, radius}]}] }
 //   { kind: 'note', text }
 //   null
 function legendHtml(legend, locale) {
@@ -24,7 +25,21 @@ function legendHtml(legend, locale) {
     `<button type="button" data-series="${escapeXml(it.id)}" aria-pressed="true"${legend.toggleable ? '' : ' disabled'}>` +
     `<span class="gc-swatch" data-mark="${escapeXml(it.mark)}" style="--sw:${it.color}"></span>${escapeXml(it.label)}</button>`
   ).join('');
-  return `<div class="gc-legend"${legend.toggleable ? '' : ' data-static'} role="group" aria-label="${escapeXml(t(locale, 'ui.series'))}">${items}</div>`;
+  const series = items
+    ? `<div class="gc-legend"${legend.toggleable ? '' : ' data-static'} role="group" aria-label="${escapeXml(t(locale, 'ui.series'))}">${items}</div>`
+    : '';
+  const sizes = (legend.sizes ?? []).map((size) => {
+    const unit = size.unit ? ` ${size.unit}` : '';
+    const samples = size.items.map((it) => {
+      const diameter = it.radius * 2;
+      return `<span class="gc-size-item" aria-label="${escapeXml(`${size.label}: ${it.value}${unit}`)}">` +
+        `<span class="gc-size-swatch" aria-hidden="true" style="--diameter:${diameter}px"></span>` +
+        `<span>${escapeXml(it.value + unit)}</span></span>`;
+    }).join('');
+    return `<div class="gc-size-legend" role="group" aria-label="${escapeXml(size.label)}">` +
+      `<span class="gc-size-title">${escapeXml(size.label)}</span>${samples}</div>`;
+  }).join('');
+  return series + sizes;
 }
 
 function cardsHtml(spec) {
@@ -83,6 +98,7 @@ export function assembleHtml(spec, svg, payload, legend = null) {
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
+  const views = viewsHtml(payload, locale);
   // The viewer builds some strings itself; ship them with the payload.
   const withStrings = {
     ...payload,
@@ -106,8 +122,8 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     .replaceAll('{{PALETTE_SIZE}}', paletteSize)
     .replace('{{PALETTE_CSS}}', paletteCss())
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
-    .replace('{{SUBTITLE_BLOCK}}', subtitle)
-    .replace('{{VIEWS}}', viewsHtml(payload, locale))
+    .replace('      {{SUBTITLE_BLOCK}}', subtitle ? `      ${subtitle}` : '')
+    .replace('  {{VIEWS}}', views ? `  ${views}` : '')
     .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale))
     .replace('{{SVG}}', svg)
     .replace('{{LEGEND}}', legendHtml(legend, locale))

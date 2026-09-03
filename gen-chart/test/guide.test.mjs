@@ -41,6 +41,13 @@ test('scatter routes to cartesian and is implemented', () => {
   assert.ok(r.recommendation.marks.includes('scatter'));
 });
 
+test('bubble chart routes to a Cartesian bubble mark', () => {
+  const r = guide('bubble chart of profit vs sales, size each bubble by quantity');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.equal(r.recommendation.implemented, true);
+  assert.deepEqual(r.recommendation.marks, ['bubble']);
+});
+
 test('heatmap scenarios route to the matrix family', () => {
   const r = guide('heatmap of tickets by hour and day of week');
   assert.equal(r.recommendation.chart_type, 'matrix');

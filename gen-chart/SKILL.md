@@ -7,7 +7,7 @@ description: >-
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
   graph, plot, or visualize data, metrics, or trends — line, bar, area,
-  scatter, pie/donut, histogram, boxplot, or heatmap — or to beautify an
+  scatter, bubble, pie/donut, histogram, boxplot, or heatmap — or to beautify an
   existing chart.
 license: MIT
 metadata:
@@ -91,7 +91,7 @@ the family you routed to.
 
 | chart_type | Marks | Use for |
 |---|---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter | trends, comparisons, composition over time, actual-vs-target, correlation |
+| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter, bubble | trends, comparisons, composition over time, actual-vs-target, correlation |
 | `distribution` | histogram, boxplot | spread, outliers, shape of raw observations |
 | `proportion` | pie, donut | parts of a whole (max 7 slices) |
 | `matrix` | heatmap | two categorical dimensions × intensity |
@@ -99,6 +99,10 @@ the family you routed to.
 `distribution` takes **raw observations**, not pre-computed summaries: the
 renderer derives bins, quartiles, and Tukey fences itself. `matrix` takes
 long-format `(row, column, value)` triples.
+
+For a bubble chart, use a Cartesian series with `"mark": "bubble"` and set
+`size` to a non-negative numeric column id. Its values control bubble area;
+the renderer owns the bounded radius scale, size legend, and tooltip row.
 
 Set `"stack": true` for composition — parts adding to a total — or
 `"stack": "percent"` to normalise every position to 100%. Every series

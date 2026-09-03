@@ -108,6 +108,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 .gc-point { fill: var(--sc); }
 .gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-bubble { stroke: var(--panel); stroke-width: 1.25; }
 .gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
 .gc-bin { fill: var(--sc); }
 .gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
@@ -154,6 +155,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-annotations [data-gone] { display: none; }
 .gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
 .gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-hover-bubble { fill: none; stroke: var(--sc); stroke-width: 2; }
 .gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
 .gc-hit { cursor: crosshair; }
 .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
@@ -167,6 +169,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-legend[data-static] button { cursor: default; }
 .gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
 .gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-swatch[data-mark="scatter"], .gc-swatch[data-mark="bubble"] { width: 9px; height: 9px; border-radius: 50%; }
+.gc-size-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.8rem;
+  margin-top: 0.65rem; color: var(--muted); font-size: 0.78rem;
+}
+.gc-size-title { color: var(--ink); font-weight: 600; }
+.gc-size-item { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 48px; }
+.gc-size-swatch {
+  display: inline-block; width: var(--diameter); height: var(--diameter);
+  max-width: 48px; max-height: 48px; border-radius: 50%;
+  background: var(--role-primary); opacity: 0.55; flex: none;
+}
 .gc-passport {
   display: none; margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.8rem;
   font-size: 0.82rem;
@@ -213,7 +227,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <header>
     <div>
       <h1>各渠道季度营收</h1>
-      
+
     </div>
     <div class="gc-toolbar">
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">导出</button>
@@ -236,7 +250,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
-  
+
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">重置缩放</button>
     <div class="gc-figure" id="gc-figure" role="application" aria-label="图表">
@@ -251,7 +265,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>结论</h2><ul><li>直销与渠道伙伴营收均逐季增长，第四季度合计达 2,900 万元。</li><li>两者全年增速接近（直销 +39%，渠道伙伴 +37%），渠道结构基本稳定在 41% 左右。</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"各渠道季度营收","unit":"万元","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[152.5,377.8,603.2,828.5],"xLabels":["第一季度","第二季度","第三季度","第四季度"],"table":{"headers":["quarter","直销","渠道伙伴"],"rows":[["第一季度",1240,860],["第二季度",1380,910],["第三季度",1510,1040],["第四季度",1720,1180]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"direct","label":"直销","mark":"bar","color":"var(--role-primary)","values":[1240,1380,1510,1720],"formatted":["1,240","1,380","1,510","1,720"],"pixels":[208.5,176.7,147.2,99.6],"stats":{"min":1240,"max":1720,"mean":1462.5,"last":1720,"count":4}},{"id":"partner","label":"渠道伙伴","mark":"bar","color":"var(--role-comparison)","values":[860,910,1040,1180],"formatted":["860","910","1,040","1,180"],"pixels":[294.8,283.4,253.9,222.1],"stats":{"min":860,"max":1180,"mean":997.5,"last":1180,"count":4}}],"locale":"zh-CN","i18n":{"ui.theme":"主题","ui.theme.toggle":"切换配色主题","ui.color":"颜色","ui.color.open":"选择图表配色","ui.color.heading":"图表配色","ui.color.reset":"重置","ui.palette.classic":"经典","ui.palette.cool":"冷色","ui.palette.warm":"暖色","ui.palette.primary":"原色","ui.export":"导出","ui.export.png":"下载 PNG（2×）","ui.export.svg":"下载 SVG","ui.export.csv":"下载数据 CSV","ui.export.card":"分享卡片（1200×630）","ui.reset":"重置缩放","ui.close":"关闭","ui.series":"数据系列","ui.chapters":"导览视图","ui.views.clear":"清除视图","ui.chart":"图表","ui.keyboard.hint":"使用方向键浏览数据点。","ui.table.caption":"图表数据","stat.min":"最小值","stat.max":"最大值","stat.mean":"平均值","stat.last":"最新值","stat.points":"数据点","stat.count":"数量","stat.share":"占比","stat.value":"数值","stat.n":"样本数","stat.median":"中位数","stat.q1":"下四分位","stat.q3":"上四分位","axis.count":"数量","note.boxplot":"箱体为四分位距，须线延伸至 1.5×IQR，圆点为离群值。","note.histogram":"{n} 个观测值分为 {bins} 个区间（Freedman-Diaconis 建议 {suggested} 个）","note.matrix":"{rows} × {cols} 网格，{kind}色阶，{buckets} 个分段","scale.sequential":"连续","scale.diverging":"发散"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"各渠道季度营收","unit":"万元","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[152.5,377.8,603.2,828.5],"xLabels":["第一季度","第二季度","第三季度","第四季度"],"table":{"headers":["quarter","直销","渠道伙伴"],"rows":[["第一季度",1240,860],["第二季度",1380,910],["第三季度",1510,1040],["第四季度",1720,1180]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"direct","label":"直销","mark":"bar","color":"var(--role-primary)","values":[1240,1380,1510,1720],"formatted":["1,240","1,380","1,510","1,720"],"pixels":[208.5,176.7,147.2,99.6],"size":null,"stats":{"min":1240,"max":1720,"mean":1462.5,"last":1720,"count":4}},{"id":"partner","label":"渠道伙伴","mark":"bar","color":"var(--role-comparison)","values":[860,910,1040,1180],"formatted":["860","910","1,040","1,180"],"pixels":[294.8,283.4,253.9,222.1],"size":null,"stats":{"min":860,"max":1180,"mean":997.5,"last":1180,"count":4}}],"locale":"zh-CN","i18n":{"ui.theme":"主题","ui.theme.toggle":"切换配色主题","ui.color":"颜色","ui.color.open":"选择图表配色","ui.color.heading":"图表配色","ui.color.reset":"重置","ui.palette.classic":"经典","ui.palette.cool":"冷色","ui.palette.warm":"暖色","ui.palette.primary":"原色","ui.export":"导出","ui.export.png":"下载 PNG（2×）","ui.export.svg":"下载 SVG","ui.export.csv":"下载数据 CSV","ui.export.card":"分享卡片（1200×630）","ui.reset":"重置缩放","ui.close":"关闭","ui.series":"数据系列","ui.chapters":"导览视图","ui.views.clear":"清除视图","ui.chart":"图表","ui.keyboard.hint":"使用方向键浏览数据点。","ui.table.caption":"图表数据","stat.min":"最小值","stat.max":"最大值","stat.mean":"平均值","stat.last":"最新值","stat.points":"数据点","stat.count":"数量","stat.share":"占比","stat.value":"数值","stat.n":"样本数","stat.median":"中位数","stat.q1":"下四分位","stat.q3":"上四分位","axis.count":"数量","note.boxplot":"箱体为四分位距，须线延伸至 1.5×IQR，圆点为离群值。","note.histogram":"{n} 个观测值分为 {bins} 个区间（Freedman-Diaconis 建议 {suggested} 个）","note.matrix":"{rows} × {cols} 网格，{kind}色阶，{buckets} 个分段","scale.sequential":"连续","scale.diverging":"发散"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -512,11 +526,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
         + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (s.size) {
+        var sizeValue = s.size.formatted[i];
+        html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+          + esc(s.size.label) + '<span class="gc-tt-val">' + esc(sizeValue === null ? '—' : sizeValue)
+          + (s.size.unit && s.size.values[i] !== null ? ' ' + esc(s.size.unit) : '') + '</span></div>';
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }
@@ -918,11 +939,16 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
         (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (s.size) {
+        parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
+          (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }

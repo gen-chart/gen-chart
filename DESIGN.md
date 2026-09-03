@@ -208,7 +208,7 @@ canvas instead.
 ## Marks and layout
 
 - **Bars** encode by length and therefore always include zero.
-- **Lines, scatter, and boxplots** encode by position and may omit zero, but
+- **Lines, scatter, bubble, and boxplots** encode by position and may omit zero, but
   padding never implies impossible values (negative durations or counts).
 - **Grid lines** sit below every mark and never outweigh one.
 - **Labels** resolve collisions by rotating, then thinning, then failing with

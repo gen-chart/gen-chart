@@ -124,6 +124,14 @@ Use gen-chart to show signup traffic by source as a donut: organic 4820, direct 
 referral 1640, paid social 980, email 610, other 340.
 ```
 
+```
+Use gen-chart to create a bubble chart of venue performance.
+Advertising spend (GBP k): 18 24 31 39 47 56 68 75
+Event profit (GBP k):       9 14 13 22 28 31 38 44
+Venue capacity (seats):   350 520 420 850 1100 950 1600 2100
+Put spend on x, profit on y, and encode capacity as bubble area.
+```
+
 ### Guided views, localization, iteration
 
 ```
@@ -164,7 +172,7 @@ Validation caps a pie at 7 slices, so instead of quietly producing an unreadable
 
 | Family           | Marks                                                    | Best for                                   | Include in your prompt              |
 | ---------------- | -------------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, scatter | trends, comparisons, composition over time | the dimension, the series, the unit |
+| **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, scatter, bubble | trends, comparisons, composition, correlation | x, y, series, unit, and bubble size |
 | **Distribution** | histogram, boxplot                                       | spread, outliers, shape                    | the raw observations, not a summary |
 | **Proportion**   | pie, donut                                               | parts of a whole (max 7)                   | the categories and their values     |
 | **Matrix**       | heatmap                                                  | two categories × intensity                 | rows, columns, and the value        |

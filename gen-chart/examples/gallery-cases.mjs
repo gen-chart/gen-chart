@@ -136,6 +136,18 @@ export const GALLERY_CASES = [
     }
   },
   {
+    id: 'venue-performance',
+    spec: 'venue-performance.cartesian.json',
+    question: 'How do advertising spend, event profit, and venue capacity relate?',
+    prompt: {
+      request: 'Create a bubble chart with advertising spend on x, event profit on y, and bubble size representing venue capacity.',
+      requirements: [
+        'Keep both financial measures in GBP thousands and capacity in seats.',
+        'Show the capacity scale and keep every raw value available in the tooltip and data table.'
+      ]
+    }
+  },
+  {
     id: 'zh-revenue',
     spec: 'zh-revenue.cartesian.json',
     question: '各渠道的季度营收如何变化？',
