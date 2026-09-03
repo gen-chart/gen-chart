@@ -213,6 +213,8 @@ canvas instead.
 - **Ranges** fill only between authored lower and upper bounds. Their visible
   label states whether the band is a confidence interval, prediction
   interval, observed min/max, or another explicitly supplied meaning.
+- **Scatter and bubble plots** warn above 2,000 visible marks. More circles
+  do not mean more evidence when overlap hides the shape of the distribution.
 - **Grid lines** sit below every mark and never outweigh one.
 - **Labels** resolve collisions by rotating, then thinning, then failing with
   a diagnostic — never by shrinking type or clipping.
@@ -228,6 +230,11 @@ visual weight than the marks it supports.
 **The Disclosure Rule.** Anything the renderer computed rather than received
 — bin counts, quartile conventions, bucket boundaries — is stated in words
 beside the chart.
+
+**The Point Density Rule.** Count circles that will actually render across
+all scatter and bubble series. Above 2,000, require deterministic
+downsampling, meaningful aggregation, or a focused subset before showcase
+delivery.
 
 ## Interaction
 

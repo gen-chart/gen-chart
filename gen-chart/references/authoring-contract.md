@@ -19,7 +19,9 @@ diagnostic catalog, or repair rules.
   x, never `band`. A `bubble` series also requires `size`, referencing a
   non-negative numeric column. Bubble area represents that value; zero-size
   rows stay in the data table but draw no circle. `area` fills to the
-  baseline, so like `bar` it requires a zero y.
+  baseline, so like `bar` it requires a zero y. Across all scatter and bubble
+  series, more than 2,000 circles that would actually render raises a point-
+  density warning. Null y values and zero/null bubble sizes do not count.
 - A `range` series uses `lower` and `upper` numeric column ids instead of
   `y`. Both bounds must appear together, lower must not exceed upper, and at
   least two adjacent pairs must exist. `meaning` is required by the honesty
@@ -113,6 +115,7 @@ diagnostic catalog, or repair rules.
 | `honesty/log-nonpositive` | error | a log axis is undefined at or below zero |
 | `honesty/log-zero` | error | a log axis cannot be asked to include zero |
 | `composition/annotation-overlap` | warning | annotation labels would collide |
+| `composition/point-density` | warning | more than 2,000 visible scatter/bubble marks risk hiding the distribution |
 | `honesty/area-zero-baseline` | error | area fills only mean something from zero |
 | `honesty/bubble-negative-size` | error | bubble area cannot represent a negative value |
 | `honesty/range-meaning-required` | error | a range band does not state what its bounds mean |

@@ -103,6 +103,9 @@ long-format `(row, column, value)` triples.
 For a bubble chart, use a Cartesian series with `"mark": "bubble"` and set
 `size` to a non-negative numeric column id. Its values control bubble area;
 the renderer owns the bounded radius scale, size legend, and tooltip row.
+Scatter and bubble charts warn when their series combine to more than 2,000
+visible points. For showcase delivery, deterministically downsample the source
+rows, aggregate them into meaningful groups, or split them into focused charts.
 
 For a confidence band or min/max envelope, use `"mark": "range"` with
 `lower` and `upper` numeric column ids. Set `meaning` to the exact semantics
@@ -129,8 +132,9 @@ and adjacent segments must be visually distinguishable, so prefer omitting
   capped at 7 slices, and must match any declared total; histogram bin
   counts stay near the Freedman-Diaconis suggestion; a sequential heatmap
   ramp rejects negative values and a diverging one requires a stated
-  midpoint. Do not restructure data to dodge a diagnostic; fix the chart
-  choice instead — the `supportedFixes` name the honest alternative.
+  midpoint; scatter and bubble charts keep visible point counts at 2,000 or
+  fewer. Do not restructure data to dodge a diagnostic; fix the chart choice
+  instead — the `supportedFixes` name the honest alternative.
 - Defaults are omissions: no `subtitle`, no `theme`, no `interactions`
   overrides unless the user asks. `meta.quality_profile: "showcase"` is the
   default for delivered work; use `standard` only when the user explicitly

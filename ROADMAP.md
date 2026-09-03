@@ -30,11 +30,12 @@ subject, measured evidence, and a closed set of supported fixes:
 - 100%-stacks disclose a shifting denominator and keep absolutes in the tooltip
 - directional colour roles rejected over mixed-sign data
 - range bands require an explicit meaning, paired bounds, and lower ≤ upper
+- scatter and bubble plots warn above 2,000 visible points, before overplotting hides the distribution
 - sequential heatmap ramps reject negatives; diverging ramps require a midpoint
 
 **Composition checks.** Tick collision (rotate → thin → fail), annotation
-overlap, stack depth, matrix density and sparseness, and adjacent stacked
-segments verified perceptually distinguishable via CIEDE2000.
+overlap, point density, stack depth, matrix density and sparseness, and
+adjacent stacked segments verified perceptually distinguishable via CIEDE2000.
 
 **The viewer.** One self-contained HTML file, offline, no CDN: crosshair
 tooltips, legend toggling, click-to-focus Data Passport with render-time
@@ -78,8 +79,9 @@ Roughly in the order they would earn their place.
 - **Dual axes.** Currently unsupported, which `guide` explains. Supporting
   them honestly means requiring distinct units, per-axis legend labelling,
   and refusing the alignment tricks that manufacture a correlation.
-- **Point density.** Suggest downsampling above roughly 2k points, where
-  overplotting hides the distribution it appears to show.
+- **Point-density transforms.** The deterministic 2,000-point warning ships;
+  renderer-side downsampling or aggregation remains future work and must
+  disclose its method while preserving the source rows for provenance.
 - **Trend annotations.** If a fitted line is ever added, it must be computed
   deterministically, labelled with its method, and never implied to be data.
 
