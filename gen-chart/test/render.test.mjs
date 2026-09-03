@@ -105,10 +105,19 @@ test('palette picker is generated after Theme with Classic selected by default',
 
   const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
   assert.deepEqual(Object.keys(payload.palettes), ['classic', 'cool', 'warm', 'primary']);
-  assert.deepEqual(payload.palettes.primary.preview, ['#E74C3C', '#F4D03F', '#3498DB']);
-  assert.deepEqual(payload.palettes.primary.light.three, ['#DC2626', '#A16207', '#0284C7']);
-  assert.deepEqual(payload.palettes.primary.dark.three, ['#F87171', '#FACC15', '#38BDF8']);
-  assert.match(html, /\.gc-dot \{ fill: var\(--sc\); fill-opacity: 1; \}/);
+  assert.deepEqual(payload.palettes.primary.three, ['#E74C3C', '#F4D03F', '#3498DB']);
+  assert.deepEqual(payload.palettes.primary.six,
+    ['#E74C3C', '#F06A5B', '#F4D03F', '#F7DC6F', '#3498DB', '#5DADE2']);
+  assert.equal((html.match(/class="gc-palette-swatch"/g) ?? []).length, 12,
+    'compact charts preview three colors for each palette');
+
+  const { html: sixColorHtml } = renderExample('traffic-sources.proportion.json');
+  assert.equal((sixColorHtml.match(/class="gc-palette-swatch"/g) ?? []).length, 24,
+    'larger charts preview all six colors for each palette');
+  for (const color of ['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F']) {
+    assert.ok(sixColorHtml.includes(`style="--preview:${color}"`), `Classic preview includes ${color}`);
+  }
+  assert.match(html, /\.gc-dot \{ fill: var\(--sc\); fill-opacity: 0\.78; \}/);
 });
 
 test('payload JSON in the artifact parses and mirrors the data', () => {

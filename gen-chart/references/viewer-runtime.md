@@ -18,11 +18,10 @@ beyond the spec fields named here.
 - **Color palette** — Color follows Theme in the toolbar. Its picker applies
   Classic (the default), Cool, Warm, or Primary to every displayed series in
   order, including role-authored series. Charts with up to three colors use
-  each palette's theme-specific three-color set; larger charts use its
-  six-color set. The original supplied colors remain in the picker previews,
-  while mark colors clear the panel-contrast and adjacent-series gates in
-  light and dark. Heatmap buckets use all six colors with contrast-aware label
-  ink. Role metadata and validation meaning remain intact. Reset restores Classic. Arrow
+  each palette's three-color set; larger charts use its six-color set. The
+  picker shows the same active three or six colors that the chart uses.
+  Heatmap buckets use all six colors with contrast-aware label ink. Role
+  metadata and validation meaning remain intact. Reset restores Classic. Arrow
   keys move through choices; Enter or Space selects; Escape closes.
 - **Brush zoom** — `interactions.brush: "x"`, valid only for line and range
   marks over a time or linear x (validation enforces this). Drag selects an index

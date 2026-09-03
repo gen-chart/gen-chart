@@ -134,25 +134,29 @@ series order or meaning.
 | **Warm** | A yellow through amber and orange to red progression | Energetic charts where warmth suits the subject |
 | **Primary** | Red, yellow, and blue pairs | Categorical charts using familiar primary-color families |
 
-Charts with up to three displayed colors use the active theme's `three`
-array. Charts with four or more use its `six` array, mapped in order to
-`--cat-0`…`--cat-5`. Picker previews retain the supplied three-color design
-anchors; chart marks use accessible light/dark descendants of those anchors.
+Charts with up to three displayed colors use the `three` array. Charts with
+four or more use the `six` array, mapped in order to `--cat-0`…`--cat-5`.
+The picker previews the same active array: three swatches for compact charts
+and six for larger charts.
 
 ```js
 const palettes = {
   classic: {
-    anchors: { three: ['#5996E7', '#8AA7F5', '#F6D985'], /* supplied six */ },
-    light: {
-      six: ['#2563EB', '#1E3A8A', '#8B5CF6', '#5B21B6', '#A16207', '#78350F'],
-      three: ['#2563EB', '#8B5CF6', '#A16207'],
-    },
-    dark: {
-      six: ['#60A5FA', '#2563EB', '#C4B5FD', '#8B5CF6', '#FACC15', '#CA8A04'],
-      three: ['#60A5FA', '#C4B5FD', '#FACC15'],
-    },
+    six: ['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F'],
+    three: ['#5996E7', '#8AA7F5', '#F6D985'],
   },
-  // Cool, Warm, and Primary use the same anchors/light/dark shape.
+  cool: {
+    six: ['#CCE7C1', '#AAD7BA', '#88C7C6', '#68ACCD', '#5494C0', '#417AB3'],
+    three: ['#AAD7BA', '#68ACCD', '#417AB3'],
+  },
+  warm: {
+    six: ['#F6E287', '#F8DB82', '#F2B75C', '#EE944B', '#E85E38', '#D03828'],
+    three: ['#F5D06C', '#EE944B', '#D03828'],
+  },
+  primary: {
+    six: ['#E74C3C', '#F06A5B', '#F4D03F', '#F7DC6F', '#3498DB', '#5DADE2'],
+    three: ['#E74C3C', '#F4D03F', '#3498DB'],
+  },
 };
 ```
 
@@ -163,12 +167,13 @@ sequential or diverging buckets and choose contrasting black or white cell
 labels. Role metadata and its validation meaning do not change; annotations
 are unaffected.
 
-**Accessibility resolution.** The original supplied colors remain visible as
-picker anchors. Every chart palette has separate light and dark mark values;
-all clear 3:1 against their panel, every adjacent pair clears ΔE 9, and
-heatmap label ink clears 4.5:1. Scatter and bubble fills are opaque so their
-measured mark color is not weakened by compositing. The complete registry and
-measured gate live in `renderers/shared/palette.mjs` and its tests.
+**Known accessibility gap.** The supplied palette values clear the current
+dark-panel contrast check, but several pale colors do not clear 3:1 against
+the light panel, and some same-family neighbours fall below the current ΔE 9
+threshold. The exact fills are part of the approved visual identity and must
+not be replaced with unrelated compliant colors. The measured audit and the
+non-color boundary-treatment option live in
+`CHART-COLOUR-PALETTE-PICKER-PLAN.md`.
 
 ### Named rules
 

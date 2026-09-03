@@ -91,24 +91,19 @@ export function applyDefaultPalette(svg, spec) {
   const colorCount = spec.chart_type === 'cartesian'
     ? spec.series.length
     : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
-  const cycle = colorCount > 0 && colorCount <= 3 ? 3 : 6;
-  // Gallery cards share one themed document. Compact charts alias their
-  // local categorical tokens to theme-aware root tokens instead of pinning
-  // light-theme hex values inline, so thumbnails adapt with the page theme.
-  const compact = cycle === 3
-    ? Array.from({ length: 3 }, (_, index) => `--cat-${index}:var(--cat-compact-${index})`).join(';')
-    : '';
-  const themed = compact ? svg.replace(/<svg(?=\s|>)/, `<svg style="${compact}"`) : svg;
+  const colors = paletteColors(DEFAULT_PALETTE, colorCount);
+  const declarations = colors.map((color, index) => `--cat-${index}:${color}`).join(';');
+  const themed = svg.replace(/<svg(?=\s|>)/, `<svg style="${declarations}"`);
   if (spec.chart_type === 'cartesian') {
     return spec.series.reduce((out, series, index) => {
       const id = escapeRegExp(escapeXml(series.id));
       const re = new RegExp(`(<g class="gc-series" data-series="${id}" style=")--sc:[^"]+`, 'g');
-      return out.replace(re, `$1--sc:var(--cat-${index % cycle})`);
+      return out.replace(re, `$1--sc:var(--cat-${index % colors.length})`);
     }, themed);
   }
   let index = 0;
   return themed.replace(/(<(?:g|path) class="(?:gc-series|gc-box|gc-slice)"[^>]*style=")--sc:[^"]+/g,
-    (_, prefix) => `${prefix}--sc:var(--cat-${index++ % cycle})`);
+    (_, prefix) => `${prefix}--sc:var(--cat-${index++ % colors.length})`);
 }
 
 const SVG_SELECTORS = ['svg.gc-chart', '.gc-grid', '.gc-axis', '.gc-yticks', '.gc-xticks',
@@ -137,13 +132,11 @@ function tokenBlock(tokens, selector) {
   return `${selector} {\n${declarations}\n}`;
 }
 
-export function withDefaultPaletteTokens(tokens, theme = 'light') {
+export function withDefaultPaletteTokens(tokens, colorCount = 6) {
   const merged = { ...tokens };
-  paletteColors(DEFAULT_PALETTE, 6, theme)
+  paletteColors(DEFAULT_PALETTE, colorCount)
     .forEach((color, index) => { merged[`--cat-${index}`] = color; });
-  paletteColors(DEFAULT_PALETTE, 3, theme)
-    .forEach((color, index) => { merged[`--cat-compact-${index}`] = color; });
-  paletteColors(DEFAULT_PALETTE, 6, theme).forEach((color, index) => {
+  paletteColors(DEFAULT_PALETTE, 6).forEach((color, index) => {
     for (const kind of ['seq', 'div']) {
       merged[`--${kind}-${index}`] = color;
       merged[`--${kind}-ink-${index}`] = paletteInk(color);
@@ -375,9 +368,9 @@ export function buildGalleryStage(stage, {
 
   const galleryTemplate = readFileSync(galleryTemplateFile, 'utf8');
   const page = renderTemplate(galleryTemplate, {
-    LIGHT_TOKENS: tokenBlock(withDefaultPaletteTokens(themes.light, 'light'), ':root'),
-    DARK_TOKENS: tokenBlock(withDefaultPaletteTokens(themes.dark, 'dark'), ':root[data-theme="dark"]'),
-    AUTO_DARK_TOKENS: tokenBlock(withDefaultPaletteTokens(themes['auto-dark'], 'dark'), ':root[data-theme="auto"]')
+    LIGHT_TOKENS: tokenBlock(withDefaultPaletteTokens(themes.light), ':root'),
+    DARK_TOKENS: tokenBlock(withDefaultPaletteTokens(themes.dark), ':root[data-theme="dark"]'),
+    AUTO_DARK_TOKENS: tokenBlock(withDefaultPaletteTokens(themes['auto-dark']), ':root[data-theme="auto"]')
       .split('\n').map((line) => `  ${line}`).join('\n'),
     CHART_CSS: markCss(rendererTemplate),
     CARDS: records.map(renderCard).join(''),
