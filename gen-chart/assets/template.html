@@ -103,6 +103,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-dot { fill: var(--sc); fill-opacity: 0.78; }
 .gc-bubble { stroke: var(--panel); stroke-width: 1.25; }
 .gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
+.gc-range { fill: var(--sc); fill-opacity: 0.2; stroke: var(--sc); stroke-opacity: 0.65; stroke-width: 1; stroke-linejoin: round; }
 .gc-bin { fill: var(--sc); }
 .gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
 .gc-box .gc-whisker, .gc-box .gc-cap { stroke: var(--sc); stroke-width: 1.5; }
@@ -162,6 +163,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-legend[data-static] button { cursor: default; }
 .gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
 .gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-swatch[data-mark="range"] { height: 9px; border-radius: 2px; opacity: 0.65; }
 .gc-swatch[data-mark="scatter"], .gc-swatch[data-mark="bubble"] { width: 9px; height: 9px; border-radius: 50%; }
 .gc-size-legend {
   display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.8rem;
@@ -352,7 +354,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // families (distribution, proportion, matrix) read per-mark instead.
   var passport = document.getElementById('gc-passport');
   function setFocus(id) {
-    focusId = id && !hidden[id] ? id : null;
+    var target = payload.series.find(function (s) { return s.id === id; });
+    focusId = id && !hidden[id] && (!target || target.focusable !== false) ? id : null;
     payload.series.forEach(function (s) {
       var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
       if (g) g.classList.toggle('gc-dim', !!focusId && s.id !== focusId);
@@ -397,7 +400,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 
   // --------------------------------------------------------- brush zoom
   // Zoom is an affine remap of original x pixels; y never rescales, so the
-  // reading stays honest. Only line marks over time/linear x support it.
+  // reading stays honest. Line and range marks over time/linear x support it.
   var resetBtn = document.getElementById('gc-reset');
   var brushRect = svg.querySelector('.gc-brush-rect');
   function zoomX(ox) {
@@ -409,12 +412,40 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   function visibleRange() {
     return zoom ? zoom : [0, payload.xPixels.length - 1];
   }
+  function rangePath(s, r, mapX) {
+    var d = '';
+    var upper = [];
+    var lower = [];
+    function flush() {
+      if (upper.length < 2) { upper = []; lower = []; return; }
+      d += 'M' + upper[0][0] + ' ' + upper[0][1];
+      for (var j = 1; j < upper.length; j++) d += 'L' + upper[j][0] + ' ' + upper[j][1];
+      for (var k = lower.length - 1; k >= 0; k--) d += 'L' + lower[k][0] + ' ' + lower[k][1];
+      d += 'Z';
+      upper = [];
+      lower = [];
+    }
+    for (var i = r[0]; i <= r[1]; i++) {
+      var lo = s.range.lower.pixels[i];
+      var hi = s.range.upper.pixels[i];
+      if (lo === null || hi === null) { flush(); continue; }
+      var x = mapX(payload.xPixels[i]).toFixed(1);
+      upper.push([x, hi]);
+      lower.push([x, lo]);
+    }
+    flush();
+    return d || 'M0 0';
+  }
   function applyZoom() {
     var r = visibleRange();
     payload.series.forEach(function (s) {
-      if (s.mark !== 'line') return;
+      if (s.mark !== 'line' && s.mark !== 'range') return;
       var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
       if (!g) return;
+      if (s.mark === 'range') {
+        g.querySelector('.gc-range').setAttribute('d', rangePath(s, r, zoomX));
+        return;
+      }
       var d = '';
       var pen = false;
       for (var i = r[0]; i <= r[1]; i++) {
@@ -516,8 +547,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     payload.series.forEach(function (s) {
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       var v = s.formatted[i];
+      var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
-        + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
+        + esc(seriesLabel) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
         + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
       if (s.size) {
         var sizeValue = s.size.formatted[i];
@@ -765,6 +797,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-annotations text{fill:var(--muted);font-size:10.5px}' +
     '.gc-dot{fill:var(--sc);fill-opacity:.78}.gc-bin{fill:var(--sc)}' +
     '.gc-area{fill:var(--sc);fill-opacity:.55;stroke:var(--sc);stroke-width:1.5;stroke-linejoin:round}' +
+    '.gc-range{fill:var(--sc);fill-opacity:.2;stroke:var(--sc);stroke-opacity:.65;stroke-width:1;stroke-linejoin:round}' +
     '.gc-box .gc-box-body{fill:var(--sc);fill-opacity:.45;stroke:var(--sc);stroke-width:1.5}' +
     '.gc-box .gc-whisker,.gc-box .gc-cap{stroke:var(--sc);stroke-width:1.5}' +
     '.gc-box .gc-median{stroke:var(--sc);stroke-width:2.5}.gc-box .gc-outlier{fill:var(--sc);fill-opacity:.7}' +
@@ -790,9 +823,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (ct) ct.innerHTML = originalTicks;
       // Re-render marks at rest by rebuilding from payload.
       payload.series.forEach(function (s) {
-        if (s.mark !== 'line') return;
+        if (s.mark !== 'line' && s.mark !== 'range') return;
         var g = clone.querySelector('.gc-series[data-series="' + CSS.escape(s.id) + '"]');
         if (!g) return;
+        if (s.mark === 'range') {
+          var full = [0, payload.xPixels.length - 1];
+          g.querySelector('.gc-range').setAttribute('d', rangePath(s, full, function (x) { return x; }));
+          return;
+        }
         var d = '';
         var pen = false;
         for (var i = 0; i < s.pixels.length; i++) {
@@ -930,7 +968,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var parts = [payload.xLabels[i]];
     payload.series.forEach(function (s) {
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
-      parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
+      var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
+      parts.push(seriesLabel + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
         (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
       if (s.size) {
         parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +

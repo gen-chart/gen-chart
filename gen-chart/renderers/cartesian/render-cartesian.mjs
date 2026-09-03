@@ -1,4 +1,4 @@
-// Cartesian renderer: line and bar marks over a linear, time, or band x
+// Cartesian renderer: line, bar, area, range, scatter, and bubble marks over a linear, time, or band x
 // scale. `analyze` runs every check layer (schema, data, semantics, honesty,
 // composition) and computes layout; `render` turns a passing analysis into
 // the final SVG + viewer payload.
@@ -41,6 +41,37 @@ function bubbleSizeScale(values, plottedValues) {
   };
 }
 
+// Build one closed polygon per contiguous run. Missing bounds break the band
+// instead of bridging an interval the data did not provide.
+function areaBetweenPath(xValues, lowerValues, upperValues, yScale) {
+  let d = '';
+  let upper = [];
+  let lower = [];
+  const flush = () => {
+    if (upper.length < 2) {
+      upper = [];
+      lower = [];
+      return;
+    }
+    d += `M${round(upper[0][0])} ${round(upper[0][1])}`;
+    for (let i = 1; i < upper.length; i++) d += `L${round(upper[i][0])} ${round(upper[i][1])}`;
+    for (let i = lower.length - 1; i >= 0; i--) d += `L${round(lower[i][0])} ${round(lower[i][1])}`;
+    d += 'Z';
+    upper = [];
+    lower = [];
+  };
+  for (let i = 0; i < xValues.length; i++) {
+    if (lowerValues[i] === null || upperValues[i] === null) {
+      flush();
+      continue;
+    }
+    upper.push([xValues[i], yScale(upperValues[i])]);
+    lower.push([xValues[i], yScale(lowerValues[i])]);
+  }
+  flush();
+  return d;
+}
+
 // ---------------------------------------------------------------- analyze
 
 export function analyzeCartesian(spec) {
@@ -81,6 +112,7 @@ export function analyzeCartesian(spec) {
   let hasArea = false;
   let hasBubble = false;
   let unit;
+  let unitSet = false;
   for (let i = 0; i < spec.series.length; i++) {
     const s = spec.series[i];
     const subject = `/series/${i}`;
@@ -91,29 +123,45 @@ export function analyzeCartesian(spec) {
         }));
     }
     seenSeries.add(s.id);
-    const col = columns.get(s.y);
-    if (!col) {
-      diagnostics.push(diag('semantic/unknown-column', 'error', `${subject}/y`,
-        `series "${s.id}" references column "${s.y}" which does not exist`, {
-          evidence: { known: [...columns.keys()] },
-          supportedFixes: ['reference an existing data column id']
-        }));
-      continue;
+    const refs = s.mark === 'range'
+      ? [{ key: 'lower', id: s.lower }, { key: 'upper', id: s.upper }]
+      : [{ key: 'y', id: s.y }];
+    const seriesColumns = [];
+    let validRefs = true;
+    for (const ref of refs) {
+      const refCol = columns.get(ref.id);
+      if (!refCol) {
+        diagnostics.push(diag('semantic/unknown-column', 'error', `${subject}/${ref.key}`,
+          `series "${s.id}" references ${ref.key} column "${ref.id}" which does not exist`, {
+            evidence: { known: [...columns.keys()] },
+            supportedFixes: ['reference an existing data column id']
+          }));
+        validRefs = false;
+        continue;
+      }
+      if (refCol.type !== 'number') {
+        diagnostics.push(diag('semantic/series-not-numeric', 'error', `${subject}/${ref.key}`,
+          `series "${s.id}" plots ${ref.key} column "${ref.id}" which is typed ${refCol.type}, not number`, {
+            supportedFixes: ['plot a number column', 'retype the data column']
+          }));
+        validRefs = false;
+        continue;
+      }
+      seriesColumns.push({ ...ref, column: refCol });
     }
-    if (col.type !== 'number') {
-      diagnostics.push(diag('semantic/series-not-numeric', 'error', `${subject}/y`,
-        `series "${s.id}" plots column "${s.y}" which is typed ${col.type}, not number`, {
-          supportedFixes: ['plot a number column', 'retype the data column']
-        }));
-      continue;
-    }
-    if (unit === undefined) unit = col.unit;
-    else if (col.unit !== unit) {
-      diagnostics.push(diag('honesty/mixed-units', 'error', `${subject}/y`,
-        `series "${s.id}" has unit ${JSON.stringify(col.unit ?? null)} but the shared y axis already carries ${JSON.stringify(unit ?? null)}; a single axis must not mix units`, {
-          evidence: { axisUnit: unit ?? null, seriesUnit: col.unit ?? null },
-          supportedFixes: ['give every plotted column the same unit', 'split into two charts']
-        }));
+    if (!validRefs) continue;
+    const col = seriesColumns[0].column;
+    for (const ref of seriesColumns) {
+      if (!unitSet) {
+        unit = ref.column.unit;
+        unitSet = true;
+      } else if (ref.column.unit !== unit) {
+        diagnostics.push(diag('honesty/mixed-units', 'error', `${subject}/${ref.key}`,
+          `series "${s.id}" ${ref.key} column has unit ${JSON.stringify(ref.column.unit ?? null)} but the shared y axis already carries ${JSON.stringify(unit ?? null)}; a single axis must not mix units`, {
+            evidence: { axisUnit: unit ?? null, seriesUnit: ref.column.unit ?? null },
+            supportedFixes: ['give every plotted column the same unit', 'split into two charts']
+          }));
+      }
     }
     if (s.mark === 'bar') {
       hasBar = true;
@@ -130,7 +178,7 @@ export function analyzeCartesian(spec) {
     // (An all-positive column under a "negative" role is legitimate — churn
     // counts are positive numbers that mean something bad — so it passes.)
     if ((s.role === 'positive' || s.role === 'negative') && col && col.type === 'number') {
-      const present = col.values.filter((v) => v !== null);
+      const present = seriesColumns.flatMap((ref) => ref.column.values).filter((v) => v !== null);
       const hasPos = present.some((v) => v > 0);
       const hasNeg = present.some((v) => v < 0);
       if (hasPos && hasNeg) {
@@ -148,6 +196,48 @@ export function analyzeCartesian(spec) {
       }
     }
     if (s.mark === 'area') hasArea = true;
+    if (s.mark === 'range') {
+      const lower = seriesColumns[0].column.values;
+      const upper = seriesColumns[1].column.values;
+      if (!s.meaning) {
+        diagnostics.push(diag('honesty/range-meaning-required', 'error', `${subject}/meaning`,
+          `range series "${s.id}" must state what its band means`, {
+            supportedFixes: ['set series.meaning to an explicit interval such as "95% confidence interval" or "observed min–max"']
+          }));
+      }
+      const incomplete = [];
+      const inverted = [];
+      let hasAdjacentPair = false;
+      for (let row = 0; row < lower.length; row++) {
+        const lo = lower[row];
+        const hi = upper[row];
+        if ((lo === null) !== (hi === null)) incomplete.push({ index: row, lower: lo, upper: hi });
+        if (lo !== null && hi !== null && lo > hi) inverted.push({ index: row, lower: lo, upper: hi });
+        if (row > 0 && lo !== null && hi !== null && lower[row - 1] !== null && upper[row - 1] !== null) {
+          hasAdjacentPair = true;
+        }
+      }
+      if (incomplete.length > 0) {
+        diagnostics.push(diag('data/range-pair-missing', 'error', subject,
+          `range series "${s.id}" has ${incomplete.length} row(s) with only one bound`, {
+            evidence: { offending: incomplete.slice(0, 5) },
+            supportedFixes: ['provide both lower and upper values for each row', 'set both bounds to null where the interval is unavailable']
+          }));
+      }
+      if (inverted.length > 0) {
+        diagnostics.push(diag('honesty/range-order', 'error', subject,
+          `range series "${s.id}" has ${inverted.length} row(s) where lower exceeds upper`, {
+            evidence: { offending: inverted.slice(0, 5) },
+            supportedFixes: ['correct the bound columns so lower is less than or equal to upper']
+          }));
+      }
+      if (!hasAdjacentPair) {
+        diagnostics.push(diag('data/range-insufficient-pairs', 'error', subject,
+          `range series "${s.id}" needs at least two adjacent rows with both bounds to draw a band`, {
+            supportedFixes: ['provide two adjacent lower/upper pairs', 'use lines or points for isolated values']
+          }));
+      }
+    }
     if ((s.mark === 'scatter' || s.mark === 'bubble') && enc.x.scale === 'band') {
       diagnostics.push(diag('semantic/mark-scale-mismatch', 'error', `${subject}/mark`,
         `${s.mark} marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading`, {
@@ -213,10 +303,10 @@ export function analyzeCartesian(spec) {
     });
   }
 
-  if (spec.interactions?.brush === 'x' && (enc.x.scale === 'band' || spec.series.some((s) => s.mark !== 'line'))) {
+  if (spec.interactions?.brush === 'x' && (enc.x.scale === 'band' || spec.series.some((s) => s.mark !== 'line' && s.mark !== 'range'))) {
     diagnostics.push(diag('semantic/brush-unsupported', 'error', '/interactions/brush',
-      'brush zoom requires every series to be a line over a time or linear x scale', {
-        supportedFixes: ['remove interactions.brush', 'use only line marks over a time or linear x scale']
+      'brush zoom requires every series to be a line or range over a time or linear x scale', {
+        supportedFixes: ['remove interactions.brush', 'use only line and range marks over a time or linear x scale']
       }));
     return { diagnostics };
   }
@@ -228,7 +318,7 @@ export function analyzeCartesian(spec) {
     if (hasBar) {
       diagnostics.push(diag('honesty/log-bar', 'error', '/encoding/y/scale',
         'bars encode value as length, which a logarithmic axis destroys — a bar twice as tall would not mean twice the value', {
-          supportedFixes: ['use a line, scatter, or bubble mark with the log scale', 'use a linear y scale for bars']
+          supportedFixes: ['use a line, range, scatter, or bubble mark with the log scale', 'use a linear y scale for bars']
         }));
       return { diagnostics };
     }
@@ -241,8 +331,14 @@ export function analyzeCartesian(spec) {
     }
     const nonPositive = [];
     for (const s2 of spec.series) {
-      const col = columns.get(s2.y);
-      col.values.forEach((v, i) => { if (v !== null && v <= 0) nonPositive.push({ series: s2.id, index: i, value: v }); });
+      const refs = s2.mark === 'range'
+        ? [{ key: 'lower', id: s2.lower }, { key: 'upper', id: s2.upper }]
+        : [{ key: 'y', id: s2.y }];
+      for (const ref of refs) {
+        columns.get(ref.id).values.forEach((v, i) => {
+          if (v !== null && v <= 0) nonPositive.push({ series: s2.id, bound: ref.key, index: i, value: v });
+        });
+      }
     }
     if (nonPositive.length > 0) {
       diagnostics.push(diag('honesty/log-nonpositive', 'error', '/encoding/y/scale',
@@ -413,10 +509,15 @@ export function analyzeCartesian(spec) {
     }
   } else {
     for (const s of spec.series) {
-      for (const v of columns.get(s.y).values) {
-        if (v === null) continue;
-        if (v < yMin) yMin = v;
-        if (v > yMax) yMax = v;
+      const valueColumns = s.mark === 'range'
+        ? [columns.get(s.lower), columns.get(s.upper)]
+        : [columns.get(s.y)];
+      for (const valueColumn of valueColumns) {
+        for (const v of valueColumn.values) {
+          if (v === null) continue;
+          if (v < yMin) yMin = v;
+          if (v > yMax) yMax = v;
+        }
       }
     }
   }
@@ -692,6 +793,19 @@ export function renderSvg(spec, analysis) {
   // In percent mode a segment's height is its share of the column total.
   const share = (v, i) => (layout.percent ? (v / layout.totals[i]) * 100 : v);
 
+  // Ranges sit behind every foreground mark. Each path closes from the upper
+  // bound back along the lower bound, using the same area geometry as filled
+  // series without implying a zero baseline.
+  for (const s of spec.series) {
+    if (s.mark !== 'range') continue;
+    const lower = columns.get(s.lower).values;
+    const upper = columns.get(s.upper).values;
+    const d = areaBetweenPath(xCenters, lower, upper, yScale);
+    out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
+    out.push(`<path class="gc-range" d="${d}"/>`);
+    out.push('</g>');
+  }
+
   // bars first (lines draw above bars)
   const barSeries = spec.series.filter((s) => s.mark === 'bar');
   barSeries.forEach((s, bi) => {
@@ -830,6 +944,7 @@ export function buildPayload(spec, analysis) {
       : xCol.type === 'number' ? fmtValue(v)
         : v);
   const sizeSeries = spec.series.filter((s) => s.mark === 'bubble');
+  const rangeLabel = (s) => `${s.label} — ${s.meaning}`;
   return {
     family: 'cartesian',
     hover: 'axis',
@@ -845,12 +960,16 @@ export function buildPayload(spec, analysis) {
     table: {
       headers: [
         xCol.label ?? spec.encoding.x.column,
-        ...spec.series.map((s) => s.label),
+        ...spec.series.flatMap((s) => s.mark === 'range'
+          ? [`${rangeLabel(s)} — lower`, `${rangeLabel(s)} — upper`]
+          : [s.label]),
         ...sizeSeries.map((s) => `${s.label} — ${columns.get(s.size).label ?? s.size}`)
       ],
       rows: xCol.values.map((xv, i) => [
         xv,
-        ...spec.series.map((s) => columns.get(s.y).values[i]),
+        ...spec.series.flatMap((s) => s.mark === 'range'
+          ? [columns.get(s.lower).values[i], columns.get(s.upper).values[i]]
+          : [columns.get(s.y).values[i]]),
         ...sizeSeries.map((s) => columns.get(s.size).values[i])
       ])
     },
@@ -858,6 +977,30 @@ export function buildPayload(spec, analysis) {
     width: layout.W,
     height: layout.H,
     series: spec.series.map((s) => {
+      if (s.mark === 'range') {
+        const lower = columns.get(s.lower).values;
+        const upper = columns.get(s.upper).values;
+        const values = lower.map((lo, i) => lo === null || upper[i] === null ? null : (lo + upper[i]) / 2);
+        const pixels = (source) => source.map((v) => v === null ? null : Number(layout.yScale(v).toFixed(1)));
+        return {
+          id: s.id,
+          label: s.label,
+          meaning: s.meaning,
+          mark: s.mark,
+          color: colors.get(s.id),
+          values,
+          formatted: lower.map((lo, i) => lo === null || upper[i] === null ? null : `${fmtValue(lo)}–${fmtValue(upper[i])}`),
+          pixels: pixels(values),
+          range: {
+            meaning: s.meaning,
+            lower: { values: lower, formatted: lower.map(fmtValue), pixels: pixels(lower) },
+            upper: { values: upper, formatted: upper.map(fmtValue), pixels: pixels(upper) }
+          },
+          size: null,
+          focusable: false,
+          stats: null
+        };
+      }
       const values = columns.get(s.y).values;
       const pct = (v, i) => (v === null ? null
         : `${((v / analysis.layout.totals[i]) * 100).toFixed(1)}% (${fmtValue(v)}${layout.unit ? ' ' + layout.unit : ''})`);
@@ -884,6 +1027,7 @@ export function buildPayload(spec, analysis) {
 }
 
 export function buildLegend(spec, analysis) {
+  const hasRange = spec.series.some((s) => s.mark === 'range');
   const sizes = spec.series.filter((s) => s.mark === 'bubble').map((s) => {
     const bubble = analysis.layout.bubbleSizes.get(s.id);
     return {
@@ -895,14 +1039,14 @@ export function buildLegend(spec, analysis) {
       }))
     };
   });
-  if (spec.series.length < 2 && sizes.length === 0) return null;
+  if (spec.series.length < 2 && sizes.length === 0 && !hasRange) return null;
   const colors = resolveSeriesColors(spec.series);
   return {
     kind: 'series',
     toggleable: spec.interactions?.legend_toggle ?? true,
-    items: spec.series.length < 2 ? [] : spec.series.map((s) => ({
+    items: spec.series.length < 2 && !hasRange ? [] : spec.series.map((s) => ({
       id: s.id,
-      label: s.label,
+      label: s.mark === 'range' ? `${s.label} — ${s.meaning}` : s.label,
       color: colors.get(s.id),
       mark: s.mark
     })),

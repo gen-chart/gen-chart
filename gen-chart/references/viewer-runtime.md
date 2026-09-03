@@ -22,8 +22,8 @@ beyond the spec fields named here.
   buckets use all six colors with contrast-aware label ink. Role metadata and
   validation meaning remain intact. Reset restores Classic. Arrow
   keys move through choices; Enter or Space selects; Escape closes.
-- **Brush zoom** — `interactions.brush: "x"`, valid only for line marks
-  over a time or linear x (validation enforces this). Drag selects an index
+- **Brush zoom** — `interactions.brush: "x"`, valid only for line and range
+  marks over a time or linear x (validation enforces this). Drag selects an index
   window; the viewer re-projects marks with an affine x remap. The y axis
   never rescales while zoomed, so amplitude comparisons stay honest.
   Reset zoom button or Esc restores; zoom state never enters exports.
@@ -74,7 +74,8 @@ The selected theme and color palette are presentation choices and remain.
 
 - **PNG (2×)** — raster on the current theme's panel background.
 - **SVG** — standalone, theme tokens resolved and inlined.
-- **Data CSV** — the exact embedded values, raw and unformatted, headers
+- **Data CSV** — the exact embedded values, raw and unformatted, including
+  separate lower and upper columns for range marks; headers
   from the authored labels. This is the provenance export: a reader can
   rebuild the chart from it.
 - **Share card (1200×630)** — title plus the chart, fit on the theme

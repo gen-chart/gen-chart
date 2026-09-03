@@ -28,6 +28,18 @@ export const GALLERY_CASES = [
     }
   },
   {
+    id: 'forecast-range',
+    spec: 'forecast-range.cartesian.json',
+    question: 'How wide is the uncertainty around the monthly revenue forecast?',
+    prompt: {
+      request: 'Show the monthly revenue forecast as a line with an uncertainty band.',
+      requirements: [
+        'Use the lower and upper columns as an 80% prediction interval and state that meaning explicitly.',
+        'Keep the GBP-thousands unit, allow x-axis brush zoom, and explain how the interval changes.'
+      ]
+    }
+  },
+  {
     id: 'latency-distribution',
     spec: 'latency-distribution.distribution.json',
     question: 'What is the shape and right tail of API response times?',

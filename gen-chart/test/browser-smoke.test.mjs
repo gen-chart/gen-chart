@@ -96,6 +96,10 @@ test('viewer runs without uncaught errors and positions its tooltip', { skip }, 
       assert.match(r.tooltipText, /Venue capacity/);
       assert.match(r.tooltipText, /seats/);
     }
+    if (name === 'forecast-range.html') {
+      assert.match(r.tooltipText, /80% prediction interval/);
+      assert.match(r.tooltipText, /GBP k/);
+    }
     // The regression that motivated this file: content was set, then the
     // positioning threw, leaving the tooltip stranded off-cursor.
     assert.match(r.tooltipLeft, /^-?\d+(\.\d+)?px$/, `${name} tooltip has no left position`);
@@ -103,6 +107,30 @@ test('viewer runs without uncaught errors and positions its tooltip', { skip }, 
     assert.ok(['light', 'dark'].includes(r.theme), `${name} theme toggle did nothing`);
     assert.equal(r.exportOpen, true, `${name} export menu did not open`);
   }
+});
+
+const RANGE_BRUSH_PROBE = `async function () {
+  var band = document.querySelector('.gc-range');
+  var reset = document.getElementById('gc-reset');
+  var zoomed = band.getAttribute('d');
+  var resetShown = reset.hasAttribute('data-on');
+  reset.click();
+  var restored = band.getAttribute('d');
+  return {
+    zoomedLines: (zoomed.match(/L/g) || []).length,
+    restoredLines: (restored.match(/L/g) || []).length,
+    resetShown: resetShown,
+    hash: location.hash
+  };
+}`;
+
+test('range paths follow brush deep links and reset to their full geometry', { skip }, () => {
+  const r = run(examplesDir + 'forecast-range.html', RANGE_BRUSH_PROBE, { hash: '#brush=1~5' });
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.zoomedLines, 9, 'five visible bound pairs should produce nine line segments');
+  assert.equal(r.restoredLines, 15, 'reset should restore all eight bound pairs');
+  assert.equal(r.resetShown, true);
+  assert.doesNotMatch(r.hash, /brush=/);
 });
 
 const KEYBOARD_PROBE = `async function () {
@@ -427,7 +455,7 @@ const GALLERY_PROBE = `async function () {
 
 const GALLERY_CARD_HEIGHT_PROBE = `async function () {
   var left = document.getElementById('example-deploy-outcomes').getBoundingClientRect();
-  var right = document.getElementById('example-latency-distribution').getBoundingClientRect();
+  var right = document.getElementById('example-forecast-range').getBoundingClientRect();
   return {
     sameRow: Math.round(left.top) === Math.round(right.top),
     leftHeight: Math.round(left.height),

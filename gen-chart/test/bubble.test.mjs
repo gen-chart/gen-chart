@@ -100,7 +100,7 @@ test('size encoding is rejected on fixed-size marks', () => {
   assert.ok(codes(spec).includes('semantic/size-unsupported-mark'));
 });
 
-test('bubble charts reject line-only brush zoom', () => {
+test('bubble charts reject line-and-range-only brush zoom', () => {
   const spec = bubbleSpec();
   spec.interactions = { brush: 'x' };
   assert.ok(codes(spec).includes('semantic/brush-unsupported'));

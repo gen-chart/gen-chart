@@ -107,7 +107,7 @@ export function applyDefaultPalette(svg, spec) {
 }
 
 const SVG_SELECTORS = ['svg.gc-chart', '.gc-grid', '.gc-axis', '.gc-yticks', '.gc-xticks',
-  '.gc-axis-label', '.gc-series', '.gc-line', '.gc-point', '.gc-dot', '.gc-area', '.gc-bin',
+  '.gc-axis-label', '.gc-series', '.gc-line', '.gc-point', '.gc-dot', '.gc-area', '.gc-range', '.gc-bin',
   '.gc-box', '.gc-slice', '.gc-donut-total', '.gc-donut-unit', '.gc-cell', '.gc-row-label',
   '.gc-ramp', '.gc-annotations'];
 
