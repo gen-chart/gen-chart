@@ -15,7 +15,7 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-181-0891b2?style=flat-square)
 
-**[Project page](https://sses79.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
+**[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
 The project page is also the quickest start: choose Cursor, Codex, Claude Code, or
 OpenCode, copy the matching install command, then use any verified example to
@@ -25,14 +25,14 @@ its showcase receipt and exact source/artifact digests.
 ---
 
 ```bash
-npx skills add sses79/gen-chart -g
+npx skills add gen-chart/gen-chart -g
 ```
 
-Using Cursor? Open the [agent-aware quick start](https://sses79.github.io/gen-chart/?agent=cursor#install) for exact global and project commands.
+Using Cursor? Open the [agent-aware quick start](https://gen-chart.github.io/gen-chart/?agent=cursor#install) for exact global and project commands.
 
 **No repository is required:** describe the chart and include its data in any agent chat.
 
-[![Claude Code using gen-chart with a pasted table](.github/assets/output800.gif)](https://sses79.github.io/gen-chart/)
+[![Claude Code using gen-chart with a pasted table](.github/assets/output800.gif)](https://gen-chart.github.io/gen-chart/)
 
 ## Quick start
 
@@ -41,7 +41,7 @@ Using Cursor? Open the [agent-aware quick start](https://sses79.github.io/gen-ch
 **Keep the tool local.** One command installs the same checked skill and zero-dependency renderers into whichever agent you use — no vendor-specific fork.
 
 ```bash
-npx skills add sses79/gen-chart -g
+npx skills add gen-chart/gen-chart -g
 ```
 
 `-g` installs to your user directory; drop it to install into the current project. Private repositories work too, using the git credentials you already have.
@@ -49,7 +49,7 @@ npx skills add sses79/gen-chart -g
 Explicit, non-interactive form:
 
 ```bash
-npx -y skills add sses79/gen-chart --skill gen-chart --agent claude-code --global --copy --yes
+npx -y skills add gen-chart/gen-chart --skill gen-chart --agent claude-code --global --copy --yes
 ```
 
 Prefer to install by hand? Build the deterministic package and unzip it:
@@ -262,7 +262,7 @@ Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush
 `npx skills add` places the files for you and supports 77 agents, including Claude Code, Cursor, Codex, and OpenCode. Target one explicitly with `--agent`:
 
 ```bash
-npx skills add sses79/gen-chart -g --agent cursor
+npx skills add gen-chart/gen-chart -g --agent cursor
 ```
 
 For a manual install, Claude Code reads `~/.claude/skills/` (or `.claude/skills/` for a single project). Other agents differ — check yours, or let the CLI handle it.

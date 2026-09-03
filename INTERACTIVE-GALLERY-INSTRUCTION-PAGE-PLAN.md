@@ -332,12 +332,12 @@ The generated commands are:
 ````text
 Global:
 ```bash
-npx -y skills add sses79/gen-chart --skill gen-chart --agent <agent> --global --copy --yes
+npx -y skills add gen-chart/gen-chart --skill gen-chart --agent <agent> --global --copy --yes
 ```
 
 This repository only:
 ```bash
-npx -y skills add sses79/gen-chart --skill gen-chart --agent <agent> --copy --yes
+npx -y skills add gen-chart/gen-chart --skill gen-chart --agent <agent> --copy --yes
 ```
 ````
 
@@ -346,7 +346,7 @@ The browser changes only this token. In the no-JavaScript fallback, show the
 existing universal command:
 
 ```text
-npx skills add sses79/gen-chart -g
+npx skills add gen-chart/gen-chart -g
 ```
 
 Keep installation copying separate from example prompt copying; do not add
