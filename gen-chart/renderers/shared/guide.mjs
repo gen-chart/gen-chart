@@ -11,6 +11,7 @@ const FAMILIES = {
 
 // Each rule: regex over the lowercased scenario, target family/marks, weight.
 const RULES = [
+  { re: /\b(confidence band|confidence interval|prediction interval|uncertainty band|min[\s/-]*max (range|envelope)|range (band|envelope)|forecast (range|uncertainty))\b/, family: 'cartesian', marks: ['range', 'line'], w: 5 },
   { re: /\b(trend|over time|timeline|growth|history|trajectory|per (day|week|month|quarter|year)|daily|weekly|monthly|quarterly|yearly|annual)\b/, family: 'cartesian', marks: ['line'], w: 3 },
   { re: /\b(mau|dau|wau|active users|revenue over|burn rate|time series|timeseries)\b/, family: 'cartesian', marks: ['line'], w: 3 },
   { re: /\b(compare|comparison|by (category|region|team|country|product|channel|segment)|ranking|top \d+|versus other)\b/, family: 'cartesian', marks: ['bar'], w: 3 },
@@ -27,7 +28,7 @@ const RULES = [
   { re: /\b(line chart|line graph)\b/, family: 'cartesian', marks: ['line'], w: 2 }
 ];
 
-const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'bubble', 'area', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
+const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'bubble', 'area', 'range', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
 
 export function guide(scenario) {
   const s = String(scenario).toLowerCase();
@@ -58,6 +59,9 @@ export function guide(scenario) {
   }
   if (/\bstacked?\b/.test(s) && /\b(negative|loss|deficit|drawdown)\b/.test(s)) {
     cautions.push('stacked marks show parts adding to a total, so negative values are rejected (honesty/stack-negative); compare series side by side instead');
+  }
+  if (/\b(confidence|prediction interval|uncertainty|envelope|min[\s/-]*max|range band)\b/.test(s)) {
+    cautions.push('a range band must state exactly what its bounds mean in series.meaning (honesty/range-meaning-required)');
   }
   if (/\b(3d|three.dimensional)\b/.test(s)) {
     cautions.push('3D charts distort value perception and are out of scope; use a flat mark');

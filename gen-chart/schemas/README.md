@@ -5,7 +5,7 @@ against one of the schemas in this folder before any layout work happens.
 
 | Schema | Governs | Marks | Status |
 |--------|---------|-------|--------|
-| `cartesian.schema.json` | `chart_type: "cartesian"` | line, bar, grouped bar, bar+line, scatter, bubble | **implemented** |
+| `cartesian.schema.json` | `chart_type: "cartesian"` | line, bar, grouped/stacked bar, area, range, bar+line, scatter, bubble | **implemented** |
 | `distribution.schema.json` | `chart_type: "distribution"` | histogram, boxplot | **implemented** |
 | `proportion.schema.json` | `chart_type: "proportion"` | pie, donut | **implemented** |
 | `matrix.schema.json` | `chart_type: "matrix"` | heatmap | **implemented** |

@@ -133,7 +133,6 @@
         "required": [
           "id",
           "mark",
-          "y",
           "label"
         ],
         "properties": {
@@ -146,11 +145,21 @@
               "bar",
               "scatter",
               "bubble",
-              "area"
+              "area",
+              "range"
             ]
           },
           "y": {
             "$ref": "common.schema.json#/$defs/id"
+          },
+          "lower": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "upper": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "meaning": {
+            "$ref": "common.schema.json#/$defs/shortText"
           },
           "label": {
             "$ref": "common.schema.json#/$defs/shortText"
@@ -164,7 +173,51 @@
           "size": {
             "$ref": "common.schema.json#/$defs/id"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mark": {
+                  "const": "range"
+                }
+              },
+              "required": [
+                "mark"
+              ]
+            },
+            "then": {
+              "required": [
+                "lower",
+                "upper"
+              ],
+              "properties": {
+                "lower": {
+                  "$ref": "common.schema.json#/$defs/id"
+                },
+                "upper": {
+                  "$ref": "common.schema.json#/$defs/id"
+                },
+                "y": false,
+                "point": false,
+                "size": false
+              }
+            },
+            "else": {
+              "required": [
+                "y"
+              ],
+              "properties": {
+                "y": {
+                  "$ref": "common.schema.json#/$defs/id"
+                },
+                "lower": false,
+                "upper": false,
+                "meaning": false
+              }
+            }
+          }
+        ]
       }
     },
     "annotations": {

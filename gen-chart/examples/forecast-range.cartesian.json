@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "Revenue forecast uncertainty widens into spring",
+    "quality_profile": "showcase"
+  },
+  "data": {
+    "columns": [
+      {
+        "id": "month",
+        "type": "date",
+        "label": "Month",
+        "values": [
+          "2026-10",
+          "2026-11",
+          "2026-12",
+          "2027-01",
+          "2027-02",
+          "2027-03",
+          "2027-04",
+          "2027-05"
+        ]
+      },
+      {
+        "id": "lower",
+        "type": "number",
+        "unit": "GBP k",
+        "label": "Lower forecast bound",
+        "values": [
+          92,
+          98,
+          101,
+          103,
+          104,
+          105,
+          105,
+          104
+        ]
+      },
+      {
+        "id": "forecast",
+        "type": "number",
+        "unit": "GBP k",
+        "label": "Revenue forecast",
+        "values": [
+          100,
+          108,
+          113,
+          118,
+          122,
+          127,
+          131,
+          135
+        ]
+      },
+      {
+        "id": "upper",
+        "type": "number",
+        "unit": "GBP k",
+        "label": "Upper forecast bound",
+        "values": [
+          108,
+          118,
+          125,
+          133,
+          140,
+          149,
+          157,
+          166
+        ]
+      }
+    ]
+  },
+  "encoding": {
+    "x": {
+      "column": "month",
+      "scale": "time",
+      "label": "Month"
+    },
+    "y": {
+      "zero": false,
+      "label": "Monthly revenue (GBP k)"
+    }
+  },
+  "series": [
+    {
+      "id": "interval",
+      "mark": "range",
+      "lower": "lower",
+      "upper": "upper",
+      "label": "Forecast uncertainty",
+      "meaning": "80% prediction interval",
+      "role": "comparison"
+    },
+    {
+      "id": "forecast",
+      "mark": "line",
+      "y": "forecast",
+      "label": "Revenue forecast",
+      "role": "primary",
+      "point": true
+    }
+  ],
+  "interactions": {
+    "brush": "x"
+  },
+  "cards": [
+    {
+      "title": "Takeaway",
+      "items": [
+        "The forecast rises from GBP 100k in October to GBP 135k in May.",
+        "The 80% prediction interval expands from GBP 92k–108k to GBP 104k–166k."
+      ]
+    }
+  ]
+}

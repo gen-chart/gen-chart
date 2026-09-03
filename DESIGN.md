@@ -208,8 +208,11 @@ canvas instead.
 ## Marks and layout
 
 - **Bars** encode by length and therefore always include zero.
-- **Lines, scatter, bubble, and boxplots** encode by position and may omit zero, but
+- **Lines, ranges, scatter, bubble, and boxplots** encode by position and may omit zero, but
   padding never implies impossible values (negative durations or counts).
+- **Ranges** fill only between authored lower and upper bounds. Their visible
+  label states whether the band is a confidence interval, prediction
+  interval, observed min/max, or another explicitly supplied meaning.
 - **Grid lines** sit below every mark and never outweigh one.
 - **Labels** resolve collisions by rotating, then thinning, then failing with
   a diagnostic — never by shrinking type or clipping.

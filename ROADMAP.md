@@ -10,7 +10,7 @@ hand-rolled SVG renderer, and no runtime dependencies.
 
 | Family | Marks |
 |---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter, bubble |
+| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble |
 | `distribution` | histogram, boxplot — computed from raw observations |
 | `proportion` | pie, donut |
 | `matrix` | heatmap, sequential or diverging |
@@ -29,6 +29,7 @@ subject, measured evidence, and a closed set of supported fixes:
 - stacks reject negatives, mixed marks, and single series
 - 100%-stacks disclose a shifting denominator and keep absolutes in the tooltip
 - directional colour roles rejected over mixed-sign data
+- range bands require an explicit meaning, paired bounds, and lower ≤ upper
 - sequential heatmap ramps reject negatives; diverging ramps require a midpoint
 
 **Composition checks.** Tick collision (rotate → thin → fail), annotation
@@ -56,7 +57,7 @@ profiles, `visual-check` for containment evidence, `demo`, `doctor`, a
 deterministic package build, and CI across Node 22 and 24.
 
 **Interactive instruction gallery.** One staged, deterministic build delivers
-all 13 examples at showcase quality before replacing the published site. The
+all 14 examples at showcase quality before replacing the published site. The
 homepage provides four-agent installation commands and teaches the complete
 Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
 example binds a concise data-bearing message prompt, exact source/artifact bytes,
@@ -71,8 +72,6 @@ Roughly in the order they would earn their place.
 - **Calendar heatmap** — a year grid of weeks × weekdays for activity
   density. A different layout engine from the matrix heatmap: date-to-cell
   mapping, month boundaries, partial weeks.
-- **Range marks** — confidence bands or min/max envelopes around a line,
-  with a rule that the band's meaning must be stated rather than implied.
 
 ### Honesty
 

@@ -13,7 +13,7 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
 ![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-181-0891b2?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-200-0891b2?style=flat-square)
 
 **[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
@@ -172,7 +172,7 @@ Validation caps a pie at 7 slices, so instead of quietly producing an unreadable
 
 | Family           | Marks                                                    | Best for                                   | Include in your prompt              |
 | ---------------- | -------------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, scatter, bubble | trends, comparisons, composition, correlation | x, y, series, unit, and bubble size |
+| **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, range, scatter, bubble | trends, comparisons, composition, uncertainty, correlation | x, y or bounds, series, unit, and size |
 | **Distribution** | histogram, boxplot                                       | spread, outliers, shape                    | the raw observations, not a summary |
 | **Proportion**   | pie, donut                                               | parts of a whole (max 7)                   | the categories and their values     |
 | **Matrix**       | heatmap                                                  | two categories × intensity                 | rows, columns, and the value        |
@@ -197,6 +197,7 @@ The difference between a chart tool and an honest one. Each rule returns a stabl
 - **Stacks** reject negative segments, mixed marks, and single series
 - **100%-stacks** disclose a shifting denominator and keep absolute values in the tooltip
 - **Directional colour** (`positive`/`negative`) is rejected over mixed-sign data
+- **Range bands** require paired ordered bounds and an explicit meaning such as “95% confidence interval”
 - **Heatmaps** reject negatives on a sequential ramp; diverging ramps require a stated midpoint
 - **Touching stacked segments** must be perceptually distinguishable, verified with CIEDE2000
 

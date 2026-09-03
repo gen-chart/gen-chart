@@ -13,13 +13,19 @@ diagnostic catalog, or repair rules.
   and `zero: true`, and appends "(log scale)" to its own caption so the
   reader never has to infer it. Reach for it only when the data spans
   multiple orders of magnitude.
-- `series[].mark`: `line` | `bar` | `scatter` | `bubble` | `area`. `point: true` draws
+- `series[].mark`: `line` | `bar` | `scatter` | `bubble` | `area` | `range`. `point: true` draws
   circles on line vertices — use it when the reader should see individual
   observations (≤ ~30 points). `scatter` and `bubble` need a linear or time
   x, never `band`. A `bubble` series also requires `size`, referencing a
   non-negative numeric column. Bubble area represents that value; zero-size
   rows stay in the data table but draw no circle. `area` fills to the
   baseline, so like `bar` it requires a zero y.
+- A `range` series uses `lower` and `upper` numeric column ids instead of
+  `y`. Both bounds must appear together, lower must not exceed upper, and at
+  least two adjacent pairs must exist. `meaning` is required by the honesty
+  layer and must state what the interval represents (for example `"80%
+  prediction interval"` or `"observed min–max"`). Range marks may omit zero
+  because both edges encode position; they cannot be stacked.
 - `stack` (top level): `true` for parts adding to a total, or `"percent"`
   to normalise each position to 100%. Percent mode fixes the axis at 0–100,
   appends "(% of total)" to the caption, keeps absolute values in the
@@ -43,7 +49,7 @@ diagnostic catalog, or repair rules.
   `string`. All columns share one length. Max 5000 rows, 12 columns.
 - `meta.width` 640–1600, `meta.height` 360–1200 (default 960×520).
 - `interactions`: `tooltip: "auto" | "off"`, `legend_toggle: boolean`
-  (default true), `brush: "x"` (opt-in zoom; line marks over time/linear x
+  (default true), `brush: "x"` (opt-in zoom; line/range marks over time/linear x
   only). Omit the whole object normally.
 - `meta.views`: up to 5 guided readings, each `{id, label, note?, focus?,
   brush?}`. `focus` lists existing series ids; `brush` is an increasing
@@ -90,11 +96,12 @@ diagnostic catalog, or repair rules.
 | `schema/invalid` | error | shape violation; the subject path names the field |
 | `data/duplicate-column-id`, `data/column-length`, `data/number-parse`, `data/string-parse` | error | data integrity |
 | `data/date-parse`, `data/date-granularity-mixed`, `data/date-order`, `data/x-order` | error | date/x ordering rules |
-| `data/all-null`, `data/bubble-no-positive-size` | error | nothing visible to draw |
+| `data/all-null`, `data/bubble-no-positive-size`, `data/range-insufficient-pairs` | error | nothing visible to draw |
+| `data/range-pair-missing` | error | a range row supplies only one bound |
 | `semantic/unknown-column`, `semantic/duplicate-series-id`, `semantic/series-not-numeric` | error | reference integrity |
 | `semantic/bubble-size-required`, `semantic/size-not-numeric`, `semantic/size-unsupported-mark` | error | bubble size encoding integrity |
 | `semantic/scale-type-mismatch`, `semantic/mark-scale-mismatch` | error | scale/column/mark compatibility |
-| `semantic/brush-unsupported` | error | brush needs line marks over time/linear x |
+| `semantic/brush-unsupported` | error | brush needs line/range marks over time/linear x |
 | `semantic/unknown-series` | error | a view focuses a series that does not exist |
 | `semantic/view-brush-range` | error | a view's brush window is outside the plotted rows |
 | `semantic/duplicate-view-id` | error | two views share an id |
@@ -108,6 +115,8 @@ diagnostic catalog, or repair rules.
 | `composition/annotation-overlap` | warning | annotation labels would collide |
 | `honesty/area-zero-baseline` | error | area fills only mean something from zero |
 | `honesty/bubble-negative-size` | error | bubble area cannot represent a negative value |
+| `honesty/range-meaning-required` | error | a range band does not state what its bounds mean |
+| `honesty/range-order` | error | a range lower bound exceeds its upper bound |
 | `honesty/stack-negative` | error | a negative segment would subtract from the stack |
 | `semantic/stack-mixed-marks` | error | stacking needs one shared mark |
 | `semantic/stack-unsupported-mark` | error | only bar and area stack |

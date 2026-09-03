@@ -6,7 +6,7 @@ description: >-
   toggling, and honest-by-construction axes. Accept pasted data
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
-  graph, plot, or visualize data, metrics, or trends — line, bar, area,
+  graph, plot, or visualize data, metrics, or trends — line, bar, area, range,
   scatter, bubble, pie/donut, histogram, boxplot, or heatmap — or to beautify an
   existing chart.
 license: MIT
@@ -91,7 +91,7 @@ the family you routed to.
 
 | chart_type | Marks | Use for |
 |---|---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter, bubble | trends, comparisons, composition over time, actual-vs-target, correlation |
+| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble | trends, comparisons, composition over time, uncertainty, actual-vs-target, correlation |
 | `distribution` | histogram, boxplot | spread, outliers, shape of raw observations |
 | `proportion` | pie, donut | parts of a whole (max 7 slices) |
 | `matrix` | heatmap | two categorical dimensions × intensity |
@@ -103,6 +103,12 @@ long-format `(row, column, value)` triples.
 For a bubble chart, use a Cartesian series with `"mark": "bubble"` and set
 `size` to a non-negative numeric column id. Its values control bubble area;
 the renderer owns the bounded radius scale, size legend, and tooltip row.
+
+For a confidence band or min/max envelope, use `"mark": "range"` with
+`lower` and `upper` numeric column ids. Set `meaning` to the exact semantics
+of those bounds, such as `"95% confidence interval"` or `"observed min–max"`;
+validation rejects an unexplained band. Pair it with a line series when the
+data includes a central estimate.
 
 Set `"stack": true` for composition — parts adding to a total — or
 `"stack": "percent"` to normalise every position to 100%. Every series
@@ -163,8 +169,8 @@ Every artifact is also accessible without a pointer: the plot is focusable,
 arrow keys walk the data points and announce them, and a visually hidden
 data table carries the exact numbers for screen readers.
 
-`interactions.brush: "x"` is the one opt-in: honest x-only zoom for line
-marks over a time or linear axis (the y scale never rescales). Read
+`interactions.brush: "x"` is the one opt-in: honest x-only zoom for line and
+range marks over a time or linear axis (the y scale never rescales). Read
 `references/viewer-runtime.md` only when the user asks about these
 features.
 
