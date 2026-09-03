@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { rendererFor } from '../renderers/shared/registry.mjs';
 import { accepted } from '../renderers/shared/diagnostics.mjs';
+import { assembleHtml } from '../renderers/shared/html.mjs';
 
 const cartesian = rendererFor('cartesian');
 
@@ -48,13 +49,70 @@ test('point density warns only above 2,000 visible scatter points with a repair 
       bySeries: [{ id: 'observations', mark: 'scatter', plottedPoints: 2001 }]
     },
     supportedFixes: [
-      'downsample the source rows deterministically until the chart has 2000 or fewer visible points',
+      'set transforms.point_density to "downsample" to render a deterministic sample while preserving source rows',
       'aggregate observations into meaningful bins or groups before charting',
       'split the data into focused subsets'
     ]
   });
   assert.equal(accepted(analysis.diagnostics, 'standard'), true);
   assert.equal(accepted(analysis.diagnostics, 'showcase'), false);
+});
+
+test('point-density downsampling caps rendered marks and preserves raw payload rows', () => {
+  const spec = pointSpec(3001);
+  spec.transforms = { point_density: 'downsample' };
+  const analysis = cartesian.analyze(spec);
+
+  assert.deepEqual(analysis.diagnostics, []);
+  assert.equal(accepted(analysis.diagnostics, 'showcase'), true);
+  assert.deepEqual(analysis.layout.pointDensity, {
+    method: 'deterministic-systematic-row-order',
+    sourcePoints: 3001,
+    renderedPoints: 2000,
+    threshold: 2000,
+    bySeries: [
+      { id: 'observations', mark: 'scatter', sourcePoints: 3001, renderedPoints: 2000 }
+    ]
+  });
+  const selected = analysis.layout.pointRenderIndexes.get('observations');
+  assert.equal(selected.length, 2000);
+  assert.equal(selected[0], 0);
+  assert.equal(selected.at(-1), 3000);
+
+  const svg = cartesian.renderSvg(spec, analysis);
+  assert.equal((svg.match(/class="gc-dot"/g) ?? []).length, 2000);
+  assert.equal(cartesian.renderSvg(spec, cartesian.analyze(spec)), svg, 'sampling is byte-stable');
+
+  const payload = cartesian.buildPayload(spec, analysis);
+  assert.equal(payload.table.rows.length, 3001);
+  assert.equal(payload.series[0].values.length, 3001);
+  assert.equal(payload.xPixels.length, 3001);
+  assert.equal(payload.pointDensity.sourcePoints, 3001);
+
+  const html = assembleHtml(spec, svg, payload, cartesian.buildLegend(spec, analysis));
+  assert.match(html, /Showing 2000 of 3001 visible points using deterministic systematic row-order sampling/);
+  assert.match(html, /The data table and CSV retain all source rows/);
+  assert.equal((html.match(/<tr>/g) ?? []).length, 3002, 'header plus every raw source row reaches the HTML table');
+});
+
+test('point-density budget is shared deterministically across scatter and bubble series', () => {
+  const spec = pointSpec(1501);
+  spec.data.columns.push(
+    { id: 'y2', type: 'number', values: spec.data.columns[1].values.map((v) => v + 2) },
+    { id: 'size', type: 'number', values: spec.data.columns[1].values.map(() => 1) }
+  );
+  spec.series.push({ id: 'bubbles', mark: 'bubble', y: 'y2', size: 'size', label: 'Bubbles' });
+  spec.transforms = { point_density: 'downsample' };
+
+  const analysis = cartesian.analyze(spec);
+  assert.deepEqual(analysis.diagnostics, []);
+  assert.deepEqual(analysis.layout.pointDensity.bySeries, [
+    { id: 'observations', mark: 'scatter', sourcePoints: 1501, renderedPoints: 1000 },
+    { id: 'bubbles', mark: 'bubble', sourcePoints: 1501, renderedPoints: 1000 }
+  ]);
+  const svg = cartesian.renderSvg(spec, analysis);
+  assert.equal((svg.match(/class="gc-dot"/g) ?? []).length, 1000);
+  assert.equal((svg.match(/class="gc-dot gc-bubble"/g) ?? []).length, 1000);
 });
 
 test('point density counts only bubbles with a plotted y and positive size', () => {

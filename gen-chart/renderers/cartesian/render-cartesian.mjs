@@ -21,6 +21,37 @@ const BUBBLE_MIN_RADIUS = 4;
 const BUBBLE_MAX_RADIUS = 24;
 const POINT_DENSITY_LIMIT = 2000;
 
+// Share a fixed rendering budget across every visible point series. Each
+// non-empty series keeps at least one mark; the rest use proportional largest-
+// remainder allocation so both the cap and the result are deterministic.
+function pointBudgets(pointsBySeries, limit) {
+  const nonEmpty = pointsBySeries.filter((s) => s.plottedPoints > 0);
+  const budgets = new Map(pointsBySeries.map((s) => [s.id, 0]));
+  if (nonEmpty.length === 0) return budgets;
+  const remaining = limit - nonEmpty.length;
+  const capacity = nonEmpty.reduce((sum, s) => sum + s.plottedPoints - 1, 0);
+  const shares = nonEmpty.map((s, order) => {
+    const exact = capacity === 0 ? 0 : remaining * (s.plottedPoints - 1) / capacity;
+    const whole = Math.floor(exact);
+    budgets.set(s.id, 1 + whole);
+    return { id: s.id, order, remainder: exact - whole };
+  });
+  let left = limit - [...budgets.values()].reduce((sum, value) => sum + value, 0);
+  shares.sort((a, b) => b.remainder - a.remainder || a.order - b.order);
+  for (let i = 0; i < left; i++) budgets.set(shares[i].id, budgets.get(shares[i].id) + 1);
+  return budgets;
+}
+
+// Systematic row-order sampling retains the first and last eligible mark and
+// spreads the remainder evenly across the authored order. It has no random
+// seed or data mutation, so identical input always produces identical SVG.
+function systematicSample(indexes, count) {
+  if (count >= indexes.length) return indexes;
+  if (count <= 1) return [indexes[Math.floor((indexes.length - 1) / 2)]];
+  return Array.from({ length: count }, (_, i) =>
+    indexes[Math.round(i * (indexes.length - 1) / (count - 1))]);
+}
+
 // Bubble values encode area, so radius follows sqrt(value / max). Zero has
 // zero area; tiny positive marks clamp to a legible 4px radius and every mark
 // stays inside the 24px ceiling.
@@ -612,12 +643,34 @@ export function analyzeCartesian(spec) {
       return { id: s.id, mark: s.mark, plottedPoints };
     });
   const plottedPoints = pointsBySeries.reduce((sum, s) => sum + s.plottedPoints, 0);
-  if (plottedPoints > POINT_DENSITY_LIMIT) {
+  let pointDensity = null;
+  const pointRenderIndexes = new Map();
+  if (plottedPoints > POINT_DENSITY_LIMIT && spec.transforms?.point_density === 'downsample') {
+    const budgets = pointBudgets(pointsBySeries, POINT_DENSITY_LIMIT);
+    const bySeries = pointsBySeries.map((summary) => {
+      const s = spec.series.find((candidate) => candidate.id === summary.id);
+      const yValues = columns.get(s.y).values;
+      const sizeValues = s.mark === 'bubble' ? columns.get(s.size).values : null;
+      const eligible = yValues.map((_, row) => row).filter((row) =>
+        xCol.values[row] !== null && yValues[row] !== null &&
+        (!sizeValues || (sizeValues[row] !== null && sizeValues[row] > 0)));
+      const selected = systematicSample(eligible, budgets.get(s.id));
+      pointRenderIndexes.set(s.id, selected);
+      return { id: s.id, mark: s.mark, sourcePoints: eligible.length, renderedPoints: selected.length };
+    });
+    pointDensity = {
+      method: 'deterministic-systematic-row-order',
+      sourcePoints: plottedPoints,
+      renderedPoints: bySeries.reduce((sum, s) => sum + s.renderedPoints, 0),
+      threshold: POINT_DENSITY_LIMIT,
+      bySeries
+    };
+  } else if (plottedPoints > POINT_DENSITY_LIMIT) {
     diagnostics.push(diag('composition/point-density', 'warning', '/series',
       `scatter and bubble series would draw ${plottedPoints} visible points; above ${POINT_DENSITY_LIMIT}, overlapping marks can hide the distribution`, {
         evidence: { plottedPoints, threshold: POINT_DENSITY_LIMIT, bySeries: pointsBySeries },
         supportedFixes: [
-          `downsample the source rows deterministically until the chart has ${POINT_DENSITY_LIMIT} or fewer visible points`,
+          'set transforms.point_density to "downsample" to render a deterministic sample while preserving source rows',
           'aggregate observations into meaningful bins or groups before charting',
           'split the data into focused subsets'
         ]
@@ -760,7 +813,7 @@ export function analyzeCartesian(spec) {
       xCenters, xTicks, rotated, thinnedEvery, band,
       yTicks: yNice.ticks, yScale, yMin: yNice.min, yMax: yNice.max,
       unit: unit ?? null, annotations, isLog, stacked, percent, totals: layoutTotals,
-      bubbleSizes
+      bubbleSizes, pointDensity, pointRenderIndexes
     }
   };
 }
@@ -903,7 +956,7 @@ export function renderSvg(spec, analysis) {
     if (s.mark !== 'scatter' && s.mark !== 'bubble') continue;
     const values = columns.get(s.y).values;
     const bubble = layout.bubbleSizes.get(s.id);
-    const indexes = values.map((_, i) => i);
+    const indexes = layout.pointRenderIndexes.get(s.id) ?? values.map((_, i) => i);
     if (bubble) indexes.sort((a, b) => (bubble.radii[b] ?? -1) - (bubble.radii[a] ?? -1) || a - b);
     out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
     indexes.forEach((i) => {
@@ -987,6 +1040,7 @@ export function buildPayload(spec, analysis) {
     legendToggle: spec.interactions?.legend_toggle ?? true,
     brush: spec.interactions?.brush ?? null,
     views: spec.meta.views ?? [],
+    ...(layout.pointDensity ? { pointDensity: layout.pointDensity } : {}),
     xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
     xLabels: xLabelsFull,
     table: {
