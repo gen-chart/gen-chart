@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
 import { t, templateStrings, resolveLocale } from './i18n.mjs';
-import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds } from './palette.mjs';
+import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds, palettePreviewColors } from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
@@ -81,7 +81,7 @@ function viewsHtml(payload, locale) {
 
 function paletteOptionsHtml(locale) {
   return paletteIds().map((id) => {
-    const preview = PALETTES[id].three.map((color) =>
+    const preview = palettePreviewColors(id).map((color) =>
       `<span class="gc-palette-swatch" style="--preview:${color}"></span>`
     ).join('');
     return `<button class="gc-palette-option" type="button" role="option" data-palette="${id}" ` +
@@ -105,8 +105,9 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     locale,
     i18n: templateStrings(locale),
     palettes: Object.fromEntries(paletteIds().map((id) => [id, {
-      six: [...PALETTES[id].six],
-      three: [...PALETTES[id].three]
+      preview: [...PALETTES[id].anchors.three],
+      light: { six: [...PALETTES[id].light.six], three: [...PALETTES[id].light.three] },
+      dark: { six: [...PALETTES[id].dark.six], three: [...PALETTES[id].dark.three] }
     }]))
   };
   // `</` must not appear un-escaped inside the JSON script block.

@@ -19,11 +19,11 @@
       "artifact": "gallery/build-times.html",
       "bytes": {
         "source": 1234,
-        "artifact": 63868
+        "artifact": 70771
       },
       "sha256": {
         "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
-        "artifact": "b57407f62215cdc9d7cd37a045cc4395230d0de1a563e08c890b21d82938e0ee"
+        "artifact": "40855f16248a002aacac2ccc596ad1d607fbc8797c41de97100468f564584773"
       },
       "validation": {
         "quality": "showcase",
@@ -47,11 +47,11 @@
       "artifact": "gallery/deploy-outcomes.html",
       "bytes": {
         "source": 1449,
-        "artifact": 64309
+        "artifact": 71212
       },
       "sha256": {
         "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
-        "artifact": "79c0540dfdf6830a8cc79171bcfe6ca083b78f2d6fce14dfd6065830f535f2a3"
+        "artifact": "c685b47dcbc7bf823e136a73c6364fe62ed6d5c58f8770d7d96e1d99385f289f"
       },
       "validation": {
         "quality": "showcase",
@@ -76,11 +76,11 @@
       "artifact": "gallery/forecast-range.html",
       "bytes": {
         "source": 2208,
-        "artifact": 65100
+        "artifact": 72003
       },
       "sha256": {
         "source": "8ae738c37600ad72613959dc447294a15ce9e9f6e104765e2df8055519772046",
-        "artifact": "fef2fa406813d60b014e3ebaef3eefb255c95999a94830ee13f1bc758f6b3297"
+        "artifact": "eee0fa61c69615ee177c9846769f411814a69556de4ecba8a56e3b18bd20c2a4"
       },
       "validation": {
         "quality": "showcase",
@@ -103,11 +103,11 @@
       "artifact": "gallery/latency-distribution.html",
       "bytes": {
         "source": 848,
-        "artifact": 64859
+        "artifact": 71762
       },
       "sha256": {
         "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
-        "artifact": "66cda8651f8b1b54371446c7a1062a395e6072542812de36fbbbf6e651123af6"
+        "artifact": "4764e2aaee6c4bce9986075dbc6046139ddf2d40d64f99f953c1648537d46818"
       },
       "validation": {
         "quality": "showcase",
@@ -132,11 +132,11 @@
       "artifact": "gallery/mau-trend.html",
       "bytes": {
         "source": 2710,
-        "artifact": 66508
+        "artifact": 73411
       },
       "sha256": {
         "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
-        "artifact": "fa92cffc084daa62935dd5287e546805d7d408f7943557e9361e806e7f61538d"
+        "artifact": "bca04816f2cdaefa7cec4e4e72bca4fea3855be2accadcc8c0f825e3ac098b49"
       },
       "validation": {
         "quality": "showcase",
@@ -160,11 +160,11 @@
       "artifact": "gallery/plan-mix.html",
       "bytes": {
         "source": 1370,
-        "artifact": 63922
+        "artifact": 70825
       },
       "sha256": {
         "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
-        "artifact": "16a6431586dfc9ca11629f7ce0e43a4afae32d71cc0f6f342020b624a4fafd0d"
+        "artifact": "2f49ea56b64d1d310694afffdc3682e81829bc484165534bc42df67e36f98eef"
       },
       "validation": {
         "quality": "showcase",
@@ -188,11 +188,11 @@
       "artifact": "gallery/request-growth.html",
       "bytes": {
         "source": 1192,
-        "artifact": 62717
+        "artifact": 69620
       },
       "sha256": {
         "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
-        "artifact": "cf90f2e23684f64756fa3fa20feb86dd4826d2d8302c1b0fa050b362ec55dd70"
+        "artifact": "a6b83b291496e3fd159e64ba0b611de566e6d14e8d2b9de532570596ea99d375"
       },
       "validation": {
         "quality": "showcase",
@@ -215,11 +215,11 @@
       "artifact": "gallery/revenue-by-region.html",
       "bytes": {
         "source": 998,
-        "artifact": 63195
+        "artifact": 70098
       },
       "sha256": {
         "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
-        "artifact": "8cf4ca2923532678def9268c3fa4ff937b7afff59e95986887389b92750f8c02"
+        "artifact": "dd4f078420c0a3c45dd31ae482c6dcc1938db5e596cf9857d95c7427b4b4808b"
       },
       "validation": {
         "quality": "showcase",
@@ -243,11 +243,11 @@
       "artifact": "gallery/signups-vs-target.html",
       "bytes": {
         "source": 1126,
-        "artifact": 64376
+        "artifact": 71279
       },
       "sha256": {
         "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
-        "artifact": "53c95943edfd94d972a48465cc84c2f0369c5a94b05d370e94172310a50baf0a"
+        "artifact": "b72f0a5b01f47aa1bbb274470aaa1acddd68bfb8a53bf4badca966efe9a7707a"
       },
       "validation": {
         "quality": "showcase",
@@ -271,11 +271,11 @@
       "artifact": "gallery/storage-mix.html",
       "bytes": {
         "source": 1806,
-        "artifact": 64308
+        "artifact": 71211
       },
       "sha256": {
         "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
-        "artifact": "92dbea829261a3aa599c9652e362d919196de3afdf341c467f80265a8da7d03e"
+        "artifact": "2d4d29adf8f25d7ac2f75bb3c9f1ac00ccdf44763b6b7a0047bd97c5d81249aa"
       },
       "validation": {
         "quality": "showcase",
@@ -299,11 +299,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 70117
+        "artifact": 77020
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "6fe25f392ecc66cba9fd843572978b5b075eed262bb04a4c65e3c5eb96b75e89"
+        "artifact": "e876cf2934ff602c7ebf21c9942016033695b0f7e27365f090e580260dbd5590"
       },
       "validation": {
         "quality": "showcase",
@@ -326,11 +326,11 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 63882
+        "artifact": 70785
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "d5c491eb8ce8b3c1c8d4bc12c54215cde3d2f6001967b834e34687dfbfcd1947"
+        "artifact": "491c64c43443d1c05501e65b827d3d5d4a90bcdb720b6a5a73b681f585033158"
       },
       "validation": {
         "quality": "showcase",
@@ -353,11 +353,11 @@
       "artifact": "gallery/venue-performance.html",
       "bytes": {
         "source": 1383,
-        "artifact": 63837
+        "artifact": 70740
       },
       "sha256": {
         "source": "8b6308c2d4d232a1e97fbe3458891d51f7656e4610634e1820b26b795f4312bd",
-        "artifact": "4047bf96473a3b8ab0967eeea625a784006498c33e80ad8359695fe499f8e651"
+        "artifact": "e224f48dae88c24f75a7ae9fe64d0409e7d5617fa872e6811617b0991bf8f227"
       },
       "validation": {
         "quality": "showcase",
@@ -380,11 +380,11 @@
       "artifact": "gallery/zh-revenue.html",
       "bytes": {
         "source": 1100,
-        "artifact": 63094
+        "artifact": 69997
       },
       "sha256": {
         "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
-        "artifact": "9cbe5e6ccaed971e7b539f2c94ba6a4bee886c19c9cb8c2de9d9c522b0a2d00f"
+        "artifact": "1b38c9f6ffd391430c99859c24359fa9242bfd62d17b508fe02c629eddb8e5b5"
       },
       "validation": {
         "quality": "showcase",

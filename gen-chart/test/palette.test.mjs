@@ -7,6 +7,7 @@ import {
   paletteCss,
   paletteIds,
   paletteInk,
+  palettePreviewColors,
   resolvePaletteId,
   resolveTokenHex
 } from '../renderers/shared/palette.mjs';
@@ -18,21 +19,23 @@ test('palette registry has the approved order, default, and dimensions', () => {
   assert.equal(DEFAULT_PALETTE, 'classic');
   assert.deepEqual(paletteIds(), ['classic', 'cool', 'warm', 'primary']);
   for (const [id, palette] of Object.entries(PALETTES)) {
-    assert.equal(palette.six.length, 6, `${id} chart cycle`);
-    assert.equal(palette.three.length, 3, `${id} preview`);
-    for (const color of [...palette.six, ...palette.three]) assert.match(color, HEX, `${id}: ${color}`);
+    for (const [name, colors] of Object.entries(palette)) {
+      assert.equal(colors.six.length, 6, `${id} ${name} cycle`);
+      assert.equal(colors.three.length, 3, `${id} ${name} compact set`);
+      for (const color of [...colors.six, ...colors.three]) assert.match(color, HEX, `${id}: ${color}`);
+    }
   }
 });
 
-test('palette registry carries the approved chart and preview colors', () => {
-  assert.deepEqual(PALETTES.classic.six,
+test('palette registry retains the approved colors as picker anchors', () => {
+  assert.deepEqual(PALETTES.classic.anchors.six,
     ['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F']);
-  assert.deepEqual(PALETTES.classic.three, ['#5996E7', '#8AA7F5', '#F6D985']);
-  assert.deepEqual(PALETTES.cool.three, ['#AAD7BA', '#68ACCD', '#417AB3']);
-  assert.deepEqual(PALETTES.warm.three, ['#F5D06C', '#EE944B', '#D03828']);
-  assert.deepEqual(PALETTES.primary.six,
+  assert.deepEqual(palettePreviewColors('classic'), ['#5996E7', '#8AA7F5', '#F6D985']);
+  assert.deepEqual(palettePreviewColors('cool'), ['#AAD7BA', '#68ACCD', '#417AB3']);
+  assert.deepEqual(palettePreviewColors('warm'), ['#F5D06C', '#EE944B', '#D03828']);
+  assert.deepEqual(PALETTES.primary.anchors.six,
     ['#E74C3C', '#F06A5B', '#F4D03F', '#F7DC6F', '#3498DB', '#5DADE2']);
-  assert.deepEqual(PALETTES.primary.three, ['#E74C3C', '#F4D03F', '#3498DB']);
+  assert.deepEqual(palettePreviewColors('primary'), ['#E74C3C', '#F4D03F', '#3498DB']);
 });
 
 test('palette ids fall back safely and generated CSS maps all categorical tokens', () => {
@@ -43,40 +46,49 @@ test('palette ids fall back safely and generated CSS maps all categorical tokens
   for (const id of paletteIds()) {
     assert.ok(css.includes(`:root[data-palette="${id}"]`), id);
     assert.ok(css.includes(`:root[data-palette="${id}"][data-palette-size="three"]`), `${id} compact`);
-    for (let i = 0; i < 6; i++) assert.ok(css.includes(`--cat-${i}: ${PALETTES[id].six[i]}`));
-    for (let i = 0; i < 6; i++) {
-      assert.ok(css.includes(`--seq-${i}: ${PALETTES[id].six[i]}`), `${id} sequential ${i}`);
-      assert.ok(css.includes(`--div-${i}: ${PALETTES[id].six[i]}`), `${id} diverging ${i}`);
-      assert.ok(contrastRatio(paletteInk(PALETTES[id].six[i]), PALETTES[id].six[i]) >= 4.5,
-        `${id} heatmap ink ${i}`);
+    assert.ok(css.includes(`:root[data-theme="dark"][data-palette="${id}"]`), `${id} explicit dark`);
+    assert.ok(css.includes(`:root[data-theme="auto"][data-palette="${id}"]`), `${id} automatic dark`);
+    for (const theme of ['light', 'dark']) {
+      for (let i = 0; i < 6; i++) {
+        assert.ok(css.includes(`--cat-${i}: ${PALETTES[id][theme].six[i]}`), `${id} ${theme} category ${i}`);
+        assert.ok(css.includes(`--seq-${i}: ${PALETTES[id][theme].six[i]}`), `${id} ${theme} sequential ${i}`);
+        assert.ok(css.includes(`--div-${i}: ${PALETTES[id][theme].six[i]}`), `${id} ${theme} diverging ${i}`);
+      }
     }
   }
-  assert.equal(paletteColors('classic', 3), PALETTES.classic.three);
-  assert.equal(paletteColors('classic', 4), PALETTES.classic.six);
-  assert.equal(paletteColors('unknown', 2), PALETTES.classic.three);
+  assert.equal(paletteColors('classic', 3, 'light'), PALETTES.classic.light.three);
+  assert.equal(paletteColors('classic', 4, 'dark'), PALETTES.classic.dark.six);
+  assert.equal(paletteColors('unknown', 2, 'light'), PALETTES.classic.light.three);
 });
 
 test('categorical token resolution follows the palette while roles follow the theme', () => {
-  assert.equal(resolveTokenHex('var(--cat-0)', 'light'), '#A2C9FB');
-  assert.equal(resolveTokenHex('var(--cat-5)', 'dark', 'warm'), '#D03828');
-  assert.equal(resolveTokenHex('var(--cat-4)', 'light', 'unknown'), '#F6D147');
+  assert.equal(resolveTokenHex('var(--cat-0)', 'light'), '#2563EB');
+  assert.equal(resolveTokenHex('var(--cat-5)', 'dark', 'warm'), '#EF4444');
+  assert.equal(resolveTokenHex('var(--cat-4)', 'light', 'unknown'), '#A16207');
   assert.equal(resolveTokenHex('var(--role-primary)', 'light'), '#2563eb');
   assert.equal(resolveTokenHex('var(--role-primary)', 'dark'), '#60a5fa');
 });
 
-test('palette accessibility audit keeps the known follow-up measurable', () => {
-  const expected = {
-    classic: { lightContrast: 5, adjacent: 0 },
-    cool: { lightContrast: 4, adjacent: 2 },
-    warm: { lightContrast: 4, adjacent: 1 },
-    primary: { lightContrast: 4, adjacent: 3 }
-  };
-  for (const [id, colors] of Object.entries(PALETTES)) {
-    const lightContrast = colors.six.filter((color) => contrastRatio(color, '#f8fafc') < AA_GRAPHIC).length;
-    const darkContrast = colors.six.filter((color) => contrastRatio(color, '#0f172a') < AA_GRAPHIC).length;
-    const adjacent = colors.six.slice(0, -1)
-      .filter((color, i) => deltaE00(color, colors.six[i + 1]) < MIN_ADJACENT_DELTA_E).length;
-    assert.deepEqual({ lightContrast, adjacent }, expected[id], id);
-    assert.equal(darkContrast, 0, `${id} dark-panel contrast`);
+test('every selectable chart palette clears contrast and adjacent-color gates in both themes', () => {
+  const panels = { light: '#f8fafc', dark: '#0f172a' };
+  for (const [id, palette] of Object.entries(PALETTES)) {
+    for (const theme of ['light', 'dark']) {
+      for (const size of ['six', 'three']) {
+        const colors = palette[theme][size];
+        for (const [index, color] of colors.entries()) {
+          const panelRatio = contrastRatio(color, panels[theme]);
+          assert.ok(panelRatio >= AA_GRAPHIC,
+            `${id} ${theme} ${size}[${index}] is ${panelRatio.toFixed(2)}:1 against the panel`);
+          const inkRatio = contrastRatio(paletteInk(color), color);
+          assert.ok(inkRatio >= 4.5,
+            `${id} ${theme} ${size}[${index}] label ink is ${inkRatio.toFixed(2)}:1`);
+        }
+        for (let i = 1; i < colors.length; i++) {
+          const difference = deltaE00(colors[i - 1], colors[i]);
+          assert.ok(difference >= MIN_ADJACENT_DELTA_E,
+            `${id} ${theme} ${size} pair ${i - 1}/${i} has ΔE ${difference.toFixed(2)}`);
+        }
+      }
+    }
   }
 });

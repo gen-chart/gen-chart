@@ -186,6 +186,7 @@ const PALETTE_PROBE = `async function () {
   out.hashAfterSelect = location.hash;
   document.getElementById('gc-theme').click();
   out.afterTheme = document.documentElement.getAttribute('data-palette');
+  out.afterThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--cat-0').trim();
   document.getElementById('gc-color-reset').click();
   out.afterReset = document.documentElement.getAttribute('data-palette');
   out.hashAfterReset = location.hash;
@@ -204,10 +205,11 @@ test('palette picker supports menus, keyboard selection, reset, theme, and hash 
   assert.equal(r.initialFocus, 'classic');
   assert.equal(r.endFocus, 'primary');
   assert.equal(r.selected, 'primary');
-  assert.ok(['#E74C3C', 'rgb(231, 76, 60)'].includes(r.selectedColor));
+  assert.ok(['#DC2626', 'rgb(220, 38, 38)'].includes(r.selectedColor));
   assert.equal(r.selectedAria, 'true');
   assert.match(r.hashAfterSelect, /palette=primary/);
   assert.equal(r.afterTheme, 'primary');
+  assert.ok(['#F87171', 'rgb(248, 113, 113)'].includes(r.afterThemeColor));
   assert.equal(r.afterReset, 'classic');
   assert.doesNotMatch(r.hashAfterReset, /palette=/);
   assert.equal(r.closedByEscape, true);
@@ -262,14 +264,19 @@ const PALETTE_HASH_PROBE = `async function () {
   };
 }`;
 
-test('palette deep link recolors role-authored series on initial load', { skip }, () => {
-  const r = run(examplesDir + 'mau-trend.html', PALETTE_HASH_PROBE,
-    { hash: '#theme=light&palette=primary' });
-  assert.deepEqual(r.errors, [], r.errors.join('; '));
-  assert.equal(r.theme, 'light');
-  assert.equal(r.palette, 'primary');
-  assert.equal(r.seriesToken, 'var(--cat-0)');
-  assert.ok(['rgb(231, 76, 60)', '#E74C3C'].includes(r.renderedColor));
+test('palette deep links restore theme-specific colors on initial load', { skip }, () => {
+  for (const [theme, expected] of [
+    ['light', ['rgb(220, 38, 38)', '#DC2626']],
+    ['dark', ['rgb(248, 113, 113)', '#F87171']]
+  ]) {
+    const r = run(examplesDir + 'mau-trend.html', PALETTE_HASH_PROBE,
+      { hash: `#theme=${theme}&palette=primary` });
+    assert.deepEqual(r.errors, [], r.errors.join('; '));
+    assert.equal(r.theme, theme);
+    assert.equal(r.palette, 'primary');
+    assert.equal(r.seriesToken, 'var(--cat-0)');
+    assert.ok(expected.includes(r.renderedColor), `${theme}: ${r.renderedColor}`);
+  }
 });
 
 const COMPACT_PALETTE_PROBE = `async function () {
@@ -290,8 +297,8 @@ test('charts with up to three colors use the compact three-color palette', { ski
   const r = run(examplesDir + 'build-times.html', COMPACT_PALETTE_PROBE);
   assert.deepEqual(r.errors, [], r.errors.join('; '));
   assert.equal(r.size, 'three');
-  assert.deepEqual(r.classic, ['rgb(89, 150, 231)', 'rgb(138, 167, 245)', 'rgb(246, 217, 133)']);
-  assert.deepEqual(r.warm, ['rgb(245, 208, 108)', 'rgb(238, 148, 75)', 'rgb(208, 56, 40)']);
+  assert.deepEqual(r.classic, ['rgb(37, 99, 235)', 'rgb(139, 92, 246)', 'rgb(161, 98, 7)']);
+  assert.deepEqual(r.warm, ['rgb(161, 98, 7)', 'rgb(194, 65, 12)', 'rgb(153, 27, 27)']);
 });
 
 const HEATMAP_PALETTE_PROBE = `async function () {
@@ -313,8 +320,8 @@ test('palette switching recolors heatmap buckets and their label ink', { skip },
   assert.deepEqual(r.errors, [], r.errors.join('; '));
   assert.equal(r.palette, 'primary');
   assert.notEqual(r.before, r.after);
-  assert.ok(['rgb(117, 99, 219)', '#7563DB'].includes(r.before));
-  assert.ok(['rgb(247, 220, 111)', '#F7DC6F'].includes(r.after));
+  assert.ok(['rgb(91, 33, 182)', '#5B21B6'].includes(r.before));
+  assert.ok(['rgb(120, 53, 15)', '#78350F'].includes(r.after));
   assert.ok(r.beforeInk.length > 0);
   assert.ok(r.afterInk.length > 0);
 });

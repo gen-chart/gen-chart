@@ -46,8 +46,9 @@ share card) that always capture the canonical chart at rest.
 
 **Accessibility.** A visually hidden data table with the exact values on
 every chart, keyboard walking of every family with live-region announcements,
-non-colour state cues, and semantic-role and heatmap colors verified against
-WCAG AA in both themes.
+non-colour state cues, and theme-specific semantic and selectable palette
+colors verified for WCAG panel contrast, readable heatmap ink, and adjacent
+series separation in both themes.
 
 **Localization.** `en` and `zh-CN` for viewer chrome and computed notes;
 authored content is never translated.
@@ -96,9 +97,6 @@ Roughly in the order they would earn their place.
 
 ### Ergonomics
 
-- **Selectable palette accessibility hardening.** Preserve the approved
-  visual direction while resolving the measured light-panel contrast and
-  adjacent-series ΔE gaps recorded in the palette picker feature plan.
 - **Data size caps.** Row limits exist; byte-level caps with a downsampling
   fix are not implemented.
 - **`meta.animation: "draw"`** — a finite line draw-in, opt-in, excluded from

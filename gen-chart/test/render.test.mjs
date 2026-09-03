@@ -105,7 +105,10 @@ test('palette picker is generated after Theme with Classic selected by default',
 
   const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
   assert.deepEqual(Object.keys(payload.palettes), ['classic', 'cool', 'warm', 'primary']);
-  assert.deepEqual(payload.palettes.primary.three, ['#E74C3C', '#F4D03F', '#3498DB']);
+  assert.deepEqual(payload.palettes.primary.preview, ['#E74C3C', '#F4D03F', '#3498DB']);
+  assert.deepEqual(payload.palettes.primary.light.three, ['#DC2626', '#A16207', '#0284C7']);
+  assert.deepEqual(payload.palettes.primary.dark.three, ['#F87171', '#FACC15', '#38BDF8']);
+  assert.match(html, /\.gc-dot \{ fill: var\(--sc\); fill-opacity: 1; \}/);
 });
 
 test('payload JSON in the artifact parses and mirrors the data', () => {
