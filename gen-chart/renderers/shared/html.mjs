@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
 import { t, templateStrings, resolveLocale } from './i18n.mjs';
-import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds } from './palette.mjs';
+import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds, palettePreviewColors } from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
@@ -79,9 +79,9 @@ function viewsHtml(payload, locale) {
     '<p class="gc-view-note" id="gc-view-note" aria-live="polite"></p>';
 }
 
-function paletteOptionsHtml(locale) {
+function paletteOptionsHtml(locale, colorCount) {
   return paletteIds().map((id) => {
-    const preview = PALETTES[id].three.map((color) =>
+    const preview = palettePreviewColors(id, colorCount).map((color) =>
       `<span class="gc-palette-swatch" style="--preview:${color}"></span>`
     ).join('');
     return `<button class="gc-palette-option" type="button" role="option" data-palette="${id}" ` +
@@ -95,6 +95,10 @@ function paletteOptionsHtml(locale) {
 export function assembleHtml(spec, svg, payload, legend = null) {
   const template = readFileSync(templatePath, 'utf8');
   const locale = resolveLocale(spec.meta.locale);
+  const colorCount = Array.isArray(payload.series) && payload.series.length
+    ? payload.series.length
+    : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
+  const paletteSize = colorCount > 0 && colorCount <= 3 ? 'three' : 'six';
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
@@ -111,10 +115,6 @@ export function assembleHtml(spec, svg, payload, legend = null) {
   };
   // `</` must not appear un-escaped inside the JSON script block.
   const payloadJson = JSON.stringify(withStrings).replaceAll('</', '<\\/');
-  const colorCount = Array.isArray(payload.series) && payload.series.length
-    ? payload.series.length
-    : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
-  const paletteSize = colorCount > 0 && colorCount <= 3 ? 'three' : 'six';
 
   let html = template
     .replaceAll('{{LANG}}', locale)
@@ -124,7 +124,7 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('      {{SUBTITLE_BLOCK}}', subtitle ? `      ${subtitle}` : '')
     .replace('  {{VIEWS}}', views ? `  ${views}` : '')
-    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale))
+    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale, colorCount))
     .replace('{{SVG}}', svg)
     .replace('{{LEGEND}}', legendHtml(legend, locale))
     .replace('{{DATA_TABLE}}', tableHtml(payload, locale))

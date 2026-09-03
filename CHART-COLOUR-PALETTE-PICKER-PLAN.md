@@ -25,8 +25,8 @@ legend, tooltip, Data Passport, deep link, and visual exports.
 
 - A Color toolbar button and compact palette popover.
 - Four named palettes in this order: Classic, Cool, Warm, Primary.
-- Six-color and compact three-color chart sets per palette, with the compact
-  set also used by picker previews, as specified in `DESIGN.md`.
+- Six-color and compact three-color chart sets per palette. The picker shows
+  the same active set used by the current chart.
 - Immediate preview and application while the popover remains open.
 - Reset to Classic.
 - Keyboard and screen-reader behavior.
@@ -53,7 +53,7 @@ legend, tooltip, Data Passport, deep link, and visual exports.
   and `aria-controls`.
 - The popover contains a **Color palette** heading and a **Reset** action.
 - Options appear vertically in this order: Classic, Cool, Warm, Primary.
-- Each option shows its localized name and its three-color preview.
+- Each option shows its localized name and its actual three- or six-color set.
 - The selected option has a visible non-color indicator and
   `aria-selected="true"`.
 - Selecting an option applies it immediately and leaves the popover open so
@@ -108,8 +108,9 @@ Example:
 ### One source of truth
 
 Keep palette ids, order, six- and three-color arrays, picker previews, and the
-Classic default in `gen-chart/renderers/shared/palette.mjs`. Do not copy the
-palette arrays independently into tests and viewer JavaScript.
+Classic default in
+`gen-chart/renderers/shared/palette.mjs`. Do not copy the palette arrays
+independently into tests and viewer JavaScript.
 
 Expose helpers for:
 
@@ -170,11 +171,11 @@ None. This is reader-controlled viewer state, not authored chart state, so
 the chart schemas, compiled validators, CLI arguments, and delivery receipt
 format do not change.
 
-## Accessibility gate
+## Accessibility gate — open
 
-The supplied palette values do not currently satisfy all invariants claimed
-by `DESIGN.md` and enforced by `gen-chart/test/contrast.test.mjs` and the
-stack composition checks.
+The supplied palette values do not satisfy all invariants claimed by
+`DESIGN.md` and enforced by `gen-chart/test/contrast.test.mjs` and the stack
+composition checks.
 
 Measured against the current light panel `#F8FAFC`, using the repository's
 own WCAG and CIEDE2000 functions:
@@ -187,20 +188,18 @@ own WCAG and CIEDE2000 functions:
 | Primary | 4 of 6 | 3 of 5 |
 
 All supplied colors clear 3:1 against the current dark panel, but that alone
-does not meet theme parity. Before implementation is accepted, choose and
-document one of these resolutions:
+does not meet theme parity.
 
-1. **Recommended:** adjust light-theme chart values while retaining the
-   supplied colors as the picker previews/design anchors, and define paired
-   dark-theme values where needed.
-2. Preserve the exact fills and add a proven non-color boundary treatment
-   for every mark family, then update the validation model to measure that
-   treatment rather than fill contrast alone.
+The first attempted resolution substituted darker theme-specific colors. It
+passed the numeric gates but materially changed the approved visual identity,
+including introducing brown descendants into Classic, and was rejected.
 
-Do not lower or bypass the WCAG/ΔE thresholds merely to make the new arrays
-pass. Whichever resolution is chosen becomes part of the palette registry
-and must be verified across bars, lines, areas, scatter, distributions, and
-pie/donut marks.
+**Product decision:** preserve the exact approved three- and six-color fills.
+The picker must preview the same active set as the chart. Future hardening must
+use a proven non-color boundary or mark treatment across every chart family,
+then update the validation model to measure that treatment rather than fill
+contrast alone. Do not lower the WCAG/ΔE thresholds or silently substitute a
+different palette to make the arrays pass.
 
 ## Implementation sequence
 
@@ -211,6 +210,7 @@ pie/donut marks.
   `renderers/shared/palette.mjs`.
 - Add token resolution/generation helpers.
 - Preserve semantic-role helpers and map heatmap helpers to palette tokens.
+- Keep picker previews generated from the exact active chart colors.
 
 ### 2. Build localized picker markup
 
@@ -293,8 +293,8 @@ No schema or generated-validator files should change.
 
 - Classic is visibly and programmatically the default.
 - Color appears immediately after Theme in every generated artifact.
-- All four options use the exact approved palette registry and correct
-  three-swatch previews.
+- All four options preview the exact three- or six-color set used by the
+  current chart.
 - Selection updates every displayed series color consumer immediately.
 - Semantic role metadata remains intact; heatmap ramps and label inks update
   with the picker.
@@ -303,7 +303,7 @@ No schema or generated-validator files should change.
 - Deep links restore a valid palette and preserve all other viewer state.
 - Visual exports use the selection; CSV does not change.
 - English and `zh-CN` have no missing or leaked strings.
-- Every approved palette passes the existing accessibility and perceptual
-  distinguishability contract in both themes.
+- The remaining fill-contrast and adjacent-color gaps stay measured and are
+  not misrepresented as resolved.
 - Full tests pass after committed examples and gallery output are regenerated.
 - Desktop, dark/light, and phone screenshots have been manually reviewed.

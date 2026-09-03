@@ -299,11 +299,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 70117
+        "artifact": 70897
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "6fe25f392ecc66cba9fd843572978b5b075eed262bb04a4c65e3c5eb96b75e89"
+        "artifact": "6c6ebad5d67137595ec85c2aab180233cba055321c069dae21ce43e54c1637c5"
       },
       "validation": {
         "quality": "showcase",
@@ -326,11 +326,11 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 63882
+        "artifact": 64662
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "d5c491eb8ce8b3c1c8d4bc12c54215cde3d2f6001967b834e34687dfbfcd1947"
+        "artifact": "cc0f1516d6a933e907fb73d410d9e90f86f1e439f1594afb3b60e9a3f8ae9340"
       },
       "validation": {
         "quality": "showcase",

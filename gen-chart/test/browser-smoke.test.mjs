@@ -186,6 +186,7 @@ const PALETTE_PROBE = `async function () {
   out.hashAfterSelect = location.hash;
   document.getElementById('gc-theme').click();
   out.afterTheme = document.documentElement.getAttribute('data-palette');
+  out.afterThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--cat-0').trim();
   document.getElementById('gc-color-reset').click();
   out.afterReset = document.documentElement.getAttribute('data-palette');
   out.hashAfterReset = location.hash;
@@ -208,6 +209,7 @@ test('palette picker supports menus, keyboard selection, reset, theme, and hash 
   assert.equal(r.selectedAria, 'true');
   assert.match(r.hashAfterSelect, /palette=primary/);
   assert.equal(r.afterTheme, 'primary');
+  assert.ok(['#E74C3C', 'rgb(231, 76, 60)'].includes(r.afterThemeColor));
   assert.equal(r.afterReset, 'classic');
   assert.doesNotMatch(r.hashAfterReset, /palette=/);
   assert.equal(r.closedByEscape, true);
@@ -262,14 +264,19 @@ const PALETTE_HASH_PROBE = `async function () {
   };
 }`;
 
-test('palette deep link recolors role-authored series on initial load', { skip }, () => {
-  const r = run(examplesDir + 'mau-trend.html', PALETTE_HASH_PROBE,
-    { hash: '#theme=light&palette=primary' });
-  assert.deepEqual(r.errors, [], r.errors.join('; '));
-  assert.equal(r.theme, 'light');
-  assert.equal(r.palette, 'primary');
-  assert.equal(r.seriesToken, 'var(--cat-0)');
-  assert.ok(['rgb(231, 76, 60)', '#E74C3C'].includes(r.renderedColor));
+test('palette deep links restore the selected colors on initial load', { skip }, () => {
+  for (const [theme, expected] of [
+    ['light', ['rgb(231, 76, 60)', '#E74C3C']],
+    ['dark', ['rgb(231, 76, 60)', '#E74C3C']]
+  ]) {
+    const r = run(examplesDir + 'mau-trend.html', PALETTE_HASH_PROBE,
+      { hash: `#theme=${theme}&palette=primary` });
+    assert.deepEqual(r.errors, [], r.errors.join('; '));
+    assert.equal(r.theme, theme);
+    assert.equal(r.palette, 'primary');
+    assert.equal(r.seriesToken, 'var(--cat-0)');
+    assert.ok(expected.includes(r.renderedColor), `${theme}: ${r.renderedColor}`);
+  }
 });
 
 const COMPACT_PALETTE_PROBE = `async function () {

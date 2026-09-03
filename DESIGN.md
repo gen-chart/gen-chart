@@ -136,7 +136,8 @@ series order or meaning.
 
 Charts with up to three displayed colors use the `three` array. Charts with
 four or more use the `six` array, mapped in order to `--cat-0`…`--cat-5`.
-The picker preview uses the same three-color array.
+The picker previews the same active array: three swatches for compact charts
+and six for larger charts.
 
 ```js
 const palettes = {
@@ -169,9 +170,10 @@ are unaffected.
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against
 the light panel, and some same-family neighbours fall below the current ΔE 9
-threshold. The measured audit and resolution options live in
-`CHART-COLOUR-PALETTE-PICKER-PLAN.md`. Do not weaken those thresholds or claim
-palette accessibility sign-off until that follow-up is resolved.
+threshold. The exact fills are part of the approved visual identity and must
+not be replaced with unrelated compliant colors. The measured audit and the
+non-color boundary-treatment option live in
+`CHART-COLOUR-PALETTE-PICKER-PLAN.md`.
 
 ### Named rules
 

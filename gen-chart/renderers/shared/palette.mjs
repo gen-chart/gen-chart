@@ -16,8 +16,9 @@ const CATEGORICAL = ['--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--c
 export const DEFAULT_PALETTE = 'classic';
 
 // One registry feeds renderer analysis, generated viewer CSS, picker
-// previews, and tests. Charts with up to three displayed colors use `three`;
-// larger charts use the full `six` cycle.
+// previews, exports, gallery thumbnails, and tests. Charts with up to three
+// displayed colors use `three`; larger charts use the full `six` cycle. The
+// picker shows that same active set so its promise matches the rendered chart.
 export const PALETTES = Object.freeze({
   classic: Object.freeze({
     six: Object.freeze(['#A2C9FB', '#5996E7', '#D5C4FC', '#7563DB', '#F6D147', '#FBF19F']),
@@ -48,6 +49,10 @@ export function resolvePaletteId(id) {
 export function paletteColors(id, colorCount = 6) {
   const palette = PALETTES[resolvePaletteId(id)];
   return colorCount > 0 && colorCount <= 3 ? palette.three : palette.six;
+}
+
+export function palettePreviewColors(id, colorCount = 3) {
+  return paletteColors(id, colorCount);
 }
 
 export function paletteInk(color) {

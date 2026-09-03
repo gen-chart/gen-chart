@@ -96,9 +96,9 @@ Roughly in the order they would earn their place.
 
 ### Ergonomics
 
-- **Selectable palette accessibility hardening.** Preserve the approved
-  visual direction while resolving the measured light-panel contrast and
-  adjacent-series ΔE gaps recorded in the palette picker feature plan.
+- **Selectable palette accessibility hardening.** Preserve the exact approved
+  three- and six-color sets while resolving the measured light-panel contrast
+  and adjacent-series ΔE gaps through proven non-color boundary treatments.
 - **Data size caps.** Row limits exist; byte-level caps with a downsampling
   fix are not implemented.
 - **`meta.animation: "draw"`** — a finite line draw-in, opt-in, excluded from
