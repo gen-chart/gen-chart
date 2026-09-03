@@ -19,6 +19,7 @@ const ROTATION_DEG = 32;
 const ROTATION_RAD = (ROTATION_DEG * Math.PI) / 180;
 const BUBBLE_MIN_RADIUS = 4;
 const BUBBLE_MAX_RADIUS = 24;
+const POINT_DENSITY_LIMIT = 2000;
 
 // Bubble values encode area, so radius follows sqrt(value / max). Zero has
 // zero area; tiny positive marks clamp to a legible 4px radius and every mark
@@ -590,6 +591,37 @@ export function analyzeCartesian(spec) {
     const scale = linearScale(nums[0], nums[n - 1], plotLeft, plotRight);
     xCenters = nums.map(scale);
     xTicks = xNice.ticks.filter((t) => t >= nums[0] && t <= nums[n - 1]).map((t) => ({ x: scale(t), label: fmtTick(t) }));
+  }
+
+  // Count marks that will actually be drawn, not merely source rows. Null y
+  // values disappear from both point marks; bubble rows also need a positive
+  // size because zero and null intentionally render no circle. Multiple point
+  // series add to the same overplotting burden, so the limit applies to their
+  // combined visible marks.
+  const pointsBySeries = spec.series
+    .filter((s) => s.mark === 'scatter' || s.mark === 'bubble')
+    .map((s) => {
+      const yValues = columns.get(s.y).values;
+      const sizeValues = s.mark === 'bubble' ? columns.get(s.size).values : null;
+      let plottedPoints = 0;
+      for (let row = 0; row < yValues.length; row++) {
+        if (xCol.values[row] === null || yValues[row] === null) continue;
+        if (sizeValues && (sizeValues[row] === null || sizeValues[row] <= 0)) continue;
+        plottedPoints++;
+      }
+      return { id: s.id, mark: s.mark, plottedPoints };
+    });
+  const plottedPoints = pointsBySeries.reduce((sum, s) => sum + s.plottedPoints, 0);
+  if (plottedPoints > POINT_DENSITY_LIMIT) {
+    diagnostics.push(diag('composition/point-density', 'warning', '/series',
+      `scatter and bubble series would draw ${plottedPoints} visible points; above ${POINT_DENSITY_LIMIT}, overlapping marks can hide the distribution`, {
+        evidence: { plottedPoints, threshold: POINT_DENSITY_LIMIT, bySeries: pointsBySeries },
+        supportedFixes: [
+          `downsample the source rows deterministically until the chart has ${POINT_DENSITY_LIMIT} or fewer visible points`,
+          'aggregate observations into meaningful bins or groups before charting',
+          'split the data into focused subsets'
+        ]
+      }));
   }
 
   // ---- x tick collision: horizontal -> rotate -> thin -> fail

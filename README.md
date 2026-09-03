@@ -13,7 +13,7 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
 ![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-200-0891b2?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-203-0891b2?style=flat-square)
 
 **[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
@@ -198,10 +198,11 @@ The difference between a chart tool and an honest one. Each rule returns a stabl
 - **100%-stacks** disclose a shifting denominator and keep absolute values in the tooltip
 - **Directional colour** (`positive`/`negative`) is rejected over mixed-sign data
 - **Range bands** require paired ordered bounds and an explicit meaning such as “95% confidence interval”
+- **Scatter and bubble density** warns above 2,000 visible points, where overlapping marks can hide the distribution
 - **Heatmaps** reject negatives on a sequential ramp; diverging ramps require a stated midpoint
 - **Touching stacked segments** must be perceptually distinguishable, verified with CIEDE2000
 
-Plus composition checks for tick collisions, annotation overlap, stack depth, and grids too dense or too sparse to read.
+Plus composition checks for tick collisions, annotation overlap, point density, stack depth, and grids too dense or too sparse to read.
 
 ## How it works
 
@@ -256,7 +257,7 @@ Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush
 - **Failures come with a repair receipt** — a stable code, the exact subject path, measured evidence, and only the fixes that will work, instead of a stack trace.
 - **Provenance survives** — the CSV export is the exact embedded data, so a reader can rebuild the chart from the artifact.
 - **Hand-rolled SVG, zero runtime dependencies** — byte-stable golden output and validation that understands the chart are only possible when we own the geometry.
-- **Verified, not asserted** — 160 tests, including real-browser suites, WCAG AA contrast maths, and CIEDE2000 checked against published test vectors. CI runs everything on Node 22 and 24, then proves the package builds byte-identically and runs standalone when extracted.
+- **Verified, not asserted** — 203 tests, including real-browser suites, WCAG AA contrast maths, and CIEDE2000 checked against published test vectors. CI runs everything on Node 22 and 24, then proves the package builds byte-identically and runs standalone when extracted.
 
 ## Where it installs
 
