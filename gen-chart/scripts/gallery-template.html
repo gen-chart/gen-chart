@@ -157,7 +157,7 @@ footer a { color: var(--role-primary); }
     <div class="no-js-install">
       <div class="command">
         <div class="command-bar"><span>Universal global install</span></div>
-        <pre><code>npx skills add sses79/gen-chart -g</code></pre>
+        <pre><code>npx skills add gen-chart/gen-chart -g</code></pre>
       </div>
     </div>
 
@@ -173,13 +173,13 @@ footer a { color: var(--role-primary); }
       </fieldset>
       <div class="command">
         <div class="command-bar"><span>Global install <span class="recommended">· recommended</span></span><button class="copy-button" type="button" data-copy-target="install-global" aria-describedby="install-status">Copy</button></div>
-        <pre><code id="install-global">npx -y skills add sses79/gen-chart --skill gen-chart --agent codex --global --copy --yes</code></pre>
+        <pre><code id="install-global">npx -y skills add gen-chart/gen-chart --skill gen-chart --agent codex --global --copy --yes</code></pre>
       </div>
       <details class="command-details">
         <summary>Install in this repository only</summary>
         <div class="command">
           <div class="command-bar"><span>Project install</span><button class="copy-button" type="button" data-copy-target="install-project" aria-describedby="install-status">Copy</button></div>
-          <pre><code id="install-project">npx -y skills add sses79/gen-chart --skill gen-chart --agent codex --copy --yes</code></pre>
+          <pre><code id="install-project">npx -y skills add gen-chart/gen-chart --skill gen-chart --agent codex --copy --yes</code></pre>
         </div>
       </details>
       <span class="copy-status" id="install-status" role="status" aria-live="polite"></span>
@@ -207,7 +207,7 @@ footer a { color: var(--role-primary); }
   </main>
 
   <footer>
-    <p>gen-chart v[[VERSION]] · generated from typed examples · <a href="gallery/manifest.json">audit the gallery manifest</a> · <a href="https://github.com/sses79/gen-chart" rel="noopener noreferrer">view source on GitHub</a></p>
+    <p>gen-chart v[[VERSION]] · generated from typed examples · <a href="gallery/manifest.json">audit the gallery manifest</a> · <a href="https://github.com/gen-chart/gen-chart" rel="noopener noreferrer">view source on GitHub</a></p>
   </footer>
 </div>
 <script>
@@ -234,9 +234,9 @@ footer a { color: var(--role-primary); }
       input.checked = input.value === agent;
     });
     document.getElementById('install-global').textContent =
-      'npx -y skills add sses79/gen-chart --skill gen-chart --agent ' + agent + ' --global --copy --yes';
+      'npx -y skills add gen-chart/gen-chart --skill gen-chart --agent ' + agent + ' --global --copy --yes';
     document.getElementById('install-project').textContent =
-      'npx -y skills add sses79/gen-chart --skill gen-chart --agent ' + agent + ' --copy --yes';
+      'npx -y skills add gen-chart/gen-chart --skill gen-chart --agent ' + agent + ' --copy --yes';
   }
 
   function renderFamily() {
