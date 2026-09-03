@@ -108,6 +108,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 .gc-point { fill: var(--sc); }
 .gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-bubble { stroke: var(--panel); stroke-width: 1.25; }
 .gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
 .gc-bin { fill: var(--sc); }
 .gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
@@ -154,6 +155,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-annotations [data-gone] { display: none; }
 .gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
 .gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-hover-bubble { fill: none; stroke: var(--sc); stroke-width: 2; }
 .gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
 .gc-hit { cursor: crosshair; }
 .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
@@ -167,6 +169,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-legend[data-static] button { cursor: default; }
 .gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
 .gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-swatch[data-mark="scatter"], .gc-swatch[data-mark="bubble"] { width: 9px; height: 9px; border-radius: 50%; }
+.gc-size-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.8rem;
+  margin-top: 0.65rem; color: var(--muted); font-size: 0.78rem;
+}
+.gc-size-title { color: var(--ink); font-weight: 600; }
+.gc-size-item { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 48px; }
+.gc-size-swatch {
+  display: inline-block; width: var(--diameter); height: var(--diameter);
+  max-width: 48px; max-height: 48px; border-radius: 50%;
+  background: var(--role-primary); opacity: 0.55; flex: none;
+}
 .gc-passport {
   display: none; margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.8rem;
   font-size: 0.82rem;
@@ -213,7 +227,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <header>
     <div>
       <h1>Accounts grew 52%, and the paid tiers grew fastest</h1>
-      
+
     </div>
     <div class="gc-toolbar">
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
@@ -236,7 +250,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
-  
+
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
     <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
@@ -251,7 +265,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Total accounts rose 52%, from 8,240 to 12,520 over six months.</li><li>Enterprise tripled and Pro more than doubled, while Free grew 27%.</li><li>Free therefore fell from 75% of accounts to 63%, even though it never shrank in absolute terms.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Accounts grew 52%, and the paid tiers grew fastest","unit":"accounts","xType":"time","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[37,222.4,389.8,575.2,754.6,940],"xLabels":["Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026"],"table":{"headers":["month","Free","Pro","Enterprise"],"rows":[["2026-01",6200,1800,240],["2026-02",6800,2100,300],["2026-03",7100,2500,380],["2026-04",7400,2900,470],["2026-05",7600,3400,590],["2026-06",7900,3900,720]]},"plot":{"left":37,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"free","label":"Free","mark":"area","color":"var(--cat-0)","values":[6200,6800,7100,7400,7600,7900],"formatted":["6,200","6,800","7,100","7,400","7,600","7,900"],"pixels":[302.3,284.2,275.1,266,260,250.9],"stats":{"min":6200,"max":7900,"mean":7166.666666666667,"last":7900,"count":6}},{"id":"pro","label":"Pro","mark":"area","color":"var(--cat-1)","values":[1800,2100,2500,2900,3400,3900],"formatted":["1,800","2,100","2,500","2,900","3,400","3,900"],"pixels":[435.5,426.4,414.3,402.2,387.1,372],"stats":{"min":1800,"max":3900,"mean":2766.6666666666665,"last":3900,"count":6}},{"id":"enterprise","label":"Enterprise","mark":"area","color":"var(--cat-2)","values":[240,300,380,470,590,720],"formatted":["240","300","380","470","590","720"],"pixels":[482.7,480.9,478.5,475.8,472.1,468.2],"stats":{"min":240,"max":720,"mean":450,"last":720,"count":6}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Accounts grew 52%, and the paid tiers grew fastest","unit":"accounts","xType":"time","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[37,222.4,389.8,575.2,754.6,940],"xLabels":["Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026"],"table":{"headers":["month","Free","Pro","Enterprise"],"rows":[["2026-01",6200,1800,240],["2026-02",6800,2100,300],["2026-03",7100,2500,380],["2026-04",7400,2900,470],["2026-05",7600,3400,590],["2026-06",7900,3900,720]]},"plot":{"left":37,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"free","label":"Free","mark":"area","color":"var(--cat-0)","values":[6200,6800,7100,7400,7600,7900],"formatted":["6,200","6,800","7,100","7,400","7,600","7,900"],"pixels":[302.3,284.2,275.1,266,260,250.9],"size":null,"stats":{"min":6200,"max":7900,"mean":7166.666666666667,"last":7900,"count":6}},{"id":"pro","label":"Pro","mark":"area","color":"var(--cat-1)","values":[1800,2100,2500,2900,3400,3900],"formatted":["1,800","2,100","2,500","2,900","3,400","3,900"],"pixels":[435.5,426.4,414.3,402.2,387.1,372],"size":null,"stats":{"min":1800,"max":3900,"mean":2766.6666666666665,"last":3900,"count":6}},{"id":"enterprise","label":"Enterprise","mark":"area","color":"var(--cat-2)","values":[240,300,380,470,590,720],"formatted":["240","300","380","470","590","720"],"pixels":[482.7,480.9,478.5,475.8,472.1,468.2],"size":null,"stats":{"min":240,"max":720,"mean":450,"last":720,"count":6}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -512,11 +526,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
         + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (s.size) {
+        var sizeValue = s.size.formatted[i];
+        html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+          + esc(s.size.label) + '<span class="gc-tt-val">' + esc(sizeValue === null ? '—' : sizeValue)
+          + (s.size.unit && s.size.values[i] !== null ? ' ' + esc(s.size.unit) : '') + '</span></div>';
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }
@@ -918,11 +939,16 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
         (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (s.size) {
+        parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
+          (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }

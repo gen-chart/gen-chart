@@ -108,6 +108,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-line { fill: none; stroke: var(--sc); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 .gc-point { fill: var(--sc); }
 .gc-dot { fill: var(--sc); fill-opacity: 0.78; }
+.gc-bubble { stroke: var(--panel); stroke-width: 1.25; }
 .gc-area { fill: var(--sc); fill-opacity: 0.55; stroke: var(--sc); stroke-width: 1.5; stroke-linejoin: round; }
 .gc-bin { fill: var(--sc); }
 .gc-box .gc-box-body { fill: var(--sc); fill-opacity: 0.45; stroke: var(--sc); stroke-width: 1.5; }
@@ -154,6 +155,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-annotations [data-gone] { display: none; }
 .gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
 .gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
+.gc-hover-bubble { fill: none; stroke: var(--sc); stroke-width: 2; }
 .gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
 .gc-hit { cursor: crosshair; }
 .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
@@ -167,6 +169,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-legend[data-static] button { cursor: default; }
 .gc-swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--sw); flex: none; }
 .gc-swatch[data-mark="bar"] { height: 11px; border-radius: 2.5px; }
+.gc-swatch[data-mark="scatter"], .gc-swatch[data-mark="bubble"] { width: 9px; height: 9px; border-radius: 50%; }
+.gc-size-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.8rem;
+  margin-top: 0.65rem; color: var(--muted); font-size: 0.78rem;
+}
+.gc-size-title { color: var(--ink); font-weight: 600; }
+.gc-size-item { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 48px; }
+.gc-size-swatch {
+  display: inline-block; width: var(--diameter); height: var(--diameter);
+  max-width: 48px; max-height: 48px; border-radius: 50%;
+  background: var(--role-primary); opacity: 0.55; flex: none;
+}
 .gc-passport {
   display: none; margin-top: 0.9rem; border-top: 1px solid var(--border); padding-top: 0.8rem;
   font-size: 0.82rem;
@@ -213,7 +227,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <header>
     <div>
       <h1>Storage grew 3.7× in five quarters, four-fifths of it cold archive</h1>
-      
+
     </div>
     <div class="gc-toolbar">
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
@@ -236,7 +250,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       </div>
     </div>
   </header>
-  
+
   <div class="gc-panel">
     <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
     <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
@@ -251,7 +265,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Total storage rose from 110 TB to 408 TB — 3.7× in five quarters.</li><li>Cold archive accounts for 234 TB of the 298 TB added, or 79% of all growth.</li><li>Hot storage grew only 16 TB over the same period, from 42 to 58 TB.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Storage grew 3.7× in five quarters, four-fifths of it cold archive","unit":"TB","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[127.5,308.2,489,669.8,850.5],"xLabels":["2025 Q3","2025 Q4","2026 Q1","2026 Q2","2026 Q3"],"table":{"headers":["quarter","Hot","Warm","Cold archive"],"rows":[["2025 Q3",42,38,30],["2025 Q4",48,47,62],["2026 Q1",51,61,118],["2026 Q2",55,74,190],["2026 Q3",58,86,264]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"hot","label":"Hot","mark":"bar","color":"var(--cat-0)","values":[42,48,51,55,58],"formatted":["42","48","51","55","58"],"pixels":[451.9,446.4,443.7,440.1,437.3],"stats":{"min":42,"max":58,"mean":50.8,"last":58,"count":5}},{"id":"warm","label":"Warm","mark":"bar","color":"var(--cat-1)","values":[38,47,61,74,86],"formatted":["38","47","61","74","86"],"pixels":[455.5,447.3,434.6,422.8,411.9],"stats":{"min":38,"max":86,"mean":61.2,"last":86,"count":5}},{"id":"cold","label":"Cold archive","mark":"bar","color":"var(--cat-2)","values":[30,62,118,190,264],"formatted":["30","62","118","190","264"],"pixels":[462.8,433.7,382.9,317.5,250.3],"stats":{"min":30,"max":264,"mean":132.8,"last":264,"count":5}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Storage grew 3.7× in five quarters, four-fifths of it cold archive","unit":"TB","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[127.5,308.2,489,669.8,850.5],"xLabels":["2025 Q3","2025 Q4","2026 Q1","2026 Q2","2026 Q3"],"table":{"headers":["quarter","Hot","Warm","Cold archive"],"rows":[["2025 Q3",42,38,30],["2025 Q4",48,47,62],["2026 Q1",51,61,118],["2026 Q2",55,74,190],["2026 Q3",58,86,264]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"hot","label":"Hot","mark":"bar","color":"var(--cat-0)","values":[42,48,51,55,58],"formatted":["42","48","51","55","58"],"pixels":[451.9,446.4,443.7,440.1,437.3],"size":null,"stats":{"min":42,"max":58,"mean":50.8,"last":58,"count":5}},{"id":"warm","label":"Warm","mark":"bar","color":"var(--cat-1)","values":[38,47,61,74,86],"formatted":["38","47","61","74","86"],"pixels":[455.5,447.3,434.6,422.8,411.9],"size":null,"stats":{"min":38,"max":86,"mean":61.2,"last":86,"count":5}},{"id":"cold","label":"Cold archive","mark":"bar","color":"var(--cat-2)","values":[30,62,118,190,264],"formatted":["30","62","118","190","264"],"pixels":[462.8,433.7,382.9,317.5,250.3],"size":null,"stats":{"min":30,"max":264,"mean":132.8,"last":264,"count":5}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -512,11 +526,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(s.label) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
         + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+      if (s.size) {
+        var sizeValue = s.size.formatted[i];
+        html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
+          + esc(s.size.label) + '<span class="gc-tt-val">' + esc(sizeValue === null ? '—' : sizeValue)
+          + (s.size.unit && s.size.values[i] !== null ? ' ' + esc(s.size.unit) : '') + '</span></div>';
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }
@@ -918,11 +939,16 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       parts.push(s.label + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
         (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+      if (s.size) {
+        parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
+          (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));
+      }
       if (dots[s.id]) {
-        if (s.pixels[i] === null) { dots[s.id].style.display = 'none'; }
+        if (s.pixels[i] === null || (s.size && (!s.size.radii[i] || s.size.radii[i] <= 0))) { dots[s.id].style.display = 'none'; }
         else {
           dots[s.id].setAttribute('cx', px);
           dots[s.id].setAttribute('cy', s.pixels[i]);
+          if (s.size) dots[s.id].setAttribute('r', s.size.radii[i] + 2);
           dots[s.id].style.display = '';
         }
       }

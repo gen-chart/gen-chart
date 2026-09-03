@@ -15,6 +15,7 @@ const RULES = [
   { re: /\b(mau|dau|wau|active users|revenue over|burn rate|time series|timeseries)\b/, family: 'cartesian', marks: ['line'], w: 3 },
   { re: /\b(compare|comparison|by (category|region|team|country|product|channel|segment)|ranking|top \d+|versus other)\b/, family: 'cartesian', marks: ['bar'], w: 3 },
   { re: /\b(vs\.? target|versus target|against (the )?(target|goal|plan|budget|forecast)|actual vs)\b/, family: 'cartesian', marks: ['bar', 'line'], w: 4 },
+  { re: /\b(bubble chart|bubble plot|bubble graph|bubble size|size (each|the) (bubble|point))\b/, family: 'cartesian', marks: ['bubble'], w: 5 },
   { re: /\b(scatter|correlat|relationship between|against each other|x vs y)\b/, family: 'cartesian', marks: ['scatter'], w: 4 },
   { re: /\b(distribution|histogram|spread|outlier|boxplot|box plot|percentile|frequency|binned)\b/, family: 'distribution', marks: ['histogram', 'boxplot'], w: 4 },
   { re: /\b(share|proportion|percentage of|percent of|breakdown|composition|parts? of (a |the )?whole|pie|donut)\b/, family: 'proportion', marks: ['pie', 'donut'], w: 4 },
@@ -26,7 +27,7 @@ const RULES = [
   { re: /\b(line chart|line graph)\b/, family: 'cartesian', marks: ['line'], w: 2 }
 ];
 
-const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'area', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
+const IMPLEMENTED_MARKS = new Set(['line', 'bar', 'scatter', 'bubble', 'area', 'histogram', 'boxplot', 'pie', 'donut', 'heatmap']);
 
 export function guide(scenario) {
   const s = String(scenario).toLowerCase();

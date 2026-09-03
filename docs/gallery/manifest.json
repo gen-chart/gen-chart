@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": "gen-chart/scripts/build-gallery.mjs",
   "generatorVersion": "0.9.0",
-  "entryCount": 12,
+  "entryCount": 13,
   "entries": [
     {
       "id": "build-times",
@@ -19,11 +19,11 @@
       "artifact": "gallery/build-times.html",
       "bytes": {
         "source": 1234,
-        "artifact": 60424
+        "artifact": 62040
       },
       "sha256": {
         "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
-        "artifact": "f97e909b1c4b33d5e5d865fa921f74bd5799511fea85102668375bfe62d35835"
+        "artifact": "714e71c4ae81cc2251167135fc52b83530a3c235ab6b693021bf8c6679419f2b"
       },
       "validation": {
         "quality": "showcase",
@@ -47,11 +47,11 @@
       "artifact": "gallery/deploy-outcomes.html",
       "bytes": {
         "source": 1449,
-        "artifact": 60829
+        "artifact": 62481
       },
       "sha256": {
         "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
-        "artifact": "934893cce17cc65bb99738c4ed1dbeec440a0c072dbbe452778f80c7f158c4ad"
+        "artifact": "2b9a3a661b6d6f6bd505b1950c492d6f48480f712092eea0a762547607e2d88d"
       },
       "validation": {
         "quality": "showcase",
@@ -74,11 +74,11 @@
       "artifact": "gallery/latency-distribution.html",
       "bytes": {
         "source": 848,
-        "artifact": 61415
+        "artifact": 63031
       },
       "sha256": {
         "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
-        "artifact": "9cce8097d6da9c5839f55a7d7995121254a887cb782e1a7a78b11f75fcebccf8"
+        "artifact": "853ea577952f4d40656e0e0fceedfecc4ad90f84a97763c3eb17fa32b605aca3"
       },
       "validation": {
         "quality": "showcase",
@@ -103,11 +103,11 @@
       "artifact": "gallery/mau-trend.html",
       "bytes": {
         "source": 2710,
-        "artifact": 63038
+        "artifact": 64680
       },
       "sha256": {
         "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
-        "artifact": "cdb7d25860cb54bd1b20184182e87ee9b404eb09b7d0704ee17949a9c64cc11c"
+        "artifact": "cafe4048bfc0ced6979e3c301de7c67497af377fb3fb6ac38f19a9e8d0f648b8"
       },
       "validation": {
         "quality": "showcase",
@@ -131,11 +131,11 @@
       "artifact": "gallery/plan-mix.html",
       "bytes": {
         "source": 1370,
-        "artifact": 60442
+        "artifact": 62094
       },
       "sha256": {
         "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
-        "artifact": "47f80936f50d9e2fdc63bfadf07b45fcae5b6be87e6d61ffd0839badee680b07"
+        "artifact": "7b22cf7c0a0bdecd457408bc6697dc1fa564f74f78d02b2e9d01b174601b63cb"
       },
       "validation": {
         "quality": "showcase",
@@ -159,11 +159,11 @@
       "artifact": "gallery/request-growth.html",
       "bytes": {
         "source": 1192,
-        "artifact": 59261
+        "artifact": 60889
       },
       "sha256": {
         "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
-        "artifact": "7bc6d34fa19625ff74e3d1eb5a41391cd80cfa7bb6a41ef29aa43b9050eaf574"
+        "artifact": "13062005566bfd7c4f3f12601c7fcda0a228579efb248df51aaa25ecd2d639c3"
       },
       "validation": {
         "quality": "showcase",
@@ -186,11 +186,11 @@
       "artifact": "gallery/revenue-by-region.html",
       "bytes": {
         "source": 998,
-        "artifact": 59727
+        "artifact": 61367
       },
       "sha256": {
         "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
-        "artifact": "24078aa9b22914052eefd527355445f4fd126bad403315b0308061fc9d6f0e15"
+        "artifact": "198a617f1ab5e89411c85f53bbd14d2474581bf5e68f2fa0bb047d0e24bed6d4"
       },
       "validation": {
         "quality": "showcase",
@@ -214,11 +214,11 @@
       "artifact": "gallery/signups-vs-target.html",
       "bytes": {
         "source": 1126,
-        "artifact": 60902
+        "artifact": 62548
       },
       "sha256": {
         "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
-        "artifact": "d2b046834bde6cf9e8c12819ab8fc3f4596199afb8604d8bc7aade066c4f40f5"
+        "artifact": "483a1ae5f70b75e966c6ac26d142ac11fc9137f8bc1fbdb917f75bc76de3a671"
       },
       "validation": {
         "quality": "showcase",
@@ -242,11 +242,11 @@
       "artifact": "gallery/storage-mix.html",
       "bytes": {
         "source": 1806,
-        "artifact": 60828
+        "artifact": 62480
       },
       "sha256": {
         "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
-        "artifact": "db200f9377e8221db81cc228c3e54f90507d452aac6915181fed4265fcc30640"
+        "artifact": "c9244ac82037da3c0bb933e0354986c1369d14090d51ff714510d980a9393192"
       },
       "validation": {
         "quality": "showcase",
@@ -270,11 +270,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 66673
+        "artifact": 68289
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "ccac59360d792cee4e1d5318fe91a9c7cd5c0e34aca66a94086f11fd400cb1dd"
+        "artifact": "db8dc90e3bd19590ad814f1a0c8b61b069723da4712cf90b41479a318b963ceb"
       },
       "validation": {
         "quality": "showcase",
@@ -297,11 +297,38 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 60438
+        "artifact": 62054
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "ef3ea6c923c8be1ca82fff980f138a9ac14a6c41cbca54fde6c590b4c01a718b"
+        "artifact": "2c529c72a6e10c00cdd400e736b42eefa01f8489cf4dfbf00b136e222976068e"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "venue-performance",
+      "title": "Higher-capacity venues occupy the strongest profit positions",
+      "question": "How do advertising spend, event profit, and venue capacity relate?",
+      "family": "cartesian",
+      "marks": [
+        "bubble"
+      ],
+      "featured": false,
+      "prompt": "Use gen-chart to create a bubble chart with advertising spend on x, event profit on y, and bubble size representing venue capacity. Keep both financial measures in GBP thousands and capacity in seats. Show the capacity scale and keep every raw value available in the tooltip and data table.\n\n| Advertising spend (GBP k) | Event profit (GBP k) | Venue capacity (seats) |\n| --- | --- | --- |\n| 18 | 9 | 350 |\n| 24 | 14 | 520 |\n| 31 | 13 | 420 |\n| 39 | 22 | 850 |\n| 47 | 28 | 1100 |\n| 56 | 31 | 950 |\n| 68 | 38 | 1600 |\n| 75 | 44 | 2100 |\n",
+      "promptSha256": "4d0f8a7dd3b7146350a9ea77fbe3bf75adf7565ab018ba86ddc6c97e0a85a553",
+      "source": "gallery/sources/venue-performance.cartesian.json",
+      "artifact": "gallery/venue-performance.html",
+      "bytes": {
+        "source": 1383,
+        "artifact": 62009
+      },
+      "sha256": {
+        "source": "8b6308c2d4d232a1e97fbe3458891d51f7656e4610634e1820b26b795f4312bd",
+        "artifact": "deb793ea65c997b5a36c984845efbe1be2d47d6f9d9458f13b6c0bb61d12c173"
       },
       "validation": {
         "quality": "showcase",
@@ -324,11 +351,11 @@
       "artifact": "gallery/zh-revenue.html",
       "bytes": {
         "source": 1100,
-        "artifact": 59626
+        "artifact": 61266
       },
       "sha256": {
         "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
-        "artifact": "b5e7b2cfa9fd74259f46d0645e3f3c59eb46b89237dd22b9d3d2bfb286546017"
+        "artifact": "15e33d0cc575a10e50c5e47f0c9e2a355c0612f17ffbeef988a613b711a60593"
       },
       "validation": {
         "quality": "showcase",

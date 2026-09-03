@@ -92,6 +92,10 @@ test('viewer runs without uncaught errors and positions its tooltip', { skip }, 
     assert.deepEqual(r.errors, [], `${name} raised viewer errors: ${r.errors.join('; ')}`);
     assert.ok(r.tooltipShown, `${name} tooltip did not open on hover`);
     assert.ok(r.tooltipText.length > 0, `${name} tooltip was empty`);
+    if (name === 'venue-performance.html') {
+      assert.match(r.tooltipText, /Venue capacity/);
+      assert.match(r.tooltipText, /seats/);
+    }
     // The regression that motivated this file: content was set, then the
     // positioning threw, leaving the tooltip stranded off-cursor.
     assert.match(r.tooltipLeft, /^-?\d+(\.\d+)?px$/, `${name} tooltip has no left position`);

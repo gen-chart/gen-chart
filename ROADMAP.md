@@ -10,7 +10,7 @@ hand-rolled SVG renderer, and no runtime dependencies.
 
 | Family | Marks |
 |---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter |
+| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, bar+line, scatter, bubble |
 | `distribution` | histogram, boxplot — computed from raw observations |
 | `proportion` | pie, donut |
 | `matrix` | heatmap, sequential or diverging |
@@ -56,7 +56,7 @@ profiles, `visual-check` for containment evidence, `demo`, `doctor`, a
 deterministic package build, and CI across Node 22 and 24.
 
 **Interactive instruction gallery.** One staged, deterministic build delivers
-all 12 examples at showcase quality before replacing the published site. The
+all 13 examples at showcase quality before replacing the published site. The
 homepage provides four-agent installation commands and teaches the complete
 Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
 example binds a concise data-bearing message prompt, exact source/artifact bytes,

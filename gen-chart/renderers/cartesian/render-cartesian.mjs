@@ -17,6 +17,29 @@ const LABEL_FONT = 11.5;
 const ANNOTATION_FONT = 10.5;
 const ROTATION_DEG = 32;
 const ROTATION_RAD = (ROTATION_DEG * Math.PI) / 180;
+const BUBBLE_MIN_RADIUS = 4;
+const BUBBLE_MAX_RADIUS = 24;
+
+// Bubble values encode area, so radius follows sqrt(value / max). Zero has
+// zero area; tiny positive marks clamp to a legible 4px radius and every mark
+// stays inside the 24px ceiling.
+function bubbleSizeScale(values, plottedValues) {
+  const positive = values.filter((v, i) => plottedValues[i] !== null && v !== null && v > 0);
+  const min = Math.min(...positive);
+  const max = Math.max(...positive);
+  const radius = (value) => {
+    if (value === null) return null;
+    if (value === 0) return 0;
+    return Math.max(BUBBLE_MIN_RADIUS, BUBBLE_MAX_RADIUS * Math.sqrt(value / max));
+  };
+  const legendValues = min === max ? [min] : [min, (min + max) / 2, max];
+  return {
+    min,
+    max,
+    radii: values.map((value, i) => plottedValues[i] === null ? null : radius(value)),
+    legend: legendValues.map((value) => ({ value, radius: radius(value) }))
+  };
+}
 
 // ---------------------------------------------------------------- analyze
 
@@ -56,6 +79,7 @@ export function analyzeCartesian(spec) {
   const seenSeries = new Set();
   let hasBar = false;
   let hasArea = false;
+  let hasBubble = false;
   let unit;
   for (let i = 0; i < spec.series.length; i++) {
     const s = spec.series[i];
@@ -124,19 +148,75 @@ export function analyzeCartesian(spec) {
       }
     }
     if (s.mark === 'area') hasArea = true;
-    if (s.mark === 'scatter' && enc.x.scale === 'band') {
+    if ((s.mark === 'scatter' || s.mark === 'bubble') && enc.x.scale === 'band') {
       diagnostics.push(diag('semantic/mark-scale-mismatch', 'error', `${subject}/mark`,
-        'scatter marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading', {
+        `${s.mark} marks show a relationship between two continuous variables; a band (categorical) x cannot carry that reading`, {
           supportedFixes: ['use a linear or time x scale', 'change the mark to "bar" for categories']
+        }));
+    }
+    if (s.mark === 'bubble') {
+      hasBubble = true;
+      if (!s.size) {
+        diagnostics.push(diag('semantic/bubble-size-required', 'error', `${subject}/size`,
+          `bubble series "${s.id}" needs a numeric size column`, {
+            supportedFixes: ['set series.size to an existing non-negative number column', 'change the mark to "scatter" for fixed-size points']
+          }));
+      } else {
+        const sizeCol = columns.get(s.size);
+        if (!sizeCol) {
+          diagnostics.push(diag('semantic/unknown-column', 'error', `${subject}/size`,
+            `bubble series "${s.id}" references size column "${s.size}" which does not exist`, {
+              evidence: { known: [...columns.keys()] },
+              supportedFixes: ['reference an existing data column id']
+            }));
+        } else if (sizeCol.type !== 'number') {
+          diagnostics.push(diag('semantic/size-not-numeric', 'error', `${subject}/size`,
+            `bubble size column "${s.size}" is typed ${sizeCol.type}, not number`, {
+              supportedFixes: ['use a number column for bubble size', 'retype the data column']
+            }));
+        } else {
+          const negatives = sizeCol.values
+            .map((value, index) => ({ value, index }))
+            .filter(({ value }) => value !== null && value < 0);
+          if (negatives.length > 0) {
+            diagnostics.push(diag('honesty/bubble-negative-size', 'error', `${subject}/size`,
+              `bubble area cannot represent ${negatives.length} negative size value(s)`, {
+                evidence: { offending: negatives.slice(0, 5) },
+                supportedFixes: ['use a non-negative magnitude column for size', 'change the mark to "scatter" and show the signed measure elsewhere']
+              }));
+          } else if (!sizeCol.values.some((v, row) => col.values[row] !== null && v !== null && v > 0)) {
+            diagnostics.push(diag('data/bubble-no-positive-size', 'error', `${subject}/size`,
+              `bubble size column "${s.size}" has no positive value paired with a plotted y value, so it would draw no visible bubbles`, {
+                supportedFixes: ['provide at least one positive size value', 'change the mark to "scatter" for fixed-size points']
+              }));
+          }
+        }
+      }
+    } else if (s.size !== undefined) {
+      diagnostics.push(diag('semantic/size-unsupported-mark', 'error', `${subject}/size`,
+        `size encoding only applies to bubble marks, not "${s.mark}"`, {
+          supportedFixes: ['change the mark to "bubble"', 'remove series.size']
         }));
     }
   }
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
 
-  if (spec.interactions?.brush === 'x' && (hasBar || enc.x.scale === 'band')) {
+  const bubbleSizes = new Map();
+  for (const s of spec.series) {
+    if (s.mark !== 'bubble') continue;
+    const sizeCol = columns.get(s.size);
+    bubbleSizes.set(s.id, {
+      column: s.size,
+      label: sizeCol.label ?? s.size,
+      unit: sizeCol.unit ?? null,
+      ...bubbleSizeScale(sizeCol.values, columns.get(s.y).values)
+    });
+  }
+
+  if (spec.interactions?.brush === 'x' && (enc.x.scale === 'band' || spec.series.some((s) => s.mark !== 'line'))) {
     diagnostics.push(diag('semantic/brush-unsupported', 'error', '/interactions/brush',
-      'brush zoom applies to line marks over a time or linear x scale; band scales and bar marks have no meaningful zoom window', {
-        supportedFixes: ['remove interactions.brush', 'change bar series to line marks over a time or linear x']
+      'brush zoom requires every series to be a line over a time or linear x scale', {
+        supportedFixes: ['remove interactions.brush', 'use only line marks over a time or linear x scale']
       }));
     return { diagnostics };
   }
@@ -148,7 +228,7 @@ export function analyzeCartesian(spec) {
     if (hasBar) {
       diagnostics.push(diag('honesty/log-bar', 'error', '/encoding/y/scale',
         'bars encode value as length, which a logarithmic axis destroys — a bar twice as tall would not mean twice the value', {
-          supportedFixes: ['use a line or scatter mark with the log scale', 'use a linear y scale for bars']
+          supportedFixes: ['use a line, scatter, or bubble mark with the log scale', 'use a linear y scale for bars']
         }));
       return { diagnostics };
     }
@@ -366,10 +446,10 @@ export function analyzeCartesian(spec) {
   const yTickLabels = yNice.ticks.map(fmtTick);
   const yTickWidth = Math.max(...yTickLabels.map((t) => estimateWidth(t, TICK_FONT)));
   const margin = {
-    top: 16 + (enc.y.label ? 20 : 0),
-    right: 20,
+    top: Math.max(16 + (enc.y.label ? 20 : 0), hasBubble ? BUBBLE_MAX_RADIUS + 2 : 0),
+    right: Math.max(20, hasBubble ? BUBBLE_MAX_RADIUS + 2 : 0),
     bottom: 30 + (enc.x.label ? 20 : 0),
-    left: Math.ceil(yTickWidth) + 18
+    left: Math.max(Math.ceil(yTickWidth) + 18, hasBubble ? BUBBLE_MAX_RADIUS + 2 : 0)
   };
 
   // ---- x positions and tick candidates
@@ -546,7 +626,8 @@ export function analyzeCartesian(spec) {
       W, H, margin, plotLeft, plotRight, plotTop, plotBottom,
       xCenters, xTicks, rotated, thinnedEvery, band,
       yTicks: yNice.ticks, yScale, yMin: yNice.min, yMax: yNice.max,
-      unit: unit ?? null, annotations, isLog, stacked, percent, totals: layoutTotals
+      unit: unit ?? null, annotations, isLog, stacked, percent, totals: layoutTotals,
+      bubbleSizes
     }
   };
 }
@@ -671,14 +752,20 @@ export function renderSvg(spec, analysis) {
     out.push('</g>');
   }
 
-  // scatter points
+  // scatter and bubble points
   for (const s of spec.series) {
-    if (s.mark !== 'scatter') continue;
+    if (s.mark !== 'scatter' && s.mark !== 'bubble') continue;
     const values = columns.get(s.y).values;
+    const bubble = layout.bubbleSizes.get(s.id);
+    const indexes = values.map((_, i) => i);
+    if (bubble) indexes.sort((a, b) => (bubble.radii[b] ?? -1) - (bubble.radii[a] ?? -1) || a - b);
     out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
-    values.forEach((v, i) => {
+    indexes.forEach((i) => {
+      const v = values[i];
       if (v === null) return;
-      out.push(`<circle class="gc-dot" cx="${round(xCenters[i])}" cy="${round(yScale(v))}" r="4"/>`);
+      const radius = bubble ? bubble.radii[i] : 4;
+      if (radius === null || radius === 0) return;
+      out.push(`<circle class="gc-dot${bubble ? ' gc-bubble' : ''}" cx="${round(xCenters[i])}" cy="${round(yScale(v))}" r="${round(radius)}"/>`);
     });
     out.push('</g>');
   }
@@ -722,11 +809,11 @@ export function renderSvg(spec, analysis) {
     out.push('</g>');
   }
 
-  // hover layer: crosshair + one marker per line series, driven by the viewer
+  // hover layer: crosshair + markers driven by the viewer
   out.push(`<g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="${plotTop}" x2="0" y2="${plotBottom}" style="display:none"/>`);
   for (const s of spec.series) {
-    if (s.mark !== 'line') continue;
-    out.push(`<circle class="gc-hover-dot" data-for="${escapeXml(s.id)}" r="4" style="display:none;--sc:${colors.get(s.id)}"/>`);
+    if (s.mark !== 'line' && s.mark !== 'bubble') continue;
+    out.push(`<circle class="gc-hover-dot${s.mark === 'bubble' ? ' gc-hover-bubble' : ''}" data-for="${escapeXml(s.id)}" r="4" style="display:none;--sc:${colors.get(s.id)}"/>`);
   }
   out.push(`<rect class="gc-hit" x="${plotLeft}" y="${plotTop}" width="${plotRight - plotLeft}" height="${plotBottom - plotTop}" fill="none" pointer-events="all"/>`);
   out.push('</g>');
@@ -742,6 +829,7 @@ export function buildPayload(spec, analysis) {
     xCol.type === 'date' ? fmtDate(xCol.ms[i], xCol.granularity, { withYear: true, locale: spec.meta.locale })
       : xCol.type === 'number' ? fmtValue(v)
         : v);
+  const sizeSeries = spec.series.filter((s) => s.mark === 'bubble');
   return {
     family: 'cartesian',
     hover: 'axis',
@@ -755,8 +843,16 @@ export function buildPayload(spec, analysis) {
     xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
     xLabels: xLabelsFull,
     table: {
-      headers: [xCol.label ?? spec.encoding.x.column, ...spec.series.map((s) => s.label)],
-      rows: xCol.values.map((xv, i) => [xv, ...spec.series.map((s) => columns.get(s.y).values[i])])
+      headers: [
+        xCol.label ?? spec.encoding.x.column,
+        ...spec.series.map((s) => s.label),
+        ...sizeSeries.map((s) => `${s.label} — ${columns.get(s.size).label ?? s.size}`)
+      ],
+      rows: xCol.values.map((xv, i) => [
+        xv,
+        ...spec.series.map((s) => columns.get(s.y).values[i]),
+        ...sizeSeries.map((s) => columns.get(s.size).values[i])
+      ])
     },
     plot: { left: layout.plotLeft, top: layout.plotTop, right: layout.plotRight, bottom: layout.plotBottom },
     width: layout.W,
@@ -765,6 +861,7 @@ export function buildPayload(spec, analysis) {
       const values = columns.get(s.y).values;
       const pct = (v, i) => (v === null ? null
         : `${((v / analysis.layout.totals[i]) * 100).toFixed(1)}% (${fmtValue(v)}${layout.unit ? ' ' + layout.unit : ''})`);
+      const bubble = layout.bubbleSizes.get(s.id);
       return {
         id: s.id,
         label: s.label,
@@ -773,24 +870,43 @@ export function buildPayload(spec, analysis) {
         values,
         formatted: layout.percent ? values.map(pct) : values.map(fmtValue),
         pixels: values.map((v) => (v === null ? null : Number(layout.yScale(v).toFixed(1)))),
+        size: bubble ? {
+          label: bubble.label,
+          unit: bubble.unit,
+          values: columns.get(bubble.column).values,
+          formatted: columns.get(bubble.column).values.map(fmtValue),
+          radii: bubble.radii.map((r) => r === null ? null : Number(r.toFixed(1)))
+        } : null,
         stats: seriesStats(values)
       };
     })
   };
 }
 
-export function buildLegend(spec) {
-  if (spec.series.length < 2) return null;
+export function buildLegend(spec, analysis) {
+  const sizes = spec.series.filter((s) => s.mark === 'bubble').map((s) => {
+    const bubble = analysis.layout.bubbleSizes.get(s.id);
+    return {
+      label: bubble.label,
+      unit: bubble.unit,
+      items: bubble.legend.map(({ value, radius }) => ({
+        value: fmtValue(value),
+        radius: round(radius)
+      }))
+    };
+  });
+  if (spec.series.length < 2 && sizes.length === 0) return null;
   const colors = resolveSeriesColors(spec.series);
   return {
     kind: 'series',
     toggleable: spec.interactions?.legend_toggle ?? true,
-    items: spec.series.map((s) => ({
+    items: spec.series.length < 2 ? [] : spec.series.map((s) => ({
       id: s.id,
       label: s.label,
       color: colors.get(s.id),
       mark: s.mark
-    }))
+    })),
+    sizes
   };
 }
 

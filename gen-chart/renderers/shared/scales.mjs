@@ -35,7 +35,7 @@ export function niceLinearTicks(min, max, count = 5) {
 
 // Ticks at nice round positions strictly inside [min, max], leaving the
 // domain itself untouched. Use where the axis legitimately does not start at
-// zero (boxplots, scatter): niceLinearTicks would snap the floor down to a
+// zero (boxplots, scatter, bubble): niceLinearTicks would snap the floor down to a
 // step multiple and squash the data into a corner.
 export function ticksWithin(min, max, { minTicks = 4, maxTicks = 8 } = {}) {
   const span = max - min;
