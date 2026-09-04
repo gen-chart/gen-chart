@@ -253,6 +253,47 @@ test('palette override recolors every role-authored series in the reported chart
   }
 });
 
+const SIGN_PALETTE_PROBE = `async function () {
+  var group = document.querySelector('.gc-series[data-color-by="sign"]');
+  var out = {
+    palette: document.documentElement.getAttribute('data-palette'),
+    options: Array.from(document.querySelectorAll('.gc-palette-option'))
+      .map(function (item) { return item.getAttribute('data-palette'); }),
+    states: []
+  };
+  document.querySelectorAll('.gc-palette-option').forEach(function (option) {
+    option.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    out.states.push({
+      id: option.getAttribute('data-palette'),
+      preview: Array.from(option.querySelectorAll('.gc-palette-swatch'))
+        .map(function (swatch) { return getComputedStyle(swatch).backgroundColor; }),
+      bars: ['negative', 'zero', 'positive'].map(function (sign) {
+        return getComputedStyle(document.querySelector('.gc-diverging-bar[data-sign="' + sign + '"]')).fill;
+      })
+    });
+  });
+  out.groupToken = group.style.getPropertyValue('--sc').trim();
+  out.legend = Array.from(document.querySelectorAll('.gc-sign-legend .gc-swatch'))
+    .map(function (swatch) { return getComputedStyle(swatch).backgroundColor; });
+  out.legendLabels = Array.from(document.querySelectorAll('.gc-sign-legend .gc-sign-item'))
+    .map(function (item) { return item.textContent.trim(); });
+  group.querySelector('.gc-diverging-bar').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  out.passportOpen = document.getElementById('gc-passport').hasAttribute('data-open');
+  return out;
+}`;
+
+test('palette changes preserve sign semantics and bars can open their series passport', { skip }, () => {
+  const r = run(examplesDir + 'service-memory-change.html', SIGN_PALETTE_PROBE);
+  assert.deepEqual(r.errors, [], r.errors.join('; '));
+  assert.equal(r.palette, 'stock');
+  assert.deepEqual(r.options, ['stock', 'blue-orange', 'teal-magenta']);
+  for (const state of r.states) assert.deepEqual(state.preview, state.bars, state.id);
+  assert.equal(r.groupToken, 'var(--role-neutral)');
+  assert.equal(r.legend.length, 3);
+  assert.deepEqual(r.legendLabels, ['Decrease', 'No change', 'Increase']);
+  assert.equal(r.passportOpen, true);
+});
+
 const PALETTE_HASH_PROBE = `async function () {
   var first = document.querySelector('.gc-series[data-series]');
   var mark = first && (first.querySelector('.gc-line') || first.querySelector('rect, path, circle'));

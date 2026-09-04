@@ -5,6 +5,18 @@ diagnostic catalog, or repair rules.
 
 ## Cartesian field reference
 
+- `orientation`: `"vertical"` (default when omitted) or `"horizontal"`.
+  Horizontal currently means exactly one unstacked `bar` series with a band
+  category in `encoding.x`, a linear signed measure in `series[].y`, a visible
+  zero baseline, and `color_by: "sign"`. It preserves authored row order.
+- Horizontal-only fields: `encoding.x.context` is `{column, label?}` for one
+  label-side metadata column; `series[].details` contains up to three
+  `{column, label?}` tooltip/table/CSV fields; `series[].value_labels` is
+  `"auto"` (default), `"always"`, or `"off"`. Context and details retain their
+  own units and never enter value-axis unit checks. Sign colors are positive,
+  negative, and neutral semantic roles; the viewer exposes them as a
+  contextual Stock, Blue–Orange, and Teal–Magenta palettes rather than
+  categorical palettes.
 - `encoding.x.scale`: `linear` (number column, strictly increasing), `time`
   (date column), `band` (string column). Bar marks require `band`.
 - `encoding.y`: `zero` (boolean, default true; rejected as `false` while any
@@ -103,6 +115,9 @@ diagnostic catalog, or repair rules.
 | `semantic/unknown-column`, `semantic/duplicate-series-id`, `semantic/series-not-numeric` | error | reference integrity |
 | `semantic/bubble-size-required`, `semantic/size-not-numeric`, `semantic/size-unsupported-mark` | error | bubble size encoding integrity |
 | `semantic/scale-type-mismatch`, `semantic/mark-scale-mismatch` | error | scale/column/mark compatibility |
+| `semantic/orientation-mark-mismatch` | error | horizontal orientation has an unsupported mark, stack, annotation, brush, or horizontal-only field is used vertically |
+| `semantic/sign-color-inapplicable` | error | sign coloring is absent, conflicts with a role, or is used outside one horizontal bar series |
+| `semantic/duplicate-detail-column` | error | context/detail metadata repeats a geometric or already referenced column |
 | `semantic/brush-unsupported` | error | brush needs line/range marks over time/linear x |
 | `semantic/unknown-series` | error | a view focuses a series that does not exist |
 | `semantic/view-brush-range` | error | a view's brush window is outside the plotted rows |
@@ -131,6 +146,10 @@ diagnostic catalog, or repair rules.
 | `composition/series-count` | warning | more than 5 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |
 | `composition/x-tick-overflow` | error | labels cannot fit at all |
+| `composition/diverging-one-sided` | warning | requested sign coloring contains no positive or no negative observations |
+| `composition/horizontal-label-overflow` | error | category/context labels leave too little signed-value plot space |
+| `composition/horizontal-row-density` | error/warning | horizontal categories are too tightly packed to read |
+| `composition/value-label-overflow` | error | `value_labels: "always"` cannot fit; auto mode omits labels with a visible note |
 | `data/insufficient-observations` | error/warning | too few raw values to summarize |
 | `data/matrix-duplicate-cell` | error | two values for one (row, column) |
 | `semantic/bins-not-applicable` | error | `bins` set on a boxplot |

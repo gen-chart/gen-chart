@@ -9,7 +9,7 @@ import { diag } from '../shared/diagnostics.mjs';
 import { niceLinearTicks, linearScale, bandScale, timeTicks, parseDateValue, logTicks, logScale } from '../shared/scales.mjs';
 import { fmtTick, fmtValue, fmtDate, escapeXml } from '../shared/format.mjs';
 import { estimateWidth } from '../shared/text-fit.mjs';
-import { resolveSeriesColors, resolveTokenHex } from '../shared/palette.mjs';
+import { resolveSeriesColors, resolveTokenHex, roleColor } from '../shared/palette.mjs';
 import { deltaE00, MIN_ADJACENT_DELTA_E } from '../shared/contrast.mjs';
 
 const TICK_FONT = 11;
@@ -71,6 +71,281 @@ function areaBetweenPath(xValues, lowerValues, upperValues, yScale) {
   }
   flush();
   return d;
+}
+
+function columnValueLabel(column, row, locale) {
+  const value = column.values[row];
+  if (value === null) return '—';
+  const formatted = column.type === 'date'
+    ? fmtDate(column.ms[row], column.granularity, { withYear: true, locale })
+    : column.type === 'number' ? fmtValue(value) : String(value);
+  return `${formatted}${unitSuffix(column.unit)}`;
+}
+
+function unitSuffix(unit) {
+  if (!unit) return '';
+  return unit === '%' ? '%' : ` ${unit}`;
+}
+
+function signedValueLabel(value, unit) {
+  if (value === null) return '—';
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${fmtValue(value)}${unitSuffix(unit)}`;
+}
+
+function valueSign(value) {
+  return value > 0 ? 'positive' : value < 0 ? 'negative' : 'zero';
+}
+
+function analyzeHorizontalCartesian(spec, columns, diagnostics, unit, seenSeries) {
+  const enc = spec.encoding;
+  const xCol = columns.get(enc.x.column);
+  const onlyBars = spec.series.every((s) => s.mark === 'bar');
+  if (!onlyBars || spec.series.length !== 1) {
+    diagnostics.push(diag('semantic/orientation-mark-mismatch', 'error', '/orientation',
+      'horizontal orientation currently supports exactly one unstacked bar series', {
+        evidence: { marks: spec.series.map((s) => s.mark), series: spec.series.length },
+        supportedFixes: ['use one bar series', 'remove "orientation" to keep the existing vertical layout']
+      }));
+  }
+  if (spec.stack === true || spec.stack === 'percent') {
+    diagnostics.push(diag('semantic/orientation-mark-mismatch', 'error', '/stack',
+      'horizontal diverging bars cannot be stacked because signed lengths must share the zero baseline', {
+        supportedFixes: ['remove "stack"', 'use a vertical stacked bar chart for part-to-whole data']
+      }));
+  }
+  if (enc.y.scale === 'log') {
+    diagnostics.push(diag('honesty/log-bar', 'error', '/encoding/y/scale',
+      'horizontal bars encode signed value as length around zero, which a logarithmic scale cannot represent', {
+        supportedFixes: ['use a linear y scale', 'remove "orientation" and use a non-bar log chart']
+      }));
+  }
+  if (enc.y.zero === false) {
+    diagnostics.push(diag('honesty/bar-zero-baseline', 'error', '/encoding/y/zero',
+      'horizontal bars encode value as length, so the numeric axis must include zero', {
+        supportedFixes: ['remove "zero": false', 'set encoding.y.zero to true']
+      }));
+  }
+  if (spec.annotations?.length) {
+    diagnostics.push(diag('semantic/orientation-mark-mismatch', 'error', '/annotations',
+      'annotations are not yet supported on horizontal diverging bars', {
+        supportedFixes: ['remove annotations', 'remove "orientation" to use the vertical Cartesian layout']
+      }));
+  }
+  if (spec.interactions?.brush === 'x') {
+    diagnostics.push(diag('semantic/brush-unsupported', 'error', '/interactions/brush',
+      'brush zoom is not supported on horizontal diverging bars', {
+        supportedFixes: ['remove interactions.brush']
+      }));
+  }
+
+  const series = spec.series[0];
+  if (series?.role && series.color_by === 'sign') {
+    diagnostics.push(diag('semantic/sign-color-inapplicable', 'error', '/series/0/role',
+      'a sign-colored series cannot also carry one series-wide semantic color role', {
+        supportedFixes: ['remove series.role', 'remove series.color_by to use one series color']
+      }));
+  }
+  if (series && series.color_by !== 'sign') {
+    diagnostics.push(diag('semantic/sign-color-inapplicable', 'error', '/series/0/color_by',
+      'horizontal diverging bars require color_by "sign" so positive and negative values cannot be mislabeled by one color', {
+        supportedFixes: ['set series.color_by to "sign"', 'remove "orientation" to use a standard vertical bar chart']
+      }));
+  }
+
+  const usedMetadata = new Set([enc.x.column, series?.y]);
+  let context = null;
+  if (enc.x.context) {
+    const contextCol = columns.get(enc.x.context.column);
+    if (!contextCol) {
+      diagnostics.push(diag('semantic/unknown-column', 'error', '/encoding/x/context/column',
+        `context references column "${enc.x.context.column}" which does not exist`, {
+          evidence: { known: [...columns.keys()] },
+          supportedFixes: ['reference an existing data column id', 'remove encoding.x.context']
+        }));
+    } else if (usedMetadata.has(enc.x.context.column)) {
+      diagnostics.push(diag('semantic/duplicate-detail-column', 'error', '/encoding/x/context/column',
+        `context column "${enc.x.context.column}" already supplies chart geometry`, {
+          supportedFixes: ['use a separate context column', 'remove encoding.x.context']
+        }));
+    } else {
+      usedMetadata.add(enc.x.context.column);
+      context = {
+        column: enc.x.context.column,
+        label: enc.x.context.label ?? contextCol.label ?? enc.x.context.column
+      };
+    }
+  }
+
+  const details = [];
+  for (let i = 0; i < (series?.details ?? []).length; i++) {
+    const detail = series.details[i];
+    const detailCol = columns.get(detail.column);
+    const subject = `/series/0/details/${i}/column`;
+    if (!detailCol) {
+      diagnostics.push(diag('semantic/unknown-column', 'error', subject,
+        `detail references column "${detail.column}" which does not exist`, {
+          evidence: { known: [...columns.keys()] },
+          supportedFixes: ['reference an existing data column id', 'remove the detail field']
+        }));
+    } else if (usedMetadata.has(detail.column)) {
+      diagnostics.push(diag('semantic/duplicate-detail-column', 'error', subject,
+        `detail column "${detail.column}" is already used by the category, value, context, or another detail`, {
+          supportedFixes: ['reference each detail column once', 'remove the duplicate detail']
+        }));
+    } else {
+      usedMetadata.add(detail.column);
+      details.push({ column: detail.column, label: detail.label ?? detailCol.label ?? detail.column });
+    }
+  }
+
+  const viewIds = new Set();
+  for (let i = 0; i < (spec.meta.views ?? []).length; i++) {
+    const view = spec.meta.views[i];
+    const subject = `/meta/views/${i}`;
+    if (viewIds.has(view.id)) {
+      diagnostics.push(diag('semantic/duplicate-view-id', 'error', subject,
+        `view id "${view.id}" is declared more than once`, {
+          supportedFixes: ['rename one of the duplicate views to a unique id']
+        }));
+    }
+    viewIds.add(view.id);
+    for (const id of view.focus ?? []) {
+      if (!seenSeries.has(id)) {
+        diagnostics.push(diag('semantic/unknown-series', 'error', `${subject}/focus`,
+          `view "${view.id}" focuses series "${id}", which this chart does not define`, {
+            evidence: { known: [...seenSeries] },
+            supportedFixes: ['reference an existing series id', 'remove the focus entry']
+          }));
+      }
+    }
+    if (view.brush) {
+      diagnostics.push(diag('semantic/view-brush-range', 'error', `${subject}/brush`,
+        'guided-view brush windows are not supported on horizontal diverging bars', {
+          supportedFixes: ['remove the brush window']
+        }));
+    }
+  }
+  if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
+
+  const values = columns.get(series.y).values;
+  const present = values.filter((v) => v !== null);
+  if (present.length === 0) {
+    diagnostics.push(diag('data/all-null', 'error', '/series',
+      'every plotted value is null; nothing to draw', {
+        supportedFixes: ['provide at least one non-null value']
+      }));
+    return { diagnostics };
+  }
+  const positives = present.filter((v) => v > 0).length;
+  const negatives = present.filter((v) => v < 0).length;
+  if (positives === 0 || negatives === 0) {
+    diagnostics.push(diag('composition/diverging-one-sided', 'warning', '/series/0/color_by',
+      'sign coloring was requested, but the plotted values do not include both positive and negative observations', {
+        evidence: { positives, negatives, zeros: present.length - positives - negatives },
+        supportedFixes: ['use a standard vertical bar chart when only one direction is present', 'provide the intended signed comparison data']
+      }));
+  }
+
+  const W = spec.meta.width ?? 960;
+  const H = spec.meta.height ?? 520;
+  const contextCol = context ? columns.get(context.column) : null;
+  const categoryWidth = Math.max(...xCol.values.map((v) => estimateWidth(String(v), LABEL_FONT)));
+  const contextLabels = contextCol
+    ? contextCol.values.map((_, row) => columnValueLabel(contextCol, row, spec.meta.locale))
+    : [];
+  const contextWidth = contextLabels.length
+    ? Math.max(...contextLabels.map((v) => estimateWidth(v, LABEL_FONT)))
+    : 0;
+  const margin = {
+    top: 48,
+    right: 24,
+    bottom: 24 + (enc.x.label ? 18 : 0),
+    left: Math.ceil(20 + categoryWidth + (context ? contextWidth + 16 : 0))
+  };
+  if (W - margin.left - margin.right < 280) {
+    diagnostics.push(diag('composition/horizontal-label-overflow', 'error', '/encoding/x',
+      'category and context labels leave less than 280px for the signed value plot', {
+        evidence: { labelMarginPx: margin.left, availablePlotPx: W - margin.left - margin.right },
+        supportedFixes: ['increase meta.width', 'shorten category labels', 'remove encoding.x.context']
+      }));
+    return { diagnostics };
+  }
+
+  const plotLeft = margin.left;
+  const plotRight = W - margin.right;
+  const plotTop = margin.top;
+  const plotBottom = H - margin.bottom;
+  const categoryBand = bandScale(xCol.values.length, plotTop, plotBottom, { paddingInner: 0.32, paddingOuter: 0.16 });
+  const rowStep = categoryBand.step;
+  if (rowStep < 2) {
+    diagnostics.push(diag('composition/horizontal-row-density', 'error', '/data/columns',
+      `${xCol.values.length} rows leave only ${rowStep.toFixed(1)}px per category`, {
+        evidence: { rows: xCol.values.length, rowStepPx: Number(rowStep.toFixed(1)) },
+        supportedFixes: ['increase meta.height', 'reduce the number of categories', 'split into focused charts']
+      }));
+    return { diagnostics };
+  }
+  if (rowStep < 12) {
+    diagnostics.push(diag('composition/horizontal-row-density', 'warning', '/data/columns',
+      `${xCol.values.length} rows leave only ${rowStep.toFixed(1)}px per category`, {
+        evidence: { rows: xCol.values.length, rowStepPx: Number(rowStep.toFixed(1)) },
+        supportedFixes: ['increase meta.height', 'reduce the number of categories', 'split into focused charts']
+      }));
+  }
+
+  const valueMin = Math.min(0, ...present);
+  const valueMax = Math.max(0, ...present);
+  const valueNice = niceLinearTicks(valueMin, valueMax, 6);
+  const valueScale = linearScale(valueNice.min, valueNice.max, plotLeft, plotRight);
+  const valueLabelsMode = series.value_labels ?? 'auto';
+  let valueLabelsShown = valueLabelsMode !== 'off';
+  const overflows = [];
+  if (valueLabelsShown) {
+    values.forEach((value, index) => {
+      if (value === null) return;
+      const label = signedValueLabel(value, unit);
+      const width = estimateWidth(label, TICK_FONT);
+      const pixel = valueScale(value);
+      const fits = value < 0 ? pixel - 6 - width >= plotLeft : pixel + 6 + width <= plotRight;
+      if (!fits) overflows.push({ index, value, neededPx: Math.ceil(width + 6) });
+    });
+  }
+  if (overflows.length && valueLabelsMode === 'always') {
+    diagnostics.push(diag('composition/value-label-overflow', 'error', '/series/0/value_labels',
+      `${overflows.length} signed value label(s) cannot fit inside the plot`, {
+        evidence: { offending: overflows.slice(0, 5) },
+        supportedFixes: ['increase meta.width', 'set series.value_labels to "auto" or "off"', 'shorten the value unit']
+      }));
+    return { diagnostics };
+  }
+  if (overflows.length) valueLabelsShown = false;
+
+  return {
+    diagnostics,
+    columns,
+    layout: {
+      orientation: 'horizontal', W, H, margin, plotLeft, plotRight, plotTop, plotBottom,
+      categoryBand,
+      categoryCenters: xCol.values.map((_, i) => categoryBand.center(i)),
+      valueTicks: valueNice.ticks,
+      valueScale,
+      valueMin: valueNice.min,
+      valueMax: valueNice.max,
+      zeroPixel: valueScale(0),
+      unit: unit ?? null,
+      context,
+      contextLabels,
+      details,
+      valueLabelsMode,
+      valueLabelsShown,
+      valueLabelsOmitted: overflows.length > 0,
+      stacked: false,
+      percent: false,
+      annotations: [],
+      bubbleSizes: new Map()
+    }
+  };
 }
 
 // ---------------------------------------------------------------- analyze
@@ -291,6 +566,26 @@ export function analyzeCartesian(spec) {
     }
   }
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
+
+  if (spec.orientation !== 'horizontal') {
+    if (enc.x.context) {
+      diagnostics.push(diag('semantic/orientation-mark-mismatch', 'error', '/encoding/x/context',
+        'context labels are supported only by horizontal bar charts', {
+          supportedFixes: ['set orientation to "horizontal"', 'remove encoding.x.context']
+        }));
+    }
+    spec.series.forEach((s, i) => {
+      if (s.color_by !== undefined || s.value_labels !== undefined || s.details !== undefined) {
+        diagnostics.push(diag('semantic/orientation-mark-mismatch', 'error', `/series/${i}`,
+          'color_by, value_labels, and details are supported only by horizontal bar charts', {
+            supportedFixes: ['set orientation to "horizontal" for one bar series', 'remove the horizontal-only fields']
+          }));
+      }
+    });
+    if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
+  } else {
+    return analyzeHorizontalCartesian(spec, columns, diagnostics, unit, seenSeries);
+  }
 
   const bubbleSizes = new Map();
   for (const s of spec.series) {
@@ -767,7 +1062,94 @@ export function analyzeCartesian(spec) {
 
 // ----------------------------------------------------------------- render
 
+function horizontalTooltip(spec, analysis, row) {
+  const { columns, layout } = analysis;
+  const series = spec.series[0];
+  const rows = [];
+  if (layout.context) {
+    const column = columns.get(layout.context.column);
+    rows.push({ label: layout.context.label, value: columnValueLabel(column, row, spec.meta.locale) });
+  }
+  rows.push({
+    label: series.label,
+    value: signedValueLabel(columns.get(series.y).values[row], layout.unit)
+  });
+  for (const detail of layout.details) {
+    rows.push({
+      label: detail.label,
+      value: columnValueLabel(columns.get(detail.column), row, spec.meta.locale)
+    });
+  }
+  return JSON.stringify({ title: columns.get(spec.encoding.x.column).values[row], rows });
+}
+
+function renderHorizontalSvg(spec, analysis) {
+  const { columns, layout } = analysis;
+  const {
+    W, H, plotLeft, plotRight, plotTop, plotBottom, categoryBand,
+    categoryCenters, valueTicks, valueScale, zeroPixel, unit
+  } = layout;
+  const enc = spec.encoding;
+  const xCol = columns.get(enc.x.column);
+  const series = spec.series[0];
+  const values = columns.get(series.y).values;
+  const categoryRight = plotLeft - 12;
+  const categoryWidth = Math.max(...xCol.values.map((v) => estimateWidth(String(v), LABEL_FONT)));
+  const contextRight = categoryRight - categoryWidth - 16;
+  const barH = Math.max(1, categoryBand.bandwidth * 0.82);
+  const out = [];
+  out.push(`<svg class="gc-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeXml(spec.meta.title)}" xmlns="http://www.w3.org/2000/svg">`);
+
+  out.push('<g class="gc-grid gc-horizontal-grid">');
+  for (const tick of valueTicks) {
+    const x = round(valueScale(tick));
+    out.push(`<line x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}"/>`);
+  }
+  out.push('</g>');
+  out.push(`<line class="gc-axis gc-zero-axis" x1="${round(zeroPixel)}" y1="${plotTop}" x2="${round(zeroPixel)}" y2="${plotBottom}"/>`);
+
+  out.push('<g class="gc-value-ticks">');
+  for (const tick of valueTicks) {
+    const x = round(valueScale(tick));
+    out.push(`<text x="${x}" y="${plotTop - 12}" text-anchor="middle">${escapeXml(`${fmtTick(tick)}${unitSuffix(unit)}`)}</text>`);
+  }
+  out.push('</g>');
+  if (enc.y.label) {
+    out.push(`<text class="gc-axis-label" x="${plotLeft}" y="16" text-anchor="start">${escapeXml(enc.y.label)}</text>`);
+  }
+  if (enc.x.label) {
+    out.push(`<text class="gc-axis-label" x="${categoryRight}" y="${H - 8}" text-anchor="end">${escapeXml(enc.x.label)}</text>`);
+  }
+
+  out.push(`<g class="gc-series" data-series="${escapeXml(series.id)}" data-color-by="sign" style="--sc:${roleColor('neutral')}">`);
+  values.forEach((value, row) => {
+    const cy = categoryCenters[row];
+    const labelY = round(cy + 4);
+    if (layout.context) {
+      out.push(`<text class="gc-context-label" x="${round(contextRight)}" y="${labelY}" text-anchor="end">${escapeXml(layout.contextLabels[row])}</text>`);
+    }
+    out.push(`<text class="gc-category-label" x="${round(categoryRight)}" y="${labelY}" text-anchor="end">${escapeXml(xCol.values[row])}</text>`);
+    if (value === null) return;
+    const sign = valueSign(value);
+    const color = roleColor(sign === 'zero' ? 'neutral' : sign);
+    const valueX = valueScale(value);
+    const x = value === 0 ? zeroPixel - 0.4 : Math.min(zeroPixel, valueX);
+    const width = value === 0 ? 0.8 : Math.max(0.8, Math.abs(valueX - zeroPixel));
+    const y = cy - barH / 2;
+    out.push(`<rect class="gc-diverging-bar" data-sign="${sign}" data-index="${row}" data-tip="${escapeXml(horizontalTooltip(spec, analysis, row))}" style="--sc:${color}" x="${round(x)}" y="${round(y)}" width="${round(width)}" height="${round(barH)}" rx="1.5"/>`);
+    if (layout.valueLabelsShown) {
+      const labelX = value < 0 ? valueX - 6 : valueX + 6;
+      const anchor = value < 0 ? 'end' : 'start';
+      out.push(`<text class="gc-bar-value" data-sign="${sign}" x="${round(labelX)}" y="${labelY}" text-anchor="${anchor}">${escapeXml(signedValueLabel(value, unit))}</text>`);
+    }
+  });
+  out.push('</g>');
+  out.push('</svg>');
+  return out.join('');
+}
+
 export function renderSvg(spec, analysis) {
+  if (analysis.layout.orientation === 'horizontal') return renderHorizontalSvg(spec, analysis);
   const { columns, layout } = analysis;
   const {
     W, H, plotLeft, plotRight, plotTop, plotBottom,
@@ -968,6 +1350,7 @@ export function renderSvg(spec, analysis) {
 }
 
 export function buildPayload(spec, analysis) {
+  if (analysis.layout.orientation === 'horizontal') return buildHorizontalPayload(spec, analysis);
   const { columns, layout } = analysis;
   const xCol = columns.get(spec.encoding.x.column);
   const colors = resolveSeriesColors(spec.series);
@@ -1058,7 +1441,88 @@ export function buildPayload(spec, analysis) {
   };
 }
 
+function buildHorizontalPayload(spec, analysis) {
+  const { columns, layout } = analysis;
+  const xCol = columns.get(spec.encoding.x.column);
+  const series = spec.series[0];
+  const values = columns.get(series.y).values;
+  const contextCol = layout.context ? columns.get(layout.context.column) : null;
+  const detailColumns = layout.details.map((detail) => ({ ...detail, source: columns.get(detail.column) }));
+  return {
+    family: 'cartesian',
+    hover: 'element',
+    orientation: 'horizontal',
+    title: spec.meta.title,
+    unit: layout.unit,
+    xType: 'band',
+    tooltip: spec.interactions?.tooltip ?? 'auto',
+    legendToggle: false,
+    brush: null,
+    views: spec.meta.views ?? [],
+    xPixels: layout.categoryCenters.map((value) => Number(value.toFixed(1))),
+    xLabels: [...xCol.values],
+    table: {
+      headers: [
+        xCol.label ?? spec.encoding.x.column,
+        ...(layout.context ? [layout.context.label] : []),
+        series.label,
+        ...detailColumns.map((detail) => detail.label)
+      ],
+      rows: xCol.values.map((category, row) => [
+        category,
+        ...(contextCol ? [contextCol.values[row]] : []),
+        values[row],
+        ...detailColumns.map((detail) => detail.source.values[row])
+      ])
+    },
+    plot: { left: layout.plotLeft, top: layout.plotTop, right: layout.plotRight, bottom: layout.plotBottom },
+    width: layout.W,
+    height: layout.H,
+    valueLabelsOmitted: layout.valueLabelsOmitted,
+    series: [{
+      id: series.id,
+      label: series.label,
+      mark: series.mark,
+      color: roleColor('neutral'),
+      colorBy: 'sign',
+      values,
+      formatted: values.map((value) => signedValueLabel(value, layout.unit)),
+      pixels: values.map((value) => value === null ? null : Number(layout.valueScale(value).toFixed(1))),
+      signs: values.map((value) => value === null ? null : valueSign(value)),
+      context: layout.context ? {
+        label: layout.context.label,
+        values: contextCol.values,
+        formatted: contextCol.values.map((_, row) => columnValueLabel(contextCol, row, spec.meta.locale))
+      } : null,
+      details: detailColumns.map((detail) => ({
+        label: detail.label,
+        values: detail.source.values,
+        formatted: detail.source.values.map((_, row) => columnValueLabel(detail.source, row, spec.meta.locale))
+      })),
+      focusable: true,
+      stats: seriesStats(values)
+    }]
+  };
+}
+
 export function buildLegend(spec, analysis) {
+  if (analysis.layout.orientation === 'horizontal') {
+    const values = analysis.columns.get(spec.series[0].y).values.filter((value) => value !== null);
+    const signs = [
+      { sign: 'negative', role: 'negative', present: values.some((value) => value < 0) },
+      { sign: 'zero', role: 'neutral', present: values.some((value) => value === 0) },
+      { sign: 'positive', role: 'positive', present: values.some((value) => value > 0) }
+    ].filter((item) => item.present);
+    return {
+      kind: 'sign',
+      items: signs.map((item) => ({
+        sign: item.sign,
+        labelKey: `legend.${item.sign}`,
+        color: roleColor(item.role)
+      })),
+      valueLabelsOmitted: analysis.layout.valueLabelsOmitted
+    };
+  }
   const hasRange = spec.series.some((s) => s.mark === 'range');
   const sizes = spec.series.filter((s) => s.mark === 'bubble').map((s) => {
     const bubble = analysis.layout.bubbleSizes.get(s.id);

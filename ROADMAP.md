@@ -10,7 +10,7 @@ hand-rolled SVG renderer, and no runtime dependencies.
 
 | Family | Marks |
 |---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble |
+| `cartesian` | line, bar, horizontal diverging bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble |
 | `distribution` | histogram, boxplot — computed from raw observations |
 | `proportion` | pie, donut |
 | `matrix` | heatmap, sequential or diverging |
@@ -30,6 +30,7 @@ subject, measured evidence, and a closed set of supported fixes:
 - 100%-stacks disclose a shifting denominator and keep absolutes in the tooltip
 - directional colour roles rejected over mixed-sign data
 - range bands require an explicit meaning, paired bounds, and lower ≤ upper
+- horizontal diverging bars require one unstacked signed series, a shared zero baseline, and sign-stable semantic colors
 - scatter and bubble plots warn above 2,000 visible points, before overplotting hides the distribution
 - sequential heatmap ramps reject negatives; diverging ramps require a midpoint
 
@@ -58,7 +59,7 @@ profiles, `visual-check` for containment evidence, `demo`, `doctor`, a
 deterministic package build, and CI across Node 22 and 24.
 
 **Interactive instruction gallery.** One staged, deterministic build delivers
-all 14 examples at showcase quality before replacing the published site. The
+all 15 examples at showcase quality before replacing the published site. The
 homepage provides four-agent installation commands and teaches the complete
 Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
 example binds a concise data-bearing message prompt, exact source/artifact bytes,

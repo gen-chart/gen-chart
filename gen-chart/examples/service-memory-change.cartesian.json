@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "orientation": "horizontal",
+  "meta": {
+    "title": "Most services grew while a smaller group released memory",
+    "subtitle": "Five-minute memory footprint versus the previous hour",
+    "quality_profile": "showcase",
+    "width": 1120,
+    "height": 780
+  },
+  "data": {
+    "columns": [
+      {
+        "id": "service",
+        "type": "string",
+        "label": "Service",
+        "values": ["spanner", "analytics-intake", "trade-scheduler", "trade-receiver", "kafka", "emailer", "product-recommendation-db", "fraud-detector", "analytics-aggregator", "product-recommendation", "product-recommendation-lite", "balance-checker", "trade-executor", "authenticator", "trade-validator", "trade-enrichment", "notifier", "slow-kafka"]
+      },
+      {
+        "id": "current_memory",
+        "type": "number",
+        "unit": "MiB",
+        "label": "Current memory",
+        "values": [141.2, 292.3, 337.7, 75.6, 806, 856.7, 888.6, 1740.8, 375.5, 103.6, 79.7, 1638.4, 973.6, 525.6, 57.3, 51.5, 575.1, 266.2]
+      },
+      {
+        "id": "change",
+        "type": "number",
+        "unit": "%",
+        "label": "Change",
+        "values": [35, 28.8, 17.4, 16.7, 13, 7.9, 4.5, 3.4, 1.7, 1.4, 0.8, 0, -2.4, -3, -3.6, -6.1, -18.9, -40.3]
+      },
+      {
+        "id": "previous_memory",
+        "type": "number",
+        "unit": "MiB",
+        "label": "Previous-hour memory",
+        "values": [104.6, 226.9, 287.6, 64.8, 713.3, 793.9, 850.3, 1683.6, 369.2, 102.2, 79.1, 1638.4, 997.5, 541.9, 59.4, 54.8, 709.1, 445.9]
+      }
+    ]
+  },
+  "encoding": {
+    "x": {
+      "column": "service",
+      "scale": "band",
+      "label": "Service",
+      "context": {
+        "column": "current_memory",
+        "label": "Current memory"
+      }
+    },
+    "y": {
+      "scale": "linear",
+      "zero": true,
+      "label": "Memory change"
+    }
+  },
+  "series": [
+    {
+      "id": "memory_change",
+      "mark": "bar",
+      "y": "change",
+      "label": "Change",
+      "color_by": "sign",
+      "value_labels": "auto",
+      "details": [
+        {
+          "column": "previous_memory",
+          "label": "Previous-hour memory"
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "title": "Takeaway",
+      "items": [
+        "Spanner has the largest increase at +35%.",
+        "Slow-kafka has the largest decrease at -40.3%.",
+        "Balance-checker is unchanged."
+      ]
+    }
+  ]
+}

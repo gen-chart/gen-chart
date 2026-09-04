@@ -14,6 +14,36 @@ const ROLE_TOKENS = {
 const CATEGORICAL = ['--cat-0', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--cat-5'];
 
 export const DEFAULT_PALETTE = 'classic';
+export const DEFAULT_SIGN_PALETTE = 'stock';
+
+// Diverging bars need role-aware triplets rather than categorical cycles.
+// Each palette preserves positive / neutral / negative meaning and provides
+// theme-specific colors that remain distinguishable from the chart panel.
+export const SIGN_PALETTES = Object.freeze({
+  stock: Object.freeze({
+    light: Object.freeze(['#059669', '#748296', '#E11D48']),
+    dark: Object.freeze(['#34D399', '#94A3B8', '#FB7185'])
+  }),
+  'blue-orange': Object.freeze({
+    light: Object.freeze(['#2563EB', '#748296', '#C2410C']),
+    dark: Object.freeze(['#60A5FA', '#94A3B8', '#FB923C'])
+  }),
+  'teal-magenta': Object.freeze({
+    light: Object.freeze(['#0F766E', '#748296', '#BE185D']),
+    dark: Object.freeze(['#2DD4BF', '#94A3B8', '#F472B6'])
+  })
+});
+
+export function signPaletteIds() {
+  return Object.keys(SIGN_PALETTES);
+}
+
+export function signPalettePreviewColors(id) {
+  if (!Object.hasOwn(SIGN_PALETTES, id)) return [];
+  // Mirror the chart's spatial reading: negative left, zero center,
+  // positive right. Stored colors remain positive / neutral / negative.
+  return ['negative', 'neutral', 'positive'].map((role) => `var(--sign-${id}-${role})`);
+}
 
 // One registry feeds renderer analysis, generated viewer CSS, picker
 // previews, exports, gallery thumbnails, and tests. Charts with up to three
@@ -64,7 +94,7 @@ export function paletteInk(color) {
 // Embedded after the theme blocks. Palette selection therefore changes only
 // categorical tokens and survives light/dark theme changes.
 export function paletteCss() {
-  return paletteIds().map((id) => {
+  const categorical = paletteIds().map((id) => {
     const declarations = PALETTES[id].six
       .map((color, i) => `--cat-${i}: ${color}`)
       .join('; ');
@@ -78,6 +108,15 @@ export function paletteCss() {
     return `:root[data-palette="${id}"] { ${declarations}; ${heatmap}; }\n` +
       `:root[data-palette="${id}"][data-palette-size="three"] { ${compact}; }`;
   }).join('\n');
+  const signTokens = signPaletteIds().map((id) => {
+    const [lp, lz, ln] = SIGN_PALETTES[id].light;
+    const [dp, dz, dn] = SIGN_PALETTES[id].dark;
+    return `:root { --sign-${id}-positive: ${lp}; --sign-${id}-neutral: ${lz}; --sign-${id}-negative: ${ln}; }\n` +
+      `:root[data-theme="dark"] { --sign-${id}-positive: ${dp}; --sign-${id}-neutral: ${dz}; --sign-${id}-negative: ${dn}; }\n` +
+      `@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --sign-${id}-positive: ${dp}; --sign-${id}-neutral: ${dz}; --sign-${id}-negative: ${dn}; } }\n` +
+      `:root[data-palette="${id}"] { --role-positive: var(--sign-${id}-positive); --role-neutral: var(--sign-${id}-neutral); --role-negative: var(--sign-${id}-negative); }`;
+  }).join('\n');
+  return `${categorical}\n${signTokens}`;
 }
 
 export const BUCKETS = 6;

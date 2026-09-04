@@ -2,14 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DEFAULT_PALETTE,
+  DEFAULT_SIGN_PALETTE,
   PALETTES,
+  SIGN_PALETTES,
   paletteColors,
   paletteCss,
   paletteIds,
   paletteInk,
   palettePreviewColors,
   resolvePaletteId,
-  resolveTokenHex
+  resolveTokenHex,
+  signPaletteIds,
+  signPalettePreviewColors
 } from '../renderers/shared/palette.mjs';
 import { contrastRatio, deltaE00, AA_GRAPHIC, MIN_ADJACENT_DELTA_E } from '../renderers/shared/contrast.mjs';
 
@@ -22,6 +26,28 @@ test('palette registry has the approved order, default, and dimensions', () => {
     assert.equal(palette.six.length, 6, `${id} chart cycle`);
     assert.equal(palette.three.length, 3, `${id} compact set`);
     for (const color of [...palette.six, ...palette.three]) assert.match(color, HEX, `${id}: ${color}`);
+  }
+});
+
+test('sign palettes define accessible positive, neutral, and negative triplets per theme', () => {
+  assert.equal(DEFAULT_SIGN_PALETTE, 'stock');
+  assert.deepEqual(signPaletteIds(), ['stock', 'blue-orange', 'teal-magenta']);
+  assert.deepEqual(signPalettePreviewColors('blue-orange'), [
+    'var(--sign-blue-orange-negative)',
+    'var(--sign-blue-orange-neutral)',
+    'var(--sign-blue-orange-positive)'
+  ]);
+  for (const [id, palette] of Object.entries(SIGN_PALETTES)) {
+    assert.equal(palette.light.length, 3, `${id} light`);
+    assert.equal(palette.dark.length, 3, `${id} dark`);
+    for (const color of palette.light) {
+      assert.match(color, HEX);
+      assert.ok(contrastRatio(color, '#f8fafc') >= AA_GRAPHIC, `${id} ${color} on light panel`);
+    }
+    for (const color of palette.dark) {
+      assert.match(color, HEX);
+      assert.ok(contrastRatio(color, '#0f172a') >= AA_GRAPHIC, `${id} ${color} on dark panel`);
+    }
   }
 });
 
@@ -50,6 +76,12 @@ test('palette ids fall back safely and generated CSS maps all categorical tokens
       assert.ok(css.includes(`--seq-${i}: ${PALETTES[id].six[i]}`), `${id} sequential ${i}`);
       assert.ok(css.includes(`--div-${i}: ${PALETTES[id].six[i]}`), `${id} diverging ${i}`);
     }
+  }
+  for (const id of signPaletteIds()) {
+    assert.ok(css.includes(`:root[data-palette="${id}"]`), id);
+    assert.ok(css.includes(`--role-positive: var(--sign-${id}-positive)`), `${id} positive role`);
+    assert.ok(css.includes(`--role-neutral: var(--sign-${id}-neutral)`), `${id} neutral role`);
+    assert.ok(css.includes(`--role-negative: var(--sign-${id}-negative)`), `${id} negative role`);
   }
   assert.equal(paletteColors('classic', 3), PALETTES.classic.three);
   assert.equal(paletteColors('classic', 4), PALETTES.classic.six);

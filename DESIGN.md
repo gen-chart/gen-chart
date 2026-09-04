@@ -164,8 +164,15 @@ Selecting a palette is an explicit viewer override: it assigns the applicable
 three- or six-color set to displayed series in order, including series that
 have an authored semantic role. Heatmaps map the six colors onto their ordered
 sequential or diverging buckets and choose contrasting black or white cell
-labels. Role metadata and its validation meaning do not change; annotations
-are unaffected.
+labels. Sign-colored horizontal bars are the exception: their contextual
+**Stock**, **Blue–Orange**, and **Teal–Magenta** palettes preview and remap the
+actual sign tokens together; each preview mirrors the chart from negative on
+the left through neutral to positive on the right. Stock is selected
+automatically. Role metadata and its validation meaning do not change;
+annotations are unaffected.
+
+The semantic sign legend follows that same spatial order: Decrease, No
+change, Increase. Missing signs are omitted without reordering those present.
 
 **Known accessibility gap.** The supplied palette values clear the current
 dark-panel contrast check, but several pale colors do not clear 3:1 against
@@ -210,6 +217,10 @@ canvas instead.
 ## Marks and layout
 
 - **Bars** encode by length and therefore always include zero.
+- **Horizontal diverging bars** place authored categories top-to-bottom and
+  extend one signed measure left or right from a shared zero line. Direction,
+  an explicit signed value, and positive/negative/neutral tokens carry the
+  meaning together; selectable categorical palettes never remap those tokens.
 - **Lines, ranges, scatter, bubble, and boxplots** encode by position and may omit zero, but
   padding never implies impossible values (negative durations or counts).
 - **Ranges** fill only between authored lower and upper bounds. Their visible

@@ -15,6 +15,14 @@ test('category comparison routes to cartesian bar', () => {
   assert.ok(r.recommendation.marks.includes('bar'));
 });
 
+test('diverging bar scenarios route to horizontal Cartesian bars', () => {
+  const r = guide('show the percentage change as a horizontal diverging bar chart');
+  assert.equal(r.recommendation.chart_type, 'cartesian');
+  assert.deepEqual(r.recommendation.marks, ['bar']);
+  assert.equal(r.recommendation.orientation, 'horizontal');
+  assert.equal(r.recommendation.implemented, true);
+});
+
 test('actual-vs-target routes to the bar+line combo with high confidence', () => {
   const r = guide('weekly signups against the target');
   assert.deepEqual(r.recommendation.marks.sort(), ['bar', 'line']);
