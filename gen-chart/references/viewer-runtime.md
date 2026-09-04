@@ -42,6 +42,10 @@ beyond the spec fields named here.
 - A visually hidden `<table>` carries the exact values with proper
   `scope` attributes — the accessible equivalent of the chart, not a
   summary. It is present for every family.
+- When point-density downsampling is active, a visible computed note states
+  the rendered and source counts and the deterministic systematic row-order
+  method. Only SVG scatter/bubble marks are sampled; keyboard walking,
+  tooltips, statistics, the accessible table, and CSV use all source rows.
 - Hidden series are struck through as well as faded; controls keep visible
   focus rings and real button semantics.
 - `prefers-reduced-motion` disables transitions; `prefers-color-scheme`

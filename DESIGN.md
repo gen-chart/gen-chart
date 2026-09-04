@@ -234,9 +234,12 @@ visual weight than the marks it supports.
 beside the chart.
 
 **The Point Density Rule.** Count circles that will actually render across
-all scatter and bubble series. Above 2,000, require deterministic
-downsampling, meaningful aggregation, or a focused subset before showcase
-delivery.
+all scatter and bubble series. Above 2,000, require
+`transforms.point_density: "downsample"`, meaningful aggregation, or a focused
+subset before showcase delivery. Downsampling is deterministic systematic
+row-order sampling, applies only to SVG marks, is disclosed beside the chart,
+and never removes source rows from the accessible table, tooltips, statistics,
+or provenance CSV.
 
 ## Interaction
 
