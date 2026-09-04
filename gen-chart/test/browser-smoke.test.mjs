@@ -108,6 +108,7 @@ test('viewer runs without uncaught errors and positions its tooltip', { skip }, 
       assert.match(r.tooltipText, /80% prediction interval/);
       assert.match(r.tooltipText, /GBP k/);
     }
+    if (name === 'deploy-outcomes.html') assert.doesNotMatch(r.tooltipText, /deploys deploys/);
     // The regression that motivated this file: content was set, then the
     // positioning threw, leaving the tooltip stranded off-cursor.
     assert.match(r.tooltipLeft, /^-?\d+(\.\d+)?px$/, `${name} tooltip has no left position`);
@@ -392,6 +393,7 @@ const EXPORT_PROBE = `async function () {
     document.documentElement.setAttribute('data-probe', JSON.stringify(o));
   }
   var out = { kinds: {}, pngCaptured: false };
+  out.legendExpected = !!document.querySelector('.gc-legend button, .gc-sign-legend .gc-sign-item, .gc-size-legend .gc-size-item');
 
   document.querySelector('[data-palette="warm"]').click();
   out.selectedCat0 = getComputedStyle(document.documentElement).getPropertyValue('--cat-0').trim();
@@ -404,7 +406,7 @@ const EXPORT_PROBE = `async function () {
     else if (b.type === 'image/svg+xml') {
       var t = await b.text();
       var token = /--cat-0:([^;}]+)/.exec(t);
-      out.kinds.svg = { size: b.size, opensWithSvg: t.indexOf('<svg') === 0, cat0: token && token[1] };
+      out.kinds.svg = { size: b.size, opensWithSvg: t.indexOf('<svg') === 0, cat0: token && token[1], hasLegend: t.includes('gc-export-legend') };
     }
   }
   publish(out);
@@ -441,6 +443,7 @@ test('exports produce valid SVG, CSV, and PNG blobs', { skip }, () => {
     assert.ok(r.kinds.svg?.opensWithSvg, `${name} SVG export is not an SVG document`);
     assert.ok(r.kinds.svg.size > 500, `${name} SVG export is suspiciously small`);
     assert.equal(r.kinds.svg.cat0, r.selectedCat0, `${name} SVG export lost the selected palette`);
+    assert.equal(r.kinds.svg.hasLegend, r.legendExpected, `${name} SVG export legend mismatch`);
     assert.ok(r.kinds.csv?.head.includes(','), `${name} CSV export has no header row`);
     // Rasterized exports: asserted whenever the decode completed in time.
     if (r.pngCaptured) {

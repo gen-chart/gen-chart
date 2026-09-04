@@ -91,6 +91,12 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
 }
 .gc-menu button:hover { background: var(--grid); }
 .gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
+.gc-export-menu { min-width: 220px; padding: 0.5rem; }
+.gc-export-group + .gc-export-group { border-top: 1px solid var(--border); margin-top: 0.35rem; padding-top: 0.35rem; }
+.gc-export-heading {
+  color: var(--muted); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.12em;
+  margin: 0; padding: 0.3rem 0.6rem 0.2rem; text-transform: uppercase;
+}
 .gc-palette-menu { min-width: 250px; padding: 0.5rem; }
 .gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
 .gc-palette-head h2 { font-size: 0.82rem; font-weight: 700; }
@@ -224,12 +230,13 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   position: fixed; z-index: 10; pointer-events: none; display: none;
   background: var(--tooltip-bg); color: var(--tooltip-ink);
   border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: min(420px, calc(100vw - 16px));
 }
 .gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
-.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-row { display: grid; grid-template-columns: auto minmax(0, 1fr) max-content; align-items: start; gap: 0.4rem; }
+.gc-tooltip .gc-tt-row:not(:has(.gc-tt-dot)) { grid-template-columns: minmax(0, 1fr) max-content; }
 .gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-tooltip .gc-tt-val { font-variant-numeric: tabular-nums; padding-left: 0.45rem; white-space: nowrap; }
 .gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
 .gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
 .gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
@@ -261,11 +268,17 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
       <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
       <button class="gc-btn" id="gc-color-btn" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
-      <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
-        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
-        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
-        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+      <div class="gc-menu gc-export-menu" id="gc-export-menu" role="menu">
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-image-heading">
+          <p class="gc-export-heading" id="gc-export-image-heading">Image</p>
+          <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+          <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        </div>
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-share-heading">
+          <p class="gc-export-heading" id="gc-export-share-heading">Share &amp; data</p>
+          <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+          <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        </div>
       </div>
       <div class="gc-menu gc-palette-menu" id="gc-color-menu">
         <div class="gc-palette-head">
@@ -293,7 +306,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>What to inspect</h2><ul><li>The top-edge strip records every authored web-ui merge event.</li><li>Duration spikes can be compared against the shared event timeline without implying causation.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"CI job max duration by branch with all web-ui merge events","unit":"minutes","xType":"time","tooltip":"auto","legendToggle":true,"brush":"x","views":[],"xPixels":[38,78.8,119.6,160.4,201.1,241.9,282.7,323.5,364.3,405.1,445.9,486.6,527.4,568.2,609,649.8,690.6,731.4,772.1,812.9,853.7,894.5,935.3,976.1,1016.9,1057.6,1098.4,1139.2,1180],"xLabels":["Sep 1, 2026 18:00 UTC","Sep 1, 2026 21:00 UTC","Sep 2, 2026 00:00 UTC","Sep 2, 2026 03:00 UTC","Sep 2, 2026 06:00 UTC","Sep 2, 2026 09:00 UTC","Sep 2, 2026 12:00 UTC","Sep 2, 2026 15:00 UTC","Sep 2, 2026 18:00 UTC","Sep 2, 2026 21:00 UTC","Sep 3, 2026 00:00 UTC","Sep 3, 2026 03:00 UTC","Sep 3, 2026 06:00 UTC","Sep 3, 2026 09:00 UTC","Sep 3, 2026 12:00 UTC","Sep 3, 2026 15:00 UTC","Sep 3, 2026 18:00 UTC","Sep 3, 2026 21:00 UTC","Sep 4, 2026 00:00 UTC","Sep 4, 2026 03:00 UTC","Sep 4, 2026 06:00 UTC","Sep 4, 2026 09:00 UTC","Sep 4, 2026 12:00 UTC","Sep 4, 2026 15:00 UTC","Sep 4, 2026 18:00 UTC","Sep 4, 2026 21:00 UTC","Sep 5, 2026 00:00 UTC","Sep 5, 2026 03:00 UTC","Sep 5, 2026 06:00 UTC"],"table":{"headers":["timestamp","main","release","hotfix"],"rows":[["2026-09-01T18:00:00.000Z",20,null,null],["2026-09-01T21:00:00.000Z",40,null,null],["2026-09-02T00:00:00.000Z",55,null,null],["2026-09-02T03:00:00.000Z",70,null,null],["2026-09-02T06:00:00.000Z",120,80,null],["2026-09-02T09:00:00.000Z",210,230,null],["2026-09-02T12:00:00.000Z",35,210,null],["2026-09-02T15:00:00.000Z",260,45,null],["2026-09-02T18:00:00.000Z",25,40,null],["2026-09-02T21:00:00.000Z",710,390,null],["2026-09-03T00:00:00.000Z",40,280,null],["2026-09-03T03:00:00.000Z",190,720,null],["2026-09-03T06:00:00.000Z",30,35,20],["2026-09-03T09:00:00.000Z",85,40,35],["2026-09-03T12:00:00.000Z",120,25,40],["2026-09-03T15:00:00.000Z",180,30,60],["2026-09-03T18:00:00.000Z",210,45,150],["2026-09-03T21:00:00.000Z",300,120,200],["2026-09-04T00:00:00.000Z",45,160,210],["2026-09-04T03:00:00.000Z",830,690,190],["2026-09-04T06:00:00.000Z",650,710,170],["2026-09-04T09:00:00.000Z",70,80,120],["2026-09-04T12:00:00.000Z",40,35,80],["2026-09-04T15:00:00.000Z",280,250,60],["2026-09-04T18:00:00.000Z",190,130,45],["2026-09-04T21:00:00.000Z",250,220,35],["2026-09-05T00:00:00.000Z",50,40,null],["2026-09-05T03:00:00.000Z",820,740,null],["2026-09-05T06:00:00.000Z",45,35,null]]},"plot":{"left":38,"top":36,"right":1180,"bottom":490},"width":1200,"height":520,"series":[{"id":"main","label":"main","mark":"line","color":"var(--role-primary)","values":[20,40,55,70,120,210,35,260,25,710,40,190,30,85,120,180,210,300,45,830,650,70,40,280,190,250,50,820,45],"formatted":["20","40","55","70","120","210","35","260","25","710","40","190","30","85","120","180","210","300","45","830","650","70","40","280","190","250","50","820","45"],"pixels":[480.9,471.8,465,458.2,435.5,394.7,474.1,372,478.6,167.7,471.8,403.7,476.4,451.4,435.5,408.3,394.7,353.8,469.6,113.2,194.9,458.2,471.8,362.9,403.7,376.5,467.3,117.7,469.6],"size":null,"stats":{"min":20,"max":830,"mean":205.86206896551724,"last":45,"count":29}},{"id":"release","label":"release","mark":"line","color":"var(--role-comparison)","values":[null,null,null,null,80,230,210,45,40,390,280,720,35,40,25,30,45,120,160,690,710,80,35,250,130,220,40,740,35],"formatted":["—","—","—","—","80","230","210","45","40","390","280","720","35","40","25","30","45","120","160","690","710","80","35","250","130","220","40","740","35"],"pixels":[null,null,null,null,453.7,385.6,394.7,469.6,471.8,312.9,362.9,163.1,474.1,471.8,478.6,476.4,469.6,435.5,417.4,176.7,167.7,453.7,474.1,376.5,431,390.1,471.8,154,474.1],"size":null,"stats":{"min":25,"max":740,"mean":215.2,"last":35,"count":25}},{"id":"hotfix","label":"hotfix","mark":"line","color":"var(--role-positive)","values":[null,null,null,null,null,null,null,null,null,null,null,null,20,35,40,60,150,200,210,190,170,120,80,60,45,35,null,null,null],"formatted":["—","—","—","—","—","—","—","—","—","—","—","—","20","35","40","60","150","200","210","190","170","120","80","60","45","35","—","—","—"],"pixels":[null,null,null,null,null,null,null,null,null,null,null,null,480.9,474.1,471.8,462.8,421.9,399.2,394.7,403.7,412.8,435.5,453.7,462.8,469.6,474.1,null,null,null],"size":null,"stats":{"min":20,"max":210,"mean":101.07142857142857,"last":35,"count":14}}],"locale":"en","defaultPalette":"classic","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"CI job max duration by branch with all web-ui merge events","unit":"minutes","xType":"time","tooltip":"auto","legendToggle":true,"brush":"x","views":[],"xPixels":[38,78.8,119.6,160.4,201.1,241.9,282.7,323.5,364.3,405.1,445.9,486.6,527.4,568.2,609,649.8,690.6,731.4,772.1,812.9,853.7,894.5,935.3,976.1,1016.9,1057.6,1098.4,1139.2,1180],"xLabels":["Sep 1, 2026 18:00 UTC","Sep 1, 2026 21:00 UTC","Sep 2, 2026 00:00 UTC","Sep 2, 2026 03:00 UTC","Sep 2, 2026 06:00 UTC","Sep 2, 2026 09:00 UTC","Sep 2, 2026 12:00 UTC","Sep 2, 2026 15:00 UTC","Sep 2, 2026 18:00 UTC","Sep 2, 2026 21:00 UTC","Sep 3, 2026 00:00 UTC","Sep 3, 2026 03:00 UTC","Sep 3, 2026 06:00 UTC","Sep 3, 2026 09:00 UTC","Sep 3, 2026 12:00 UTC","Sep 3, 2026 15:00 UTC","Sep 3, 2026 18:00 UTC","Sep 3, 2026 21:00 UTC","Sep 4, 2026 00:00 UTC","Sep 4, 2026 03:00 UTC","Sep 4, 2026 06:00 UTC","Sep 4, 2026 09:00 UTC","Sep 4, 2026 12:00 UTC","Sep 4, 2026 15:00 UTC","Sep 4, 2026 18:00 UTC","Sep 4, 2026 21:00 UTC","Sep 5, 2026 00:00 UTC","Sep 5, 2026 03:00 UTC","Sep 5, 2026 06:00 UTC"],"table":{"headers":["timestamp","main","release","hotfix"],"rows":[["2026-09-01T18:00:00.000Z",20,null,null],["2026-09-01T21:00:00.000Z",40,null,null],["2026-09-02T00:00:00.000Z",55,null,null],["2026-09-02T03:00:00.000Z",70,null,null],["2026-09-02T06:00:00.000Z",120,80,null],["2026-09-02T09:00:00.000Z",210,230,null],["2026-09-02T12:00:00.000Z",35,210,null],["2026-09-02T15:00:00.000Z",260,45,null],["2026-09-02T18:00:00.000Z",25,40,null],["2026-09-02T21:00:00.000Z",710,390,null],["2026-09-03T00:00:00.000Z",40,280,null],["2026-09-03T03:00:00.000Z",190,720,null],["2026-09-03T06:00:00.000Z",30,35,20],["2026-09-03T09:00:00.000Z",85,40,35],["2026-09-03T12:00:00.000Z",120,25,40],["2026-09-03T15:00:00.000Z",180,30,60],["2026-09-03T18:00:00.000Z",210,45,150],["2026-09-03T21:00:00.000Z",300,120,200],["2026-09-04T00:00:00.000Z",45,160,210],["2026-09-04T03:00:00.000Z",830,690,190],["2026-09-04T06:00:00.000Z",650,710,170],["2026-09-04T09:00:00.000Z",70,80,120],["2026-09-04T12:00:00.000Z",40,35,80],["2026-09-04T15:00:00.000Z",280,250,60],["2026-09-04T18:00:00.000Z",190,130,45],["2026-09-04T21:00:00.000Z",250,220,35],["2026-09-05T00:00:00.000Z",50,40,null],["2026-09-05T03:00:00.000Z",820,740,null],["2026-09-05T06:00:00.000Z",45,35,null]]},"plot":{"left":38,"top":36,"right":1180,"bottom":490},"width":1200,"height":520,"series":[{"id":"main","label":"main","mark":"line","color":"var(--role-primary)","unit":"minutes","values":[20,40,55,70,120,210,35,260,25,710,40,190,30,85,120,180,210,300,45,830,650,70,40,280,190,250,50,820,45],"formatted":["20","40","55","70","120","210","35","260","25","710","40","190","30","85","120","180","210","300","45","830","650","70","40","280","190","250","50","820","45"],"pixels":[480.9,471.8,465,458.2,435.5,394.7,474.1,372,478.6,167.7,471.8,403.7,476.4,451.4,435.5,408.3,394.7,353.8,469.6,113.2,194.9,458.2,471.8,362.9,403.7,376.5,467.3,117.7,469.6],"size":null,"stats":{"min":20,"max":830,"mean":205.86206896551724,"last":45,"count":29}},{"id":"release","label":"release","mark":"line","color":"var(--role-comparison)","unit":"minutes","values":[null,null,null,null,80,230,210,45,40,390,280,720,35,40,25,30,45,120,160,690,710,80,35,250,130,220,40,740,35],"formatted":["—","—","—","—","80","230","210","45","40","390","280","720","35","40","25","30","45","120","160","690","710","80","35","250","130","220","40","740","35"],"pixels":[null,null,null,null,453.7,385.6,394.7,469.6,471.8,312.9,362.9,163.1,474.1,471.8,478.6,476.4,469.6,435.5,417.4,176.7,167.7,453.7,474.1,376.5,431,390.1,471.8,154,474.1],"size":null,"stats":{"min":25,"max":740,"mean":215.2,"last":35,"count":25}},{"id":"hotfix","label":"hotfix","mark":"line","color":"var(--role-positive)","unit":"minutes","values":[null,null,null,null,null,null,null,null,null,null,null,null,20,35,40,60,150,200,210,190,170,120,80,60,45,35,null,null,null],"formatted":["—","—","—","—","—","—","—","—","—","—","—","—","20","35","40","60","150","200","210","190","170","120","80","60","45","35","—","—","—"],"pixels":[null,null,null,null,null,null,null,null,null,null,null,null,480.9,474.1,471.8,462.8,421.9,399.2,394.7,403.7,412.8,435.5,453.7,462.8,469.6,474.1,null,null,null],"size":null,"stats":{"min":20,"max":210,"mean":101.07142857142857,"last":35,"count":14}}],"locale":"en","defaultPalette":"classic","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.image":"Image","ui.export.share":"Share & data","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -593,7 +606,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(seriesLabel) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
-        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+        + (s.unit && s.values[i] !== null ? ' ' + esc(s.unit) : '') + '</span></div>';
       if (s.size) {
         var sizeValue = s.size.formatted[i];
         html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
@@ -854,6 +867,78 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-row-label{fill:var(--muted);font-size:11px}' +
     '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
 
+  function appendExportLegend(clone) {
+    var items = [];
+    document.querySelectorAll('.gc-legend button, .gc-sign-legend .gc-sign-item').forEach(function (item) {
+      var swatch = item.querySelector('.gc-swatch');
+      if (!swatch) return;
+      items.push({
+        label: item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(swatch).backgroundColor,
+        mark: swatch.getAttribute('data-mark') || 'line'
+      });
+    });
+    document.querySelectorAll('.gc-size-legend .gc-size-item').forEach(function (item) {
+      items.push({
+        label: item.getAttribute('aria-label') || item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(root).getPropertyValue('--role-primary').trim(),
+        mark: 'bubble'
+      });
+    });
+    if (!items.length) return payload.height;
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var group = document.createElementNS(ns, 'g');
+    group.setAttribute('class', 'gc-export-legend');
+    group.setAttribute('aria-hidden', 'true');
+    var left = 24;
+    var right = payload.width - 24;
+    var x = left;
+    var y = payload.height + 24;
+    var lineHeight = 26;
+    items.forEach(function (item) {
+      var itemWidth = Math.min(right - left, 34 + item.label.length * 7);
+      if (x > left && x + itemWidth > right) { x = left; y += lineHeight; }
+      var mark;
+      if (item.mark === 'line') {
+        mark = document.createElementNS(ns, 'line');
+        mark.setAttribute('x1', x);
+        mark.setAttribute('x2', x + 16);
+        mark.setAttribute('y1', y);
+        mark.setAttribute('y2', y);
+        mark.setAttribute('stroke', item.color);
+        mark.setAttribute('stroke-width', '4');
+        mark.setAttribute('stroke-linecap', 'round');
+      } else if (item.mark === 'scatter' || item.mark === 'bubble') {
+        mark = document.createElementNS(ns, 'circle');
+        mark.setAttribute('cx', x + 8);
+        mark.setAttribute('cy', y);
+        mark.setAttribute('r', '5');
+        mark.setAttribute('fill', item.color);
+      } else {
+        mark = document.createElementNS(ns, 'rect');
+        mark.setAttribute('x', x);
+        mark.setAttribute('y', y - (item.mark === 'range' ? 5 : 6));
+        mark.setAttribute('width', '16');
+        mark.setAttribute('height', item.mark === 'range' ? '10' : '12');
+        mark.setAttribute('rx', '2');
+        mark.setAttribute('fill', item.color);
+        if (item.mark === 'range') mark.setAttribute('fill-opacity', '0.65');
+      }
+      group.appendChild(mark);
+      var label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', x + 24);
+      label.setAttribute('y', y + 4);
+      label.setAttribute('fill', 'var(--ink)');
+      label.setAttribute('font-size', '13');
+      label.textContent = item.label;
+      group.appendChild(label);
+      x += itemWidth + 12;
+    });
+    clone.appendChild(group);
+    return y + 18;
+  }
+
   // Canonical export: full authored chart at rest — no hover layer, no
   // hidden/dimmed series, no zoom remap.
   function exportSvgString() {
@@ -905,8 +990,10 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
     style.textContent = 'svg{' + tokens + '}' + SVG_CSS;
     clone.insertBefore(style, clone.firstChild);
+    var exportHeight = appendExportLegend(clone);
+    clone.setAttribute('viewBox', '0 0 ' + payload.width + ' ' + exportHeight);
     clone.setAttribute('width', payload.width);
-    clone.setAttribute('height', payload.height);
+    clone.setAttribute('height', exportHeight);
     return new XMLSerializer().serializeToString(clone);
   }
   function download(name, blob) {
@@ -921,9 +1008,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var img = new Image();
     var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
     img.onload = function () {
+      var sourceWidth = img.naturalWidth || payload.width;
+      var sourceHeight = img.naturalHeight || payload.height;
       var canvas = document.createElement('canvas');
-      canvas.width = payload.width * scale;
-      canvas.height = payload.height * scale;
+      canvas.width = sourceWidth * scale;
+      canvas.height = sourceHeight * scale;
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1016,7 +1105,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       parts.push(seriesLabel + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
-        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+        (s.unit && s.values[i] !== null ? ' ' + s.unit : ''));
       if (s.size) {
         parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
           (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));

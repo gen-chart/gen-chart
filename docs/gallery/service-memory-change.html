@@ -91,6 +91,12 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
 }
 .gc-menu button:hover { background: var(--grid); }
 .gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
+.gc-export-menu { min-width: 220px; padding: 0.5rem; }
+.gc-export-group + .gc-export-group { border-top: 1px solid var(--border); margin-top: 0.35rem; padding-top: 0.35rem; }
+.gc-export-heading {
+  color: var(--muted); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.12em;
+  margin: 0; padding: 0.3rem 0.6rem 0.2rem; text-transform: uppercase;
+}
 .gc-palette-menu { min-width: 250px; padding: 0.5rem; }
 .gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
 .gc-palette-head h2 { font-size: 0.82rem; font-weight: 700; }
@@ -224,12 +230,13 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   position: fixed; z-index: 10; pointer-events: none; display: none;
   background: var(--tooltip-bg); color: var(--tooltip-ink);
   border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: min(420px, calc(100vw - 16px));
 }
 .gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
-.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-row { display: grid; grid-template-columns: auto minmax(0, 1fr) max-content; align-items: start; gap: 0.4rem; }
+.gc-tooltip .gc-tt-row:not(:has(.gc-tt-dot)) { grid-template-columns: minmax(0, 1fr) max-content; }
 .gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-tooltip .gc-tt-val { font-variant-numeric: tabular-nums; padding-left: 0.45rem; white-space: nowrap; }
 .gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
 .gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
 .gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
@@ -261,11 +268,17 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
       <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
       <button class="gc-btn" id="gc-color-btn" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
-      <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
-        <button type="button" data-export="svg" role="menuitem">Download SVG</button>
-        <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
-        <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+      <div class="gc-menu gc-export-menu" id="gc-export-menu" role="menu">
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-image-heading">
+          <p class="gc-export-heading" id="gc-export-image-heading">Image</p>
+          <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
+          <button type="button" data-export="svg" role="menuitem">Download SVG</button>
+        </div>
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-share-heading">
+          <p class="gc-export-heading" id="gc-export-share-heading">Share &amp; data</p>
+          <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
+          <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
+        </div>
       </div>
       <div class="gc-menu gc-palette-menu" id="gc-color-menu">
         <div class="gc-palette-head">
@@ -293,7 +306,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Spanner has the largest increase at +35%.</li><li>Slow-kafka has the largest decrease at -40.3%.</li><li>Balance-checker is unchanged.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"element","orientation":"horizontal","title":"Most services grew while a smaller group released memory","unit":"%","xType":"band","tooltip":"auto","legendToggle":false,"brush":null,"views":[],"xPixels":[67.2,105.5,143.8,182.2,220.5,258.8,297.2,335.5,373.8,412.2,450.5,488.8,527.2,565.5,603.8,642.2,680.5,718.8],"xLabels":["spanner","analytics-intake","trade-scheduler","trade-receiver","kafka","emailer","product-recommendation-db","fraud-detector","analytics-aggregator","product-recommendation","product-recommendation-lite","balance-checker","trade-executor","authenticator","trade-validator","trade-enrichment","notifier","slow-kafka"],"table":{"headers":["Service","Current memory","Change","Previous-hour memory"],"rows":[["spanner",141.2,35,104.6],["analytics-intake",292.3,28.8,226.9],["trade-scheduler",337.7,17.4,287.6],["trade-receiver",75.6,16.7,64.8],["kafka",806,13,713.3],["emailer",856.7,7.9,793.9],["product-recommendation-db",888.6,4.5,850.3],["fraud-detector",1740.8,3.4,1683.6],["analytics-aggregator",375.5,1.7,369.2],["product-recommendation",103.6,1.4,102.2],["product-recommendation-lite",79.7,0.8,79.1],["balance-checker",1638.4,0,1638.4],["trade-executor",973.6,-2.4,997.5],["authenticator",525.6,-3,541.9],["trade-validator",57.3,-3.6,59.4],["trade-enrichment",51.5,-6.1,54.8],["notifier",575.1,-18.9,709.1],["slow-kafka",266.2,-40.3,445.9]]},"plot":{"left":261,"top":48,"right":1096,"bottom":738},"width":1120,"height":780,"valueLabelsOmitted":false,"series":[{"id":"memory_change","label":"Change","mark":"bar","color":"var(--role-neutral)","colorBy":"sign","values":[35,28.8,17.4,16.7,13,7.9,4.5,3.4,1.7,1.4,0.8,0,-2.4,-3,-3.6,-6.1,-18.9,-40.3],"formatted":["+35%","+28.8%","+17.4%","+16.7%","+13%","+7.9%","+4.5%","+3.4%","+1.7%","+1.4%","+0.8%","0%","-2.4%","-3%","-3.6%","-6.1%","-18.9%","-40.3%"],"pixels":[1054.3,1002.5,907.3,901.4,870.5,828,799.6,790.4,776.2,773.7,768.7,762,742,736.9,731.9,711.1,604.2,425.5],"signs":["positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","zero","negative","negative","negative","negative","negative","negative"],"context":{"label":"Current memory","values":[141.2,292.3,337.7,75.6,806,856.7,888.6,1740.8,375.5,103.6,79.7,1638.4,973.6,525.6,57.3,51.5,575.1,266.2],"formatted":["141.2 MiB","292.3 MiB","337.7 MiB","75.6 MiB","806 MiB","856.7 MiB","888.6 MiB","1,740.8 MiB","375.5 MiB","103.6 MiB","79.7 MiB","1,638.4 MiB","973.6 MiB","525.6 MiB","57.3 MiB","51.5 MiB","575.1 MiB","266.2 MiB"]},"details":[{"label":"Previous-hour memory","values":[104.6,226.9,287.6,64.8,713.3,793.9,850.3,1683.6,369.2,102.2,79.1,1638.4,997.5,541.9,59.4,54.8,709.1,445.9],"formatted":["104.6 MiB","226.9 MiB","287.6 MiB","64.8 MiB","713.3 MiB","793.9 MiB","850.3 MiB","1,683.6 MiB","369.2 MiB","102.2 MiB","79.1 MiB","1,638.4 MiB","997.5 MiB","541.9 MiB","59.4 MiB","54.8 MiB","709.1 MiB","445.9 MiB"]}],"focusable":true,"stats":{"min":-40.3,"max":35,"mean":3.127777777777779,"last":-40.3,"count":18}}],"locale":"en","defaultPalette":"stock","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"stock":{"six":["#059669","#748296","#E11D48"],"three":["#059669","#748296","#E11D48"]},"blue-orange":{"six":["#2563EB","#748296","#C2410C"],"three":["#2563EB","#748296","#C2410C"]},"teal-magenta":{"six":["#0F766E","#748296","#BE185D"],"three":["#0F766E","#748296","#BE185D"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"element","orientation":"horizontal","title":"Most services grew while a smaller group released memory","unit":"%","xType":"band","tooltip":"auto","legendToggle":false,"brush":null,"views":[],"xPixels":[67.2,105.5,143.8,182.2,220.5,258.8,297.2,335.5,373.8,412.2,450.5,488.8,527.2,565.5,603.8,642.2,680.5,718.8],"xLabels":["spanner","analytics-intake","trade-scheduler","trade-receiver","kafka","emailer","product-recommendation-db","fraud-detector","analytics-aggregator","product-recommendation","product-recommendation-lite","balance-checker","trade-executor","authenticator","trade-validator","trade-enrichment","notifier","slow-kafka"],"table":{"headers":["Service","Current memory","Change","Previous-hour memory"],"rows":[["spanner",141.2,35,104.6],["analytics-intake",292.3,28.8,226.9],["trade-scheduler",337.7,17.4,287.6],["trade-receiver",75.6,16.7,64.8],["kafka",806,13,713.3],["emailer",856.7,7.9,793.9],["product-recommendation-db",888.6,4.5,850.3],["fraud-detector",1740.8,3.4,1683.6],["analytics-aggregator",375.5,1.7,369.2],["product-recommendation",103.6,1.4,102.2],["product-recommendation-lite",79.7,0.8,79.1],["balance-checker",1638.4,0,1638.4],["trade-executor",973.6,-2.4,997.5],["authenticator",525.6,-3,541.9],["trade-validator",57.3,-3.6,59.4],["trade-enrichment",51.5,-6.1,54.8],["notifier",575.1,-18.9,709.1],["slow-kafka",266.2,-40.3,445.9]]},"plot":{"left":261,"top":48,"right":1096,"bottom":738},"width":1120,"height":780,"valueLabelsOmitted":false,"series":[{"id":"memory_change","label":"Change","mark":"bar","color":"var(--role-neutral)","colorBy":"sign","values":[35,28.8,17.4,16.7,13,7.9,4.5,3.4,1.7,1.4,0.8,0,-2.4,-3,-3.6,-6.1,-18.9,-40.3],"formatted":["+35%","+28.8%","+17.4%","+16.7%","+13%","+7.9%","+4.5%","+3.4%","+1.7%","+1.4%","+0.8%","0%","-2.4%","-3%","-3.6%","-6.1%","-18.9%","-40.3%"],"pixels":[1054.3,1002.5,907.3,901.4,870.5,828,799.6,790.4,776.2,773.7,768.7,762,742,736.9,731.9,711.1,604.2,425.5],"signs":["positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","zero","negative","negative","negative","negative","negative","negative"],"context":{"label":"Current memory","values":[141.2,292.3,337.7,75.6,806,856.7,888.6,1740.8,375.5,103.6,79.7,1638.4,973.6,525.6,57.3,51.5,575.1,266.2],"formatted":["141.2 MiB","292.3 MiB","337.7 MiB","75.6 MiB","806 MiB","856.7 MiB","888.6 MiB","1,740.8 MiB","375.5 MiB","103.6 MiB","79.7 MiB","1,638.4 MiB","973.6 MiB","525.6 MiB","57.3 MiB","51.5 MiB","575.1 MiB","266.2 MiB"]},"details":[{"label":"Previous-hour memory","values":[104.6,226.9,287.6,64.8,713.3,793.9,850.3,1683.6,369.2,102.2,79.1,1638.4,997.5,541.9,59.4,54.8,709.1,445.9],"formatted":["104.6 MiB","226.9 MiB","287.6 MiB","64.8 MiB","713.3 MiB","793.9 MiB","850.3 MiB","1,683.6 MiB","369.2 MiB","102.2 MiB","79.1 MiB","1,638.4 MiB","997.5 MiB","541.9 MiB","59.4 MiB","54.8 MiB","709.1 MiB","445.9 MiB"]}],"focusable":true,"stats":{"min":-40.3,"max":35,"mean":3.127777777777779,"last":-40.3,"count":18}}],"locale":"en","defaultPalette":"stock","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.image":"Image","ui.export.share":"Share & data","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"stock":{"six":["#059669","#748296","#E11D48"],"three":["#059669","#748296","#E11D48"]},"blue-orange":{"six":["#2563EB","#748296","#C2410C"],"three":["#2563EB","#748296","#C2410C"]},"teal-magenta":{"six":["#0F766E","#748296","#BE185D"],"three":["#0F766E","#748296","#BE185D"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -593,7 +606,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(seriesLabel) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
-        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+        + (s.unit && s.values[i] !== null ? ' ' + esc(s.unit) : '') + '</span></div>';
       if (s.size) {
         var sizeValue = s.size.formatted[i];
         html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
@@ -854,6 +867,78 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-row-label{fill:var(--muted);font-size:11px}' +
     '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
 
+  function appendExportLegend(clone) {
+    var items = [];
+    document.querySelectorAll('.gc-legend button, .gc-sign-legend .gc-sign-item').forEach(function (item) {
+      var swatch = item.querySelector('.gc-swatch');
+      if (!swatch) return;
+      items.push({
+        label: item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(swatch).backgroundColor,
+        mark: swatch.getAttribute('data-mark') || 'line'
+      });
+    });
+    document.querySelectorAll('.gc-size-legend .gc-size-item').forEach(function (item) {
+      items.push({
+        label: item.getAttribute('aria-label') || item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(root).getPropertyValue('--role-primary').trim(),
+        mark: 'bubble'
+      });
+    });
+    if (!items.length) return payload.height;
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var group = document.createElementNS(ns, 'g');
+    group.setAttribute('class', 'gc-export-legend');
+    group.setAttribute('aria-hidden', 'true');
+    var left = 24;
+    var right = payload.width - 24;
+    var x = left;
+    var y = payload.height + 24;
+    var lineHeight = 26;
+    items.forEach(function (item) {
+      var itemWidth = Math.min(right - left, 34 + item.label.length * 7);
+      if (x > left && x + itemWidth > right) { x = left; y += lineHeight; }
+      var mark;
+      if (item.mark === 'line') {
+        mark = document.createElementNS(ns, 'line');
+        mark.setAttribute('x1', x);
+        mark.setAttribute('x2', x + 16);
+        mark.setAttribute('y1', y);
+        mark.setAttribute('y2', y);
+        mark.setAttribute('stroke', item.color);
+        mark.setAttribute('stroke-width', '4');
+        mark.setAttribute('stroke-linecap', 'round');
+      } else if (item.mark === 'scatter' || item.mark === 'bubble') {
+        mark = document.createElementNS(ns, 'circle');
+        mark.setAttribute('cx', x + 8);
+        mark.setAttribute('cy', y);
+        mark.setAttribute('r', '5');
+        mark.setAttribute('fill', item.color);
+      } else {
+        mark = document.createElementNS(ns, 'rect');
+        mark.setAttribute('x', x);
+        mark.setAttribute('y', y - (item.mark === 'range' ? 5 : 6));
+        mark.setAttribute('width', '16');
+        mark.setAttribute('height', item.mark === 'range' ? '10' : '12');
+        mark.setAttribute('rx', '2');
+        mark.setAttribute('fill', item.color);
+        if (item.mark === 'range') mark.setAttribute('fill-opacity', '0.65');
+      }
+      group.appendChild(mark);
+      var label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', x + 24);
+      label.setAttribute('y', y + 4);
+      label.setAttribute('fill', 'var(--ink)');
+      label.setAttribute('font-size', '13');
+      label.textContent = item.label;
+      group.appendChild(label);
+      x += itemWidth + 12;
+    });
+    clone.appendChild(group);
+    return y + 18;
+  }
+
   // Canonical export: full authored chart at rest — no hover layer, no
   // hidden/dimmed series, no zoom remap.
   function exportSvgString() {
@@ -905,8 +990,10 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
     style.textContent = 'svg{' + tokens + '}' + SVG_CSS;
     clone.insertBefore(style, clone.firstChild);
+    var exportHeight = appendExportLegend(clone);
+    clone.setAttribute('viewBox', '0 0 ' + payload.width + ' ' + exportHeight);
     clone.setAttribute('width', payload.width);
-    clone.setAttribute('height', payload.height);
+    clone.setAttribute('height', exportHeight);
     return new XMLSerializer().serializeToString(clone);
   }
   function download(name, blob) {
@@ -921,9 +1008,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var img = new Image();
     var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
     img.onload = function () {
+      var sourceWidth = img.naturalWidth || payload.width;
+      var sourceHeight = img.naturalHeight || payload.height;
       var canvas = document.createElement('canvas');
-      canvas.width = payload.width * scale;
-      canvas.height = payload.height * scale;
+      canvas.width = sourceWidth * scale;
+      canvas.height = sourceHeight * scale;
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1016,7 +1105,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       parts.push(seriesLabel + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
-        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+        (s.unit && s.values[i] !== null ? ' ' + s.unit : ''));
       if (s.size) {
         parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
           (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));

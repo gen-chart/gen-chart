@@ -191,6 +191,7 @@ test('normalising never hides the absolute value: the tooltip keeps both', () =>
   const a = cartesian.analyze(spec);
   const p = cartesian.buildPayload(spec, a);
   assert.match(p.series[1].formatted[0], /^\d+\.\d% \(\d+ deploys\)$/);
+  assert.equal(p.series[1].unit, null, 'the already-formatted percentage must not append the unit twice');
   // The CSV export still carries raw counts, not shares.
   assert.equal(p.table.rows[0][1], spec.data.columns[1].values[0]);
 });

@@ -69,6 +69,7 @@ test('range meaning and raw bounds reach the legend, tooltip payload, table, and
 
   assert.equal(range.meaning, '80% prediction interval');
   assert.equal(range.formatted[0], '92–108');
+  assert.equal(range.unit, 'GBP k');
   assert.deepEqual(range.range.lower.values, [92, 98, 101, 103, 104]);
   assert.deepEqual(payload.table.headers, [
     'Month',
