@@ -4,19 +4,6 @@ Read this only when the user asks about the generated artifact's
 interactions, exports, or deep links. None of it requires authoring work
 beyond the spec fields named here.
 
-## Presentation modes
-
-- **Standalone** is a complete HTML document and stores interaction state in
-  the URL hash. It remains the default.
-- **Inline** is a shell-free fragment rooted at `.gc-embed`. CSS, DOM queries,
-  theme, palette, keyboard state, tooltip position, and menus are scoped to
-  that root. Runtime IDs are unique per mounted instance, so identical
-  fragments can share a page. Narrow behavior responds to the parent
-  container and scrolls only inside the chart panel.
-- **Both** builds both presentations from one validation and SVG-render pass.
-  The files are independent and therefore each contains the full stylesheet,
-  payload, SVG, accessibility table, and runtime.
-
 ## Interactions
 
 - **Tooltip + crosshair** — nearest-x lookup, formatted values with units.
@@ -91,11 +78,6 @@ stay comparable across locales. `<html lang>` follows the locale.
 keeps the hash current as the reader explores. Classic is omitted because it
 is the palette default.
 
-Deep links apply only to standalone output. Inline output never reads or
-writes the host URL; it dispatches a bubbling `gen-chart:state-change` event
-from its root with `{ detail: { hash } }` when local state changes. A qualified
-host adapter may persist that value without coupling the renderer to a host.
-
 ## Exports
 
 The Export menu is canonical-at-rest: hover, dim, hidden-series, and zoom
@@ -111,6 +93,15 @@ The selected theme and color palette are presentation choices and remain.
   rebuild the chart from it.
 - **Share card (1200×630)** — title plus the chart, fit on the theme
   background, for READMEs and social posts.
+
+## Static delivery preview
+
+`deliver --preview png` creates a sibling PNG from the same accepted HTML for
+callers that display local images in Markdown. It forces the light theme and
+captures the canonical at-rest chart with its title and legends; toolbar,
+guided-view buttons, takeaway cards, tooltips, and focus state are excluded.
+The preview has no interactions or accessible table, so always link the HTML
+beside it. This is a handoff format, not `visual-check` evidence.
 
 ## visual-check
 

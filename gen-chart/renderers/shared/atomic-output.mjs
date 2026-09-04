@@ -9,16 +9,16 @@ const DEFAULT_OPERATIONS = { existsSync, renameSync, unlinkSync, writeFileSync }
 // deterministic under test instead of depending on a filesystem accident.
 export function commitAtomically(outputs, operations = DEFAULT_OPERATIONS) {
   const nonce = `${process.pid}-${Date.now()}`;
-  const records = outputs.map(({ path, html }, index) => ({
+  const records = outputs.map(({ path, content }, index) => ({
     path,
-    html,
+    content,
     staged: join(dirname(path), `.${basename(path)}.tmp-${nonce}-${index}`),
     backup: join(dirname(path), `.${basename(path)}.bak-${nonce}-${index}`),
     hadPrevious: false,
     committed: false
   }));
   try {
-    for (const record of records) operations.writeFileSync(record.staged, record.html);
+    for (const record of records) operations.writeFileSync(record.staged, record.content);
     for (const record of records) {
       if (operations.existsSync(record.path)) {
         operations.renameSync(record.path, record.backup);

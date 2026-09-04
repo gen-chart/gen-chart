@@ -60,19 +60,26 @@ the user has explicitly accepted the warnings.
 ## deliver
 
 ```bash
-node bin/gen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --json
+node bin/gen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --preview png --json
 ```
 
-Runs the same checks, then renders. The commit is atomic: the artifact is
-written to a temporary file in the destination directory and renamed into
-place only after it is complete. **A failed delivery leaves any previous
-artifact untouched** — so an old file at that path is not evidence of
-success.
+Runs the same checks, then renders. With `--preview png`, the commit is atomic
+across the interactive HTML and sibling PNG: both candidates are staged before
+either destination is replaced, and both previous files are restored if the
+commit fails. **A failed delivery leaves any previous artifact set untouched**
+— so old files at those paths are not evidence of success.
 
 This is the fast default path: call `deliver` on the first complete candidate
-instead of running `validate` first. On acceptance, hand off the HTML
-immediately. Delivery creates the self-contained HTML with inline SVG; it does
-not create screenshots or PNG files.
+instead of running `validate` first. `--preview png` uses local headless
+Chrome/Chromium to capture a deterministic light-theme, at-rest view of the
+same accepted HTML. It hides interactive-only controls and cards, but keeps
+the title, chart, legends, and computed point-density note. The PNG is for
+ordinary Markdown image display; the HTML remains the interactive and
+accessible source of truth.
+
+Without `--preview png`, delivery remains HTML-only. If the browser is
+unavailable, preview delivery fails before either destination is changed; set
+`GEN_CHART_CHROME` or rerun without the preview option and report the fallback.
 
 Adds to the receipt:
 
@@ -80,56 +87,22 @@ Adds to the receipt:
 {
   "output": "/abs/path/chart.html",
   "bytes": { "spec": 812, "html": 43759 },
-  "sha256": { "spec": "…", "html": "…" }
-}
-```
-
-Report the path, the error and warning counts, and the SHA-256 pair. A
-non-zero exit can never be described as success.
-
-### Output formats
-
-`render` and `deliver` accept `--format standalone|inline|both`.
-`standalone` is the unchanged default. `inline` writes a self-contained HTML
-fragment at the positional output path. `both` writes the standalone document
-there and inserts `.inline` before `.html` for the fragment sibling. Validation,
-analysis, SVG geometry, payload construction, and legend construction run once;
-only the presentation assembly, hashing, and writes are repeated.
-
-Paired delivery stages both candidates before replacing either destination and
-restores both prior files if the commit cannot complete. Its receipt replaces
-the single `output` field with independently hashed entries:
-
-```json
-{
-  "format": "both",
-  "outputs": {
-    "standalone": {
-      "path": "/abs/path/chart.html",
-      "media_type": "text/html",
-      "bytes": 64000,
-      "sha256": "…"
-    },
-    "inline": {
-      "path": "/abs/path/chart.inline.html",
-      "media_type": "text/html",
-      "bytes": 65000,
-      "sha256": "…",
-      "presentation": {
-        "kind": "html-fragment",
-        "self_contained": true,
-        "requires_script": true,
-        "required_primitives": ["inline-script", "blob-url", "canvas-for-raster-exports"],
-        "host_display": "not-verified"
-      }
-    }
+  "sha256": { "spec": "…", "html": "…" },
+  "preview": {
+    "output": "/abs/path/chart.png",
+    "media_type": "image/png",
+    "width": 1120,
+    "height": 684,
+    "theme": "light",
+    "bytes": 58142,
+    "sha256": "…"
   }
 }
 ```
 
-`host_display: "not-verified"` is intentional: the CLI can prove what it
-wrote, but it cannot prove that a chat or artifact host accepted and displayed
-the fragment. See `inline-output.md` for handoff rules.
+Embed the preview using ordinary Markdown image syntax, link the HTML, and
+report the error and warning counts. Add hashes only for automation or when
+asked. A non-zero exit can never be described as success.
 
 ## visual-check
 
@@ -179,7 +152,8 @@ skipped and continue.
 
 ## Handoff
 
-By default, state the delivered path and receipt summary (errors, warnings,
-quality). Add hashes for automation or when requested. Mention containment,
-screenshots, or visual-review status only when `visual-check` actually ran.
-If anything failed, say what and quote the diagnostics.
+By default, state the finding, embed the sibling PNG, link the interactive
+HTML, and give the receipt summary (errors, warnings, quality). Add hashes for
+automation or when requested. The delivery PNG is not visual-check evidence;
+mention containment or visual-review status only when `visual-check` actually
+ran. If anything failed, say what and quote the diagnostics.

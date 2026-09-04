@@ -18,7 +18,6 @@
     "test": "npm run check:validators && node --test",
     "build:zip": "node scripts/build-zip.mjs",
     "test:ci": "npm run check:validators && node --test --test-concurrency=1",
-    "benchmark:formats": "node scripts/benchmark-output-formats.mjs --check",
     "build:gallery": "node scripts/build-gallery.mjs"
   },
   "devDependencies": {

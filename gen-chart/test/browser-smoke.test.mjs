@@ -16,8 +16,6 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findChrome } from '../renderers/shared/visual-check.mjs';
-import { rendererFor } from '../renderers/shared/registry.mjs';
-import { assembleInlineHtml } from '../renderers/shared/html.mjs';
 
 const chrome = findChrome();
 const skip = chrome ? false : 'no Chrome/Chromium found';
@@ -109,87 +107,6 @@ test('viewer runs without uncaught errors and positions its tooltip', { skip }, 
     assert.ok(['light', 'dark'].includes(r.theme), `${name} theme toggle did nothing`);
     assert.equal(r.exportOpen, true, `${name} export menu did not open`);
   }
-});
-
-const INLINE_PAIR_PROBE = `async function () {
-  var roots = Array.from(document.querySelectorAll('[data-gc-root]'));
-  var first = roots[0];
-  var second = roots[1];
-  var events = [];
-  first.addEventListener('gen-chart:state-change', function (event) { events.push(event.detail.hash); });
-  first.querySelector('[data-gc-role="theme-button"]').click();
-  first.querySelector('[data-palette="primary"]').click();
-
-  var svg = first.querySelector('svg.gc-chart');
-  var payload = JSON.parse(first.querySelector('script[type="application/json"]').textContent);
-  var target = svg.querySelector('.gc-hit') || svg.querySelector('[data-tip]');
-  var box = first.getBoundingClientRect();
-  target.dispatchEvent(new PointerEvent(payload.hover === 'axis' ? 'pointermove' : 'pointerover', {
-    bubbles: true, clientX: box.left + box.width * 0.5, clientY: box.top + 180
-  }));
-  var tooltip = first.querySelector('[data-gc-role="tooltip"]');
-  var ids = Array.from(document.querySelectorAll('[id]')).map(function (element) { return element.id; });
-  var title = document.getElementById('host-title');
-  return {
-    count: roots.length,
-    instances: roots.map(function (root) { return root.getAttribute('data-gc-instance'); }),
-    firstTheme: first.getAttribute('data-theme'),
-    secondTheme: second.getAttribute('data-theme'),
-    hostTheme: document.documentElement.getAttribute('data-theme'),
-    firstPalette: first.getAttribute('data-palette'),
-    secondPalette: second.getAttribute('data-palette'),
-    hash: location.hash,
-    events: events,
-    uniqueIds: new Set(ids).size === ids.length,
-    describedByResolves: Boolean(document.getElementById(
-      first.querySelector('[data-gc-role="figure"]').getAttribute('aria-describedby')
-    )),
-    tooltipShown: tooltip.style.display === 'block',
-    tooltipLeft: parseFloat(tooltip.style.left),
-    tooltipTop: parseFloat(tooltip.style.top),
-    tooltipWithinRoot: parseFloat(tooltip.style.left) >= 0 &&
-      parseFloat(tooltip.style.left) + tooltip.offsetWidth <= first.clientWidth,
-    hostTitleMargin: getComputedStyle(title).marginTop,
-    pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth
-  };
-}`;
-
-test('two identical inline fragments isolate IDs, state, styles, and tooltips', { skip }, () => {
-  const spec = JSON.parse(readFileSync(examplesDir + 'mau-trend.cartesian.json', 'utf8'));
-  const renderer = rendererFor(spec.chart_type);
-  const analysis = renderer.analyze(spec);
-  const fragment = assembleInlineHtml(
-    spec,
-    renderer.renderSvg(spec, analysis),
-    renderer.buildPayload(spec, analysis),
-    renderer.buildLegend(spec, analysis)
-  );
-  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-inline-pair-'));
-  const page = join(dir, 'pair.html');
-  writeFileSync(page, '<!doctype html><html data-theme="host"><head><style>' +
-    'body{margin:0;background:rgb(1,2,3)} #host-title{margin:33px;color:rgb(9,8,7)} ' +
-    '.slot{width:100%;max-width:620px;margin:auto}</style></head><body>' +
-    '<h1 id="host-title">Host title</h1><div class="slot">' + fragment + '</div>' +
-    '<div class="slot">' + fragment + '</div></body></html>');
-  const r = run(page, INLINE_PAIR_PROBE, { width: 500, height: 900 });
-  assert.deepEqual(r.errors, [], r.errors.join('; '));
-  assert.equal(r.count, 2);
-  assert.equal(new Set(r.instances).size, 2);
-  assert.ok(r.instances.every(Boolean));
-  assert.ok(['light', 'dark'].includes(r.firstTheme));
-  assert.equal(r.secondTheme, 'auto');
-  assert.equal(r.hostTheme, 'host');
-  assert.equal(r.firstPalette, 'primary');
-  assert.equal(r.secondPalette, 'classic');
-  assert.equal(r.hash, '');
-  assert.ok(r.events.some((hash) => /palette=primary/.test(hash)));
-  assert.equal(r.uniqueIds, true);
-  assert.equal(r.describedByResolves, true);
-  assert.equal(r.tooltipShown, true);
-  assert.equal(r.tooltipWithinRoot, true);
-  assert.ok(Number.isFinite(r.tooltipLeft) && Number.isFinite(r.tooltipTop));
-  assert.equal(r.hostTitleMargin, '33px');
-  assert.equal(r.pageOverflow, false);
 });
 
 const RANGE_BRUSH_PROBE = `async function () {
@@ -531,30 +448,6 @@ test('exports produce valid SVG, CSV, and PNG blobs', { skip }, () => {
   // rasterized, PNG export is genuinely broken rather than merely slow.
   assert.ok(rasterized > 0,
     'no example produced a PNG export — rasterization appears broken, not just slow');
-});
-
-const BLOCKED_EXPORT_PROBE = `async function () {
-  var root = document.querySelector('[data-gc-root]');
-  var failures = [];
-  root.addEventListener('gen-chart:export-error', function (event) { failures.push(event.detail); });
-  URL.createObjectURL = function () { throw new Error('blocked by host'); };
-  var button = document.querySelector('[data-export="svg"]');
-  button.click();
-  return {
-    disabled: button.disabled,
-    label: button.getAttribute('aria-label'),
-    failures: failures
-  };
-}`;
-
-test('a host-blocked export is disabled accessibly without an uncaught error', { skip }, () => {
-  const r = run(examplesDir + 'mau-trend.html', BLOCKED_EXPORT_PROBE);
-  assert.deepEqual(r.errors, [], r.errors.join('; '));
-  assert.equal(r.disabled, true);
-  assert.match(r.label, /Unavailable in this host/);
-  assert.equal(r.failures.length, 1);
-  assert.equal(r.failures[0].kind, 'svg');
-  assert.match(r.failures[0].message, /blocked by host/);
 });
 
 const GALLERY_PROBE = `async function () {

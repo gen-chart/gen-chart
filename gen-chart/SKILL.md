@@ -1,8 +1,9 @@
 ---
 name: gen-chart
 description: >-
-  Create polished, validated, interactive charts as self-contained standalone
-  HTML and container-scoped inline HTML fragments with inline SVG, dark/light themes, crosshair tooltips, legend
+  Create polished, validated charts as a static PNG preview plus a
+  self-contained interactive HTML artifact with inline SVG, dark/light
+  themes, crosshair tooltips, legend
   toggling, and honest-by-construction axes. Accept pasted data
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
@@ -47,17 +48,24 @@ the family you routed to.
 5. Deliver the first complete candidate directly:
 
    ```bash
-   node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --json
+   node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --preview png --json
    ```
 
    `deliver` runs the same schema, data-integrity, semantic, honesty, and
-   composition checks as `validate`; it writes the HTML atomically only when
-   the candidate is accepted. Do not run a separate `validate` before the
-   first delivery. Successful delivery produces the self-contained HTML with
-   inline SVG and no screenshots or other image files.
+   composition checks as `validate`; it writes the interactive HTML and its
+   sibling PNG atomically only when the candidate is accepted. The PNG is a
+   static, light-theme preview of the same rendered chart, with controls and
+   takeaway cards omitted. Do not run a separate `validate` before the first
+   delivery.
+
+   PNG generation uses local Chrome/Chromium. If delivery reports
+   `PREVIEW_BROWSER_UNAVAILABLE`, immediately repeat the same command without
+   `--preview png`, hand off the HTML, and say that the static preview was
+   unavailable. Never hand-draw or substitute a different chart image.
 6. If delivery fails, change only each diagnostic's `subject` and choose only
    from its `supportedFixes` — one diagnosed repair per round. Re-run
-   `deliver` after the edit; a failed delivery preserves the previous output.
+   `deliver` after the edit; a failed delivery preserves the previous HTML
+   and PNG pair.
    Use `validate` separately only when you need a diagnostic-only check that
    must not write an accepted artifact:
 
@@ -70,10 +78,21 @@ the family you routed to.
    success. Successful delivery reports SHA-256 and byte counts for the spec
    and artifact; keep them for provenance, but see **Output** for when they
    belong in the reply.
-7. After successful delivery, hand off the HTML immediately. Do **not** run
-   `visual-check` or generate screenshots by default. Run it only when the
-   user asks for screenshots, visual inspection, containment evidence, or
-   release/publication verification:
+7. After successful delivery, embed the PNG with ordinary Markdown image
+   syntax, then link the HTML directly below it:
+
+   ```markdown
+   ![Concise description of the chart](/absolute/path/output.png)
+
+   [Open the interactive chart](/absolute/path/output.html)
+   ```
+
+   This handoff works in callers that render local Markdown images; the HTML
+   remains the full-fidelity fallback everywhere else. Do not claim the PNG
+   is interactive. Do **not** run `visual-check` by default: the delivery PNG
+   is a reader preview, while `visual-check` produces separate verification
+   evidence. Run it only when the user asks for visual inspection,
+   containment evidence, or release/publication verification:
 
    ```bash
    node bin/gen-chart.mjs visual-check <output.html> --json
@@ -87,33 +106,6 @@ the family you routed to.
    whether the chart reads well, so its result is never "visual QA passed"
    or "verified in light and dark". If you opened a screenshot, say what you
    saw. If you did not, say only that containment was measured.
-
-## Inline and paired output
-
-**Default to one standalone HTML file.** Run `deliver` without `--format`
-unless the current caller exposes a native inline-visualization channel that
-can accept and execute a gen-chart HTML fragment directly in the response.
-
-If that inline channel is actually available, generate both presentations so
-the response can show the chart inline and still offer a larger browser view:
-
-```bash
-node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> \
-  --quality showcase --format both --json
-```
-
-This writes `<output.html>` plus a sibling with `.inline` inserted before the
-`.html` suffix. Send the inline sibling through that native channel and link
-the standalone sibling. A file preview, attachment, downloadable HTML,
-Artifact, canvas, or side panel does **not** by itself establish inline
-response support. Do not infer support from the product name, invent a
-Markdown token, or claim inline display merely because the fragment exists.
-
-Use `--format inline` only when the caller specifically needs the fragment
-without a standalone file. If no qualifying inline-visualization channel is
-exposed, omit `--format`: generating only standalone is faster, uses less disk,
-and is the truthful default. Read `references/inline-output.md` for the
-fragment and host-qualification contract.
 
 ## Type router
 
@@ -201,13 +193,13 @@ receipt shapes, exit codes, and the repair loop in detail.
 
 ## Viewer capabilities (no extra authoring work)
 
-Generated standalone and inline HTML already contain: dark/light theme toggle honoring
+Generated HTML already contains: dark/light theme toggle honoring
 `prefers-color-scheme`, a Color picker for Classic, Cool, Warm, and Primary
 chart palettes (applied to every displayed series in order), crosshair
 tooltip with formatted values and units,
 legend series toggling (auto when ≥2 series), click-to-focus Data Passport
 with render-time stats, deep links (`#theme=`, `#palette=`, `#focus=`,
-`#hidden=`, `#brush=` in standalone mode), and an Export menu (PNG 2×, standalone SVG,
+`#hidden=`, `#brush=`), and an Export menu (PNG 2×, standalone SVG,
 provenance data CSV, 1200×630 share card) that always captures the canonical
 at-rest chart with the selected theme and palette. Everything is inline — one
 portable file, no CDN, works offline.
@@ -216,9 +208,7 @@ Sign-colored horizontal bars use contextual Stock, Blue–Orange, and
 Teal–Magenta palettes whose previews match their positive, neutral, and
 negative colors.
 
-Inline instances keep interaction state on their own root and emit
-`gen-chart:state-change`; they never change the host page URL. Every artifact
-is also accessible without a pointer: the plot is focusable,
+Every artifact is also accessible without a pointer: the plot is focusable,
 arrow keys walk the data points and announce them, and a visually hidden
 data table carries the exact numbers for screen readers.
 
@@ -244,18 +234,13 @@ Lead with the chart, not the receipt. The reader wants to know what it shows
 and where it is; hashes and per-viewport measurements are provenance, and
 provenance is noise until someone asks for it.
 
-**Default handoff — three things:**
+**Default handoff — four things:**
 
 - one sentence on what the chart shows, in the data's own terms
-- the path to the HTML file
+- the sibling PNG embedded with `![alt text](/absolute/path/chart.png)`
+- a direct `[Open the interactive chart](/absolute/path/chart.html)` link
 - one short line on checking, e.g. `Validated at showcase quality — 0 errors,
   0 warnings.`
-
-When a qualifying channel actually rendered the fragment inside the response,
-lead with that inline result and include the standalone file link as the
-full-window fallback. Otherwise generate and hand off one standalone file.
-Opening HTML in an Artifact or side panel is not inline display. Say which
-presentation happened; artifact generation alone proves nothing about display.
 
 **Add the rest only when asked, when something failed, or when the caller is
 automation rather than a person:** SHA-256 receipts, per-viewport containment
@@ -263,9 +248,12 @@ numbers, and full diagnostics.
 
 A good handoff:
 
-> Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%. The chart is at
-> `revenue-q2.html` — open it for hover values and CSV export. Validated at
-> showcase quality — 0 errors, 0 warnings.
+> Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%.
+>
+> ![Q2 revenue growth by region](/absolute/path/revenue-q2.png)
+>
+> [Open the interactive chart](/absolute/path/revenue-q2.html) for hover
+> values and CSV export. Validated at showcase quality — 0 errors, 0 warnings.
 
 Not this:
 

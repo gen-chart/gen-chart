@@ -9,10 +9,10 @@ import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 
 test('paired commit restores both files when the second final rename fails', () => {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-atomic-'));
-  const standalone = join(dir, 'chart.html');
-  const inline = join(dir, 'chart.inline.html');
-  writeFileSync(standalone, 'old standalone');
-  writeFileSync(inline, 'old inline');
+  const html = join(dir, 'chart.html');
+  const png = join(dir, 'chart.png');
+  writeFileSync(html, 'old html');
+  writeFileSync(png, Buffer.from('old png'));
 
   let finalRenames = 0;
   const operations = {
@@ -26,10 +26,10 @@ test('paired commit restores both files when the second final rename fails', () 
   };
 
   assert.throws(() => commitAtomically([
-    { path: standalone, html: 'new standalone' },
-    { path: inline, html: 'new inline' }
+    { path: html, content: 'new html' },
+    { path: png, content: Buffer.from('new png') }
   ], operations), /injected second-rename failure/);
-  assert.equal(readFileSync(standalone, 'utf8'), 'old standalone');
-  assert.equal(readFileSync(inline, 'utf8'), 'old inline');
-  assert.deepEqual(readdirSync(dir).sort(), ['chart.html', 'chart.inline.html']);
+  assert.equal(readFileSync(html, 'utf8'), 'old html');
+  assert.equal(readFileSync(png, 'utf8'), 'old png');
+  assert.deepEqual(readdirSync(dir).sort(), ['chart.html', 'chart.png']);
 });

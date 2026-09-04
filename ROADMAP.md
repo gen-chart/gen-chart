@@ -40,8 +40,7 @@ subject, measured evidence, and a closed set of supported fixes:
 overlap, point density, stack depth, matrix density and sparseness, and
 adjacent stacked segments verified perceptually distinguishable via CIEDE2000.
 
-**The viewer.** Self-contained standalone HTML and container-scoped inline
-HTML fragments, offline, no CDN: crosshair
+**The viewer.** One self-contained HTML file, offline, no CDN: crosshair
 tooltips, legend toggling, click-to-focus Data Passport with render-time
 statistics, a Color picker for Classic, Cool, Warm, and Primary chart
 palettes, opt-in brush zoom that never rescales y, up to five authored guided
@@ -56,11 +55,11 @@ WCAG AA in both themes.
 **Localization.** `en` and `zh-CN` for viewer chrome and computed notes;
 authored content is never translated.
 
-**Tooling.** `validate` / `render` / `deliver` with atomic commits,
-`--format standalone|inline|both` with one shared render pass and paired
-receipts, SHA-256 receipts, `guide` for routing, `inspect-data` for typed column
-profiles, `visual-check` for containment evidence, `demo`, `doctor`, a
-deterministic package build, and CI across Node 22 and 24.
+**Tooling.** `validate` / `render` / `deliver` with atomic commits and
+SHA-256 receipts, optional same-render PNG previews for chat handoff, `guide`
+for routing, `inspect-data` for typed column profiles, `visual-check` for
+containment evidence, `demo`, `doctor`, a deterministic package build, and CI
+across Node 22 and 24.
 
 **Interactive instruction gallery.** One staged, deterministic build delivers
 all 15 examples at showcase quality before replacing the published site. The

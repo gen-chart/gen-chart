@@ -67,7 +67,6 @@ body {
   padding: 2rem 1.25rem; display: flex; justify-content: center;
   transition: background 150ms, color 150ms;
 }
-.gc-embed { width: 100%; display: flex; justify-content: center; }
 .gc-wrap { width: 100%; max-width: 1040px; }
 header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
@@ -91,7 +90,6 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
   font: inherit; font-size: 0.8rem; padding: 0.42rem 0.6rem; border-radius: 0.4rem; cursor: pointer;
 }
 .gc-menu button:hover { background: var(--grid); }
-.gc-menu button:disabled { cursor: not-allowed; opacity: 0.55; }
 .gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
 .gc-palette-menu { min-width: 250px; padding: 0.5rem; }
 .gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
@@ -227,12 +225,6 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
 }
-.gc-embed[data-gc-format="inline"] {
-  position: relative; isolation: isolate; background: var(--bg); color: var(--ink);
-  padding: 1.25rem; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  transition: background 150ms, color 150ms; container-type: inline-size;
-}
-.gc-embed[data-gc-format="inline"] .gc-tooltip { position: absolute; }
 .gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
 .gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
 .gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
@@ -247,18 +239,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
    inside its own panel instead, so the page body never scrolls sideways. */
 @media (max-width: 700px) {
   body { padding: 1.25rem 0.75rem; }
-  .gc-embed[data-gc-format="inline"] { padding: 0.75rem; }
   header { flex-wrap: wrap; }
   .gc-toolbar { margin-left: auto; }
   .gc-palette-menu { max-width: calc(100vw - 1.5rem); }
-  .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
-  svg.gc-chart { min-width: 560px; }
-  .gc-panel { padding: 1rem 0.85rem; }
-}
-@container (max-width: 700px) {
-  header { flex-wrap: wrap; }
-  .gc-toolbar { margin-left: auto; }
-  .gc-palette-menu { max-width: calc(100cqw - 2.5rem); }
   .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
   svg.gc-chart { min-width: 560px; }
   .gc-panel { padding: 1rem 0.85rem; }
@@ -267,8 +250,6 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 </style>
 </head>
 <body>
-<!-- GEN_CHART_COMPONENT_START -->
-<div class="gc-embed" data-gc-root data-gc-format="standalone" data-theme="auto" data-palette="stock" data-palette-size="three">
 <div class="gc-wrap">
   <header>
     <div>
@@ -276,19 +257,19 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       <p class="gc-subtitle">Five-minute memory footprint versus the previous hour</p>
     </div>
     <div class="gc-toolbar">
-      <button class="gc-btn" id="gc-export-btn" data-gc-role="export-button" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
-      <button class="gc-btn" id="gc-theme" data-gc-role="theme-button" type="button" aria-label="Toggle color theme">Theme</button>
-      <button class="gc-btn" id="gc-color-btn" data-gc-role="color-button" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
-      <div class="gc-menu" id="gc-export-menu" data-gc-role="export-menu" role="menu">
+      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
+      <button class="gc-btn" id="gc-color-btn" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
+      <div class="gc-menu" id="gc-export-menu" role="menu">
         <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
         <button type="button" data-export="svg" role="menuitem">Download SVG</button>
         <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
         <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
       </div>
-      <div class="gc-menu gc-palette-menu" id="gc-color-menu" data-gc-role="color-menu">
+      <div class="gc-menu gc-palette-menu" id="gc-color-menu">
         <div class="gc-palette-head">
           <h2 id="gc-color-heading">Color palette</h2>
-          <button class="gc-palette-reset" id="gc-color-reset" data-gc-role="color-reset" type="button">Reset</button>
+          <button class="gc-palette-reset" id="gc-color-reset" type="button">Reset</button>
         </div>
         <div class="gc-palette-options" id="gc-palette-options" role="listbox" aria-labelledby="gc-color-heading">
           <button class="gc-palette-option" type="button" role="option" data-palette="stock" aria-selected="true" tabindex="0"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:var(--sign-stock-negative)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-stock-neutral)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-stock-positive)"></span></span><span>Stock</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="blue-orange" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:var(--sign-blue-orange-negative)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-blue-orange-neutral)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-blue-orange-positive)"></span></span><span>Blue–Orange</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="teal-magenta" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:var(--sign-teal-magenta-negative)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-teal-magenta-neutral)"></span><span class="gc-palette-swatch" style="--preview:var(--sign-teal-magenta-positive)"></span></span><span>Teal–Magenta</span><span class="gc-palette-check" aria-hidden="true">✓</span></button>
@@ -298,53 +279,26 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   </header>
 
   <div class="gc-panel">
-    <button class="gc-btn gc-reset" id="gc-reset" data-gc-role="reset" type="button">Reset zoom</button>
-    <div class="gc-figure" id="gc-figure" data-gc-role="figure" role="application" aria-label="Chart">
+    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
       <svg class="gc-chart" viewBox="0 0 1120 780" role="img" aria-label="Most services grew while a smaller group released memory" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid gc-horizontal-grid"><line x1="261" y1="48" x2="261" y2="738"/><line x1="428" y1="48" x2="428" y2="738"/><line x1="595" y1="48" x2="595" y2="738"/><line x1="762" y1="48" x2="762" y2="738"/><line x1="929" y1="48" x2="929" y2="738"/><line x1="1096" y1="48" x2="1096" y2="738"/></g><line class="gc-axis gc-zero-axis" x1="762" y1="48" x2="762" y2="738"/><g class="gc-value-ticks"><text x="261" y="36" text-anchor="middle">-60%</text><text x="428" y="36" text-anchor="middle">-40%</text><text x="595" y="36" text-anchor="middle">-20%</text><text x="762" y="36" text-anchor="middle">0%</text><text x="929" y="36" text-anchor="middle">20%</text><text x="1096" y="36" text-anchor="middle">40%</text></g><text class="gc-axis-label" x="261" y="16" text-anchor="start">Memory change</text><text class="gc-axis-label" x="249" y="772" text-anchor="end">Service</text><g class="gc-series" data-series="memory_change" data-color-by="sign" style="--sc:var(--role-neutral)"><text class="gc-context-label" x="77.1" y="71.2" text-anchor="end">141.2 MiB</text><text class="gc-category-label" x="249" y="71.2" text-anchor="end">spanner</text><rect class="gc-diverging-bar" data-sign="positive" data-index="0" data-tip="{&quot;title&quot;:&quot;spanner&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;141.2 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+35%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;104.6 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="56.5" width="292.3" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="1060.3" y="71.2" text-anchor="start">+35%</text><text class="gc-context-label" x="77.1" y="109.5" text-anchor="end">292.3 MiB</text><text class="gc-category-label" x="249" y="109.5" text-anchor="end">analytics-intake</text><rect class="gc-diverging-bar" data-sign="positive" data-index="1" data-tip="{&quot;title&quot;:&quot;analytics-intake&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;292.3 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+28.8%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;226.9 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="94.8" width="240.5" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="1008.5" y="109.5" text-anchor="start">+28.8%</text><text class="gc-context-label" x="77.1" y="147.8" text-anchor="end">337.7 MiB</text><text class="gc-category-label" x="249" y="147.8" text-anchor="end">trade-scheduler</text><rect class="gc-diverging-bar" data-sign="positive" data-index="2" data-tip="{&quot;title&quot;:&quot;trade-scheduler&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;337.7 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+17.4%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;287.6 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="133.1" width="145.3" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="913.3" y="147.8" text-anchor="start">+17.4%</text><text class="gc-context-label" x="77.1" y="186.2" text-anchor="end">75.6 MiB</text><text class="gc-category-label" x="249" y="186.2" text-anchor="end">trade-receiver</text><rect class="gc-diverging-bar" data-sign="positive" data-index="3" data-tip="{&quot;title&quot;:&quot;trade-receiver&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;75.6 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+16.7%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;64.8 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="171.5" width="139.4" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="907.4" y="186.2" text-anchor="start">+16.7%</text><text class="gc-context-label" x="77.1" y="224.5" text-anchor="end">806 MiB</text><text class="gc-category-label" x="249" y="224.5" text-anchor="end">kafka</text><rect class="gc-diverging-bar" data-sign="positive" data-index="4" data-tip="{&quot;title&quot;:&quot;kafka&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;806 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+13%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;713.3 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="209.8" width="108.5" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="876.5" y="224.5" text-anchor="start">+13%</text><text class="gc-context-label" x="77.1" y="262.8" text-anchor="end">856.7 MiB</text><text class="gc-category-label" x="249" y="262.8" text-anchor="end">emailer</text><rect class="gc-diverging-bar" data-sign="positive" data-index="5" data-tip="{&quot;title&quot;:&quot;emailer&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;856.7 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+7.9%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;793.9 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="248.1" width="66" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="834" y="262.8" text-anchor="start">+7.9%</text><text class="gc-context-label" x="77.1" y="301.2" text-anchor="end">888.6 MiB</text><text class="gc-category-label" x="249" y="301.2" text-anchor="end">product-recommendation-db</text><rect class="gc-diverging-bar" data-sign="positive" data-index="6" data-tip="{&quot;title&quot;:&quot;product-recommendation-db&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;888.6 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+4.5%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;850.3 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="286.5" width="37.6" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="805.6" y="301.2" text-anchor="start">+4.5%</text><text class="gc-context-label" x="77.1" y="339.5" text-anchor="end">1,740.8 MiB</text><text class="gc-category-label" x="249" y="339.5" text-anchor="end">fraud-detector</text><rect class="gc-diverging-bar" data-sign="positive" data-index="7" data-tip="{&quot;title&quot;:&quot;fraud-detector&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;1,740.8 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+3.4%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;1,683.6 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="324.8" width="28.4" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="796.4" y="339.5" text-anchor="start">+3.4%</text><text class="gc-context-label" x="77.1" y="377.8" text-anchor="end">375.5 MiB</text><text class="gc-category-label" x="249" y="377.8" text-anchor="end">analytics-aggregator</text><rect class="gc-diverging-bar" data-sign="positive" data-index="8" data-tip="{&quot;title&quot;:&quot;analytics-aggregator&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;375.5 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+1.7%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;369.2 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="363.1" width="14.2" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="782.2" y="377.8" text-anchor="start">+1.7%</text><text class="gc-context-label" x="77.1" y="416.2" text-anchor="end">103.6 MiB</text><text class="gc-category-label" x="249" y="416.2" text-anchor="end">product-recommendation</text><rect class="gc-diverging-bar" data-sign="positive" data-index="9" data-tip="{&quot;title&quot;:&quot;product-recommendation&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;103.6 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+1.4%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;102.2 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="401.5" width="11.7" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="779.7" y="416.2" text-anchor="start">+1.4%</text><text class="gc-context-label" x="77.1" y="454.5" text-anchor="end">79.7 MiB</text><text class="gc-category-label" x="249" y="454.5" text-anchor="end">product-recommendation-lite</text><rect class="gc-diverging-bar" data-sign="positive" data-index="10" data-tip="{&quot;title&quot;:&quot;product-recommendation-lite&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;79.7 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;+0.8%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;79.1 MiB&quot;}]}" style="--sc:var(--role-positive)" x="762" y="439.8" width="6.7" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="positive" x="774.7" y="454.5" text-anchor="start">+0.8%</text><text class="gc-context-label" x="77.1" y="492.8" text-anchor="end">1,638.4 MiB</text><text class="gc-category-label" x="249" y="492.8" text-anchor="end">balance-checker</text><rect class="gc-diverging-bar" data-sign="zero" data-index="11" data-tip="{&quot;title&quot;:&quot;balance-checker&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;1,638.4 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;0%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;1,638.4 MiB&quot;}]}" style="--sc:var(--role-neutral)" x="761.6" y="478.1" width="0.8" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="zero" x="768" y="492.8" text-anchor="start">0%</text><text class="gc-context-label" x="77.1" y="531.2" text-anchor="end">973.6 MiB</text><text class="gc-category-label" x="249" y="531.2" text-anchor="end">trade-executor</text><rect class="gc-diverging-bar" data-sign="negative" data-index="12" data-tip="{&quot;title&quot;:&quot;trade-executor&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;973.6 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-2.4%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;997.5 MiB&quot;}]}" style="--sc:var(--role-negative)" x="742" y="516.5" width="20" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="736" y="531.2" text-anchor="end">-2.4%</text><text class="gc-context-label" x="77.1" y="569.5" text-anchor="end">525.6 MiB</text><text class="gc-category-label" x="249" y="569.5" text-anchor="end">authenticator</text><rect class="gc-diverging-bar" data-sign="negative" data-index="13" data-tip="{&quot;title&quot;:&quot;authenticator&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;525.6 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-3%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;541.9 MiB&quot;}]}" style="--sc:var(--role-negative)" x="736.9" y="554.8" width="25.1" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="730.9" y="569.5" text-anchor="end">-3%</text><text class="gc-context-label" x="77.1" y="607.8" text-anchor="end">57.3 MiB</text><text class="gc-category-label" x="249" y="607.8" text-anchor="end">trade-validator</text><rect class="gc-diverging-bar" data-sign="negative" data-index="14" data-tip="{&quot;title&quot;:&quot;trade-validator&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;57.3 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-3.6%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;59.4 MiB&quot;}]}" style="--sc:var(--role-negative)" x="731.9" y="593.1" width="30.1" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="725.9" y="607.8" text-anchor="end">-3.6%</text><text class="gc-context-label" x="77.1" y="646.2" text-anchor="end">51.5 MiB</text><text class="gc-category-label" x="249" y="646.2" text-anchor="end">trade-enrichment</text><rect class="gc-diverging-bar" data-sign="negative" data-index="15" data-tip="{&quot;title&quot;:&quot;trade-enrichment&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;51.5 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-6.1%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;54.8 MiB&quot;}]}" style="--sc:var(--role-negative)" x="711.1" y="631.5" width="50.9" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="705.1" y="646.2" text-anchor="end">-6.1%</text><text class="gc-context-label" x="77.1" y="684.5" text-anchor="end">575.1 MiB</text><text class="gc-category-label" x="249" y="684.5" text-anchor="end">notifier</text><rect class="gc-diverging-bar" data-sign="negative" data-index="16" data-tip="{&quot;title&quot;:&quot;notifier&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;575.1 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-18.9%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;709.1 MiB&quot;}]}" style="--sc:var(--role-negative)" x="604.2" y="669.8" width="157.8" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="598.2" y="684.5" text-anchor="end">-18.9%</text><text class="gc-context-label" x="77.1" y="722.8" text-anchor="end">266.2 MiB</text><text class="gc-category-label" x="249" y="722.8" text-anchor="end">slow-kafka</text><rect class="gc-diverging-bar" data-sign="negative" data-index="17" data-tip="{&quot;title&quot;:&quot;slow-kafka&quot;,&quot;rows&quot;:[{&quot;label&quot;:&quot;Current memory&quot;,&quot;value&quot;:&quot;266.2 MiB&quot;},{&quot;label&quot;:&quot;Change&quot;,&quot;value&quot;:&quot;-40.3%&quot;},{&quot;label&quot;:&quot;Previous-hour memory&quot;,&quot;value&quot;:&quot;445.9 MiB&quot;}]}" style="--sc:var(--role-negative)" x="425.5" y="708.1" width="336.5" height="21.4" rx="1.5"/><text class="gc-bar-value" data-sign="negative" x="419.5" y="722.8" text-anchor="end">-40.3%</text></g></svg>
     </div>
-    <p class="gc-sr-only" id="gc-kbd-hint" data-gc-role="keyboard-hint">Use arrow keys to walk the data points.</p>
-    <p class="gc-sr-only" id="gc-live" data-gc-role="live" aria-live="polite"></p>
+    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
     <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">Service</th><th scope="col">Current memory</th><th scope="col">Change</th><th scope="col">Previous-hour memory</th></tr></thead><tbody><tr><th scope="row">spanner</th><td>141.2</td><td>35</td><td>104.6</td></tr><tr><th scope="row">analytics-intake</th><td>292.3</td><td>28.8</td><td>226.9</td></tr><tr><th scope="row">trade-scheduler</th><td>337.7</td><td>17.4</td><td>287.6</td></tr><tr><th scope="row">trade-receiver</th><td>75.6</td><td>16.7</td><td>64.8</td></tr><tr><th scope="row">kafka</th><td>806</td><td>13</td><td>713.3</td></tr><tr><th scope="row">emailer</th><td>856.7</td><td>7.9</td><td>793.9</td></tr><tr><th scope="row">product-recommendation-db</th><td>888.6</td><td>4.5</td><td>850.3</td></tr><tr><th scope="row">fraud-detector</th><td>1740.8</td><td>3.4</td><td>1683.6</td></tr><tr><th scope="row">analytics-aggregator</th><td>375.5</td><td>1.7</td><td>369.2</td></tr><tr><th scope="row">product-recommendation</th><td>103.6</td><td>1.4</td><td>102.2</td></tr><tr><th scope="row">product-recommendation-lite</th><td>79.7</td><td>0.8</td><td>79.1</td></tr><tr><th scope="row">balance-checker</th><td>1638.4</td><td>0</td><td>1638.4</td></tr><tr><th scope="row">trade-executor</th><td>973.6</td><td>-2.4</td><td>997.5</td></tr><tr><th scope="row">authenticator</th><td>525.6</td><td>-3</td><td>541.9</td></tr><tr><th scope="row">trade-validator</th><td>57.3</td><td>-3.6</td><td>59.4</td></tr><tr><th scope="row">trade-enrichment</th><td>51.5</td><td>-6.1</td><td>54.8</td></tr><tr><th scope="row">notifier</th><td>575.1</td><td>-18.9</td><td>709.1</td></tr><tr><th scope="row">slow-kafka</th><td>266.2</td><td>-40.3</td><td>445.9</td></tr></tbody></table>
     <div class="gc-sign-legend" role="group" aria-label="Direction"><span class="gc-sign-item"><span class="gc-swatch" data-semantic="negative" data-mark="bar" style="--sw:var(--role-negative)"></span>Decrease</span><span class="gc-sign-item"><span class="gc-swatch" data-semantic="zero" data-mark="bar" style="--sw:var(--role-neutral)"></span>No change</span><span class="gc-sign-item"><span class="gc-swatch" data-semantic="positive" data-mark="bar" style="--sw:var(--role-positive)"></span>Increase</span></div>
-    <div class="gc-passport" id="gc-passport" data-gc-role="passport" aria-live="polite"></div>
+    <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
   </div>
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Spanner has the largest increase at +35%.</li><li>Slow-kafka has the largest decrease at -40.3%.</li><li>Balance-checker is unchanged.</li></ul></section></div>
 </div>
-<div class="gc-tooltip" id="gc-tooltip" data-gc-role="tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"element","orientation":"horizontal","title":"Most services grew while a smaller group released memory","unit":"%","xType":"band","tooltip":"auto","legendToggle":false,"brush":null,"views":[],"xPixels":[67.2,105.5,143.8,182.2,220.5,258.8,297.2,335.5,373.8,412.2,450.5,488.8,527.2,565.5,603.8,642.2,680.5,718.8],"xLabels":["spanner","analytics-intake","trade-scheduler","trade-receiver","kafka","emailer","product-recommendation-db","fraud-detector","analytics-aggregator","product-recommendation","product-recommendation-lite","balance-checker","trade-executor","authenticator","trade-validator","trade-enrichment","notifier","slow-kafka"],"table":{"headers":["Service","Current memory","Change","Previous-hour memory"],"rows":[["spanner",141.2,35,104.6],["analytics-intake",292.3,28.8,226.9],["trade-scheduler",337.7,17.4,287.6],["trade-receiver",75.6,16.7,64.8],["kafka",806,13,713.3],["emailer",856.7,7.9,793.9],["product-recommendation-db",888.6,4.5,850.3],["fraud-detector",1740.8,3.4,1683.6],["analytics-aggregator",375.5,1.7,369.2],["product-recommendation",103.6,1.4,102.2],["product-recommendation-lite",79.7,0.8,79.1],["balance-checker",1638.4,0,1638.4],["trade-executor",973.6,-2.4,997.5],["authenticator",525.6,-3,541.9],["trade-validator",57.3,-3.6,59.4],["trade-enrichment",51.5,-6.1,54.8],["notifier",575.1,-18.9,709.1],["slow-kafka",266.2,-40.3,445.9]]},"plot":{"left":261,"top":48,"right":1096,"bottom":738},"width":1120,"height":780,"valueLabelsOmitted":false,"series":[{"id":"memory_change","label":"Change","mark":"bar","color":"var(--role-neutral)","colorBy":"sign","values":[35,28.8,17.4,16.7,13,7.9,4.5,3.4,1.7,1.4,0.8,0,-2.4,-3,-3.6,-6.1,-18.9,-40.3],"formatted":["+35%","+28.8%","+17.4%","+16.7%","+13%","+7.9%","+4.5%","+3.4%","+1.7%","+1.4%","+0.8%","0%","-2.4%","-3%","-3.6%","-6.1%","-18.9%","-40.3%"],"pixels":[1054.3,1002.5,907.3,901.4,870.5,828,799.6,790.4,776.2,773.7,768.7,762,742,736.9,731.9,711.1,604.2,425.5],"signs":["positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","zero","negative","negative","negative","negative","negative","negative"],"context":{"label":"Current memory","values":[141.2,292.3,337.7,75.6,806,856.7,888.6,1740.8,375.5,103.6,79.7,1638.4,973.6,525.6,57.3,51.5,575.1,266.2],"formatted":["141.2 MiB","292.3 MiB","337.7 MiB","75.6 MiB","806 MiB","856.7 MiB","888.6 MiB","1,740.8 MiB","375.5 MiB","103.6 MiB","79.7 MiB","1,638.4 MiB","973.6 MiB","525.6 MiB","57.3 MiB","51.5 MiB","575.1 MiB","266.2 MiB"]},"details":[{"label":"Previous-hour memory","values":[104.6,226.9,287.6,64.8,713.3,793.9,850.3,1683.6,369.2,102.2,79.1,1638.4,997.5,541.9,59.4,54.8,709.1,445.9],"formatted":["104.6 MiB","226.9 MiB","287.6 MiB","64.8 MiB","713.3 MiB","793.9 MiB","850.3 MiB","1,683.6 MiB","369.2 MiB","102.2 MiB","79.1 MiB","1,638.4 MiB","997.5 MiB","541.9 MiB","59.4 MiB","54.8 MiB","709.1 MiB","445.9 MiB"]}],"focusable":true,"stats":{"min":-40.3,"max":35,"mean":3.127777777777779,"last":-40.3,"count":18}}],"locale":"en","defaultPalette":"stock","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.export.unavailable":"Unavailable in this host","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"stock":{"six":["#059669","#748296","#E11D48"],"three":["#059669","#748296","#E11D48"]},"blue-orange":{"six":["#2563EB","#748296","#C2410C"],"three":["#2563EB","#748296","#C2410C"]},"teal-magenta":{"six":["#0F766E","#748296","#BE185D"],"three":["#0F766E","#748296","#BE185D"]}}}</script>
+<div class="gc-tooltip" id="gc-tooltip" role="status"></div>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"element","orientation":"horizontal","title":"Most services grew while a smaller group released memory","unit":"%","xType":"band","tooltip":"auto","legendToggle":false,"brush":null,"views":[],"xPixels":[67.2,105.5,143.8,182.2,220.5,258.8,297.2,335.5,373.8,412.2,450.5,488.8,527.2,565.5,603.8,642.2,680.5,718.8],"xLabels":["spanner","analytics-intake","trade-scheduler","trade-receiver","kafka","emailer","product-recommendation-db","fraud-detector","analytics-aggregator","product-recommendation","product-recommendation-lite","balance-checker","trade-executor","authenticator","trade-validator","trade-enrichment","notifier","slow-kafka"],"table":{"headers":["Service","Current memory","Change","Previous-hour memory"],"rows":[["spanner",141.2,35,104.6],["analytics-intake",292.3,28.8,226.9],["trade-scheduler",337.7,17.4,287.6],["trade-receiver",75.6,16.7,64.8],["kafka",806,13,713.3],["emailer",856.7,7.9,793.9],["product-recommendation-db",888.6,4.5,850.3],["fraud-detector",1740.8,3.4,1683.6],["analytics-aggregator",375.5,1.7,369.2],["product-recommendation",103.6,1.4,102.2],["product-recommendation-lite",79.7,0.8,79.1],["balance-checker",1638.4,0,1638.4],["trade-executor",973.6,-2.4,997.5],["authenticator",525.6,-3,541.9],["trade-validator",57.3,-3.6,59.4],["trade-enrichment",51.5,-6.1,54.8],["notifier",575.1,-18.9,709.1],["slow-kafka",266.2,-40.3,445.9]]},"plot":{"left":261,"top":48,"right":1096,"bottom":738},"width":1120,"height":780,"valueLabelsOmitted":false,"series":[{"id":"memory_change","label":"Change","mark":"bar","color":"var(--role-neutral)","colorBy":"sign","values":[35,28.8,17.4,16.7,13,7.9,4.5,3.4,1.7,1.4,0.8,0,-2.4,-3,-3.6,-6.1,-18.9,-40.3],"formatted":["+35%","+28.8%","+17.4%","+16.7%","+13%","+7.9%","+4.5%","+3.4%","+1.7%","+1.4%","+0.8%","0%","-2.4%","-3%","-3.6%","-6.1%","-18.9%","-40.3%"],"pixels":[1054.3,1002.5,907.3,901.4,870.5,828,799.6,790.4,776.2,773.7,768.7,762,742,736.9,731.9,711.1,604.2,425.5],"signs":["positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","positive","zero","negative","negative","negative","negative","negative","negative"],"context":{"label":"Current memory","values":[141.2,292.3,337.7,75.6,806,856.7,888.6,1740.8,375.5,103.6,79.7,1638.4,973.6,525.6,57.3,51.5,575.1,266.2],"formatted":["141.2 MiB","292.3 MiB","337.7 MiB","75.6 MiB","806 MiB","856.7 MiB","888.6 MiB","1,740.8 MiB","375.5 MiB","103.6 MiB","79.7 MiB","1,638.4 MiB","973.6 MiB","525.6 MiB","57.3 MiB","51.5 MiB","575.1 MiB","266.2 MiB"]},"details":[{"label":"Previous-hour memory","values":[104.6,226.9,287.6,64.8,713.3,793.9,850.3,1683.6,369.2,102.2,79.1,1638.4,997.5,541.9,59.4,54.8,709.1,445.9],"formatted":["104.6 MiB","226.9 MiB","287.6 MiB","64.8 MiB","713.3 MiB","793.9 MiB","850.3 MiB","1,683.6 MiB","369.2 MiB","102.2 MiB","79.1 MiB","1,638.4 MiB","997.5 MiB","541.9 MiB","59.4 MiB","54.8 MiB","709.1 MiB","445.9 MiB"]}],"focusable":true,"stats":{"min":-40.3,"max":35,"mean":3.127777777777779,"last":-40.3,"count":18}}],"locale":"en","defaultPalette":"stock","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"stock":{"six":["#059669","#748296","#E11D48"],"three":["#059669","#748296","#E11D48"]},"blue-orange":{"six":["#2563EB","#748296","#C2410C"],"three":["#2563EB","#748296","#C2410C"]},"teal-magenta":{"six":["#0F766E","#748296","#BE185D"],"three":["#0F766E","#748296","#BE185D"]}}}</script>
 <script>
 (function () {
   'use strict';
-  var runtimeScript = document.currentScript;
-  var scope = runtimeScript && runtimeScript.closest('[data-gc-root]');
-  if (!scope) return;
-  var inline = scope.getAttribute('data-gc-format') === 'inline';
-  var root = inline ? scope : document.documentElement;
-  var payloadElement = scope.querySelector('[id="gc-payload"]');
-  var payload = JSON.parse(payloadElement.textContent);
-  if (inline) {
-    var instanceId = 'gc-' + (globalThis.crypto && globalThis.crypto.randomUUID
-      ? globalThis.crypto.randomUUID()
-      : Math.random().toString(36).slice(2));
-    var ids = {};
-    scope.querySelectorAll('[id]').forEach(function (element) {
-      var old = element.id;
-      var replacement = instanceId + '-' + old;
-      ids[old] = replacement;
-      element.id = replacement;
-    });
-    ['aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(function (attribute) {
-      scope.querySelectorAll('[' + attribute + ']').forEach(function (element) {
-        var value = element.getAttribute(attribute).split(/\s+/).map(function (id) {
-          return ids[id] || id;
-        }).join(' ');
-        element.setAttribute(attribute, value);
-      });
-    });
-    scope.setAttribute('data-gc-instance', instanceId);
-  }
-  var svg = scope.querySelector('svg.gc-chart');
-  var keyboardHintId = scope.querySelector('[data-gc-role="keyboard-hint"]').id;
+  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
+  var root = document.documentElement;
+  var svg = document.querySelector('svg.gc-chart');
   var plot = payload.plot;
   var hidden = {};
   var focusId = null;
@@ -365,14 +319,13 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // ---------------------------------------------------------- deep links
   function readHash() {
     var out = {};
-    if (inline) return out;
     location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
       var i = kv.indexOf('=');
       if (i > 0) out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
     });
     return out;
   }
-  function currentState() {
+  function writeHash() {
     var parts = [];
     var theme = root.getAttribute('data-theme');
     if (theme !== 'auto') parts.push('theme=' + theme);
@@ -382,21 +335,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
     if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
     if (activeView) parts.push('view=' + encodeURIComponent(activeView));
-    return parts;
-  }
-  function writeHash() {
-    var parts = currentState();
-    if (inline) {
-      scope.dispatchEvent(new CustomEvent('gen-chart:state-change', {
-        bubbles: true, detail: { hash: parts.length ? '#' + parts.join('&') : '' }
-      }));
-      return;
-    }
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
   }
 
   // -------------------------------------------------------------- theme
-  scope.querySelector('[data-gc-role="theme-button"]').addEventListener('click', function () {
+  document.getElementById('gc-theme').addEventListener('click', function () {
     var current = root.getAttribute('data-theme');
     if (current === 'auto') {
       current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -408,7 +351,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var isAxis = payload.hover === 'axis';
 
   // ------------------------------------------------------------- legend
-  var legend = scope.querySelector('.gc-legend');
+  var legend = document.querySelector('.gc-legend');
   function applyHidden(id) {
     var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(id) + '"]');
     if (g) g.classList.toggle('gc-off', !!hidden[id]);
@@ -441,7 +384,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // ------------------------------------------------------ data passport
   // Passport, zoom, and crosshair are axis-family features. Element-hover
   // families (distribution, proportion, matrix) read per-mark instead.
-  var passport = scope.querySelector('[data-gc-role="passport"]');
+  var passport = document.getElementById('gc-passport');
   function setFocus(id) {
     var target = payload.series.find(function (s) { return s.id === id; });
     focusId = id && !hidden[id] && (!target || target.focusable !== false) ? id : null;
@@ -499,7 +442,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // --------------------------------------------------------- brush zoom
   // Zoom is an affine remap of original x pixels; y never rescales, so the
   // reading stays honest. Line and range marks over time/linear x support it.
-  var resetBtn = scope.querySelector('[data-gc-role="reset"]');
+  var resetBtn = document.getElementById('gc-reset');
   var brushRect = svg.querySelector('.gc-brush-rect');
   function zoomX(ox) {
     if (!zoom) return ox;
@@ -602,12 +545,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     writeHash();
   }
   resetBtn.addEventListener('click', function () { setZoom(null); });
-  scope.addEventListener('keydown', function (e) {
+  document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { setZoom(null); setFocus(null); writeHash(); }
   });
 
   // ------------------------------------------------- tooltip + pointer
-  var tooltip = scope.querySelector('[data-gc-role="tooltip"]');
+  var tooltip = document.getElementById('gc-tooltip');
   var crosshair = svg.querySelector('.gc-crosshair');
   var hit = svg.querySelector('.gc-hit');
   var dots = {};
@@ -667,7 +610,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     });
     tooltip.innerHTML = html;
     tooltip.style.display = 'block';
-    positionTip(clientX, clientY);
+    var pad = 14;
+    var tw = tooltip.offsetWidth;
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
   }
   if (isAxis && payload.tooltip !== 'off' && hit) {
     hit.addEventListener('pointermove', function (evt) { if (!brushing) showTip(evt); });
@@ -701,22 +649,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
   function moveTip(evt) { moveTipTo(evt.clientX, evt.clientY); }
   function moveTipTo(clientX, clientY) {
-    positionTip(clientX, clientY);
-  }
-  function positionTip(clientX, clientY) {
     var pad = 14;
     var tw = tooltip.offsetWidth;
-    var th = tooltip.offsetHeight;
-    var bounds = inline ? scope.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-    var px = clientX - bounds.left;
-    var py = clientY - bounds.top;
-    var x = px + pad;
-    if (x + tw > bounds.width - 8) x = px - tw - pad;
-    x = Math.max(8, Math.min(x, Math.max(8, bounds.width - tw - 8)));
-    var y = Math.max(8, py - th / 2);
-    if (inline) y = Math.min(y, Math.max(8, scope.clientHeight - th - 8));
+    var x = clientX + pad;
+    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
     tooltip.style.left = x + 'px';
-    tooltip.style.top = y + 'px';
+    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
   }
 
   // Brush drag on the hit rect.
@@ -753,34 +691,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // ------------------------------------------------------------ exports
-  var exportBtn = scope.querySelector('[data-gc-role="export-button"]');
-  var exportMenu = scope.querySelector('[data-gc-role="export-menu"]');
-  var colorBtn = scope.querySelector('[data-gc-role="color-button"]');
-  var colorMenu = scope.querySelector('[data-gc-role="color-menu"]');
-  var colorReset = scope.querySelector('[data-gc-role="color-reset"]');
-  var paletteOptions = Array.from(scope.querySelectorAll('.gc-palette-option'));
-  var basicExports = typeof Blob === 'function' && typeof URL !== 'undefined' &&
-    typeof URL.createObjectURL === 'function' && typeof URL.revokeObjectURL === 'function';
-  var canvasProbe = document.createElement('canvas');
-  var canvasContext = null;
-  try { canvasContext = canvasProbe.getContext('2d'); } catch (error) {}
-  var rasterExports = basicExports && typeof Image === 'function' &&
-    Boolean(canvasContext) && typeof canvasProbe.toBlob === 'function';
-  function exportUnavailable(button) {
-    var reason = payload.i18n['ui.export.unavailable'];
-    button.disabled = true;
-    button.title = reason;
-    button.setAttribute('aria-label', button.textContent.trim() + '. ' + reason);
-  }
-  scope.querySelectorAll('[data-export]').forEach(function (button) {
-    var kind = button.getAttribute('data-export');
-    var available = basicExports && (kind === 'svg' || kind === 'csv' || rasterExports);
-    if (!available) exportUnavailable(button);
-  });
-  if (!basicExports) {
-    exportBtn.disabled = true;
-    exportBtn.title = payload.i18n['ui.export.unavailable'];
-  }
+  var exportBtn = document.getElementById('gc-export-btn');
+  var exportMenu = document.getElementById('gc-export-menu');
+  var colorBtn = document.getElementById('gc-color-btn');
+  var colorMenu = document.getElementById('gc-color-menu');
+  var colorReset = document.getElementById('gc-color-reset');
+  var paletteOptions = Array.from(document.querySelectorAll('.gc-palette-option'));
 
   function closeExportMenu() {
     exportMenu.removeAttribute('data-open');
@@ -818,7 +734,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         element.style.setProperty('--sc', paletteToken(index, colorCount));
       });
     }
-    scope.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
+    document.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
       swatch.style.setProperty('--sw', paletteToken(index, colorCount));
     });
     if (focusId) setFocus(focusId);
@@ -898,7 +814,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       setPalette(option.getAttribute('data-palette'), true);
     }
   });
-  scope.addEventListener('click', function (e) {
+  document.addEventListener('click', function (e) {
     if (!e.target.closest('.gc-toolbar')) {
       closeExportMenu();
       closeColorMenu(false);
@@ -989,58 +905,27 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     clone.setAttribute('height', payload.height);
     return new XMLSerializer().serializeToString(clone);
   }
-  function exportFailure(kind, error) {
-    var button = scope.querySelector('[data-export="' + kind + '"]');
-    if (button) exportUnavailable(button);
-    scope.dispatchEvent(new CustomEvent('gen-chart:export-error', {
-      bubbles: true,
-      detail: { kind: kind, message: error && error.message ? error.message : String(error) }
-    }));
+  function download(name, blob) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   }
-  function download(name, blob, kind) {
-    try {
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      scope.appendChild(a);
-      a.click();
-      setTimeout(function () {
-        try { URL.revokeObjectURL(a.href); } catch (error) {}
-        a.remove();
-      }, 1000);
-    } catch (error) {
-      exportFailure(kind, error);
-    }
-  }
-  function svgToCanvas(scale, kind, cb) {
+  function svgToCanvas(scale, cb) {
     var img = new Image();
-    var url;
-    try {
-      url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
-    } catch (error) {
-      exportFailure(kind, error);
-      return;
-    }
+    var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
     img.onload = function () {
-      try {
-        var canvas = document.createElement('canvas');
-        canvas.width = payload.width * scale;
-        canvas.height = payload.height * scale;
-        var ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('2D canvas context is unavailable');
-        ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-        cb(canvas);
-      } catch (error) {
-        try { URL.revokeObjectURL(url); } catch (revokeError) {}
-        exportFailure(kind, error);
-      }
-    };
-    img.onerror = function () {
-      try { URL.revokeObjectURL(url); } catch (error) {}
-      exportFailure(kind, new Error('SVG image decoding is unavailable'));
+      var canvas = document.createElement('canvas');
+      canvas.width = payload.width * scale;
+      canvas.height = payload.height * scale;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      cb(canvas);
     };
     img.src = url;
   }
@@ -1060,18 +945,15 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     kind = kind.getAttribute('data-export');
     exportMenu.removeAttribute('data-open');
     if (kind === 'svg') {
-      download(slug() + '.svg', new Blob([exportSvgString()], { type: 'image/svg+xml' }), kind);
+      download(slug() + '.svg', new Blob([exportSvgString()], { type: 'image/svg+xml' }));
     } else if (kind === 'csv') {
-      download(slug() + '.csv', new Blob([csvString()], { type: 'text/csv' }), kind);
+      download(slug() + '.csv', new Blob([csvString()], { type: 'text/csv' }));
     } else if (kind === 'png') {
-      svgToCanvas(2, kind, function (canvas) {
-        canvas.toBlob(function (b) {
-          if (b) download(slug() + '.png', b, kind);
-          else exportFailure(kind, new Error('PNG encoding is unavailable'));
-        }, 'image/png');
+      svgToCanvas(2, function (canvas) {
+        canvas.toBlob(function (b) { download(slug() + '.png', b); }, 'image/png');
       });
     } else if (kind === 'card') {
-      svgToCanvas(2, kind, function (chart) {
+      svgToCanvas(2, function (chart) {
         var cs = getComputedStyle(root);
         var canvas = document.createElement('canvas');
         canvas.width = 1200;
@@ -1088,10 +970,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         var w = chart.width * s;
         var h = chart.height * s;
         ctx.drawImage(chart, (1200 - w) / 2, 100 + (boxH - h) / 2, w, h);
-        canvas.toBlob(function (b) {
-          if (b) download(slug() + '-share.png', b, kind);
-          else exportFailure(kind, new Error('PNG encoding is unavailable'));
-        }, 'image/png');
+        canvas.toBlob(function (b) { download(slug() + '-share.png', b); }, 'image/png');
       });
     }
   });
@@ -1100,12 +979,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // The chart is focusable and arrow keys walk the data points, so the
   // reading does not depend on a pointer. Each step announces the value
   // through the live region for screen readers.
-  var figure = scope.querySelector('[data-gc-role="figure"]');
-  var live = scope.querySelector('[data-gc-role="live"]');
+  var figure = document.getElementById('gc-figure');
+  var live = document.getElementById('gc-live');
   var cursor = null;
   if (isAxis && figure) {
     figure.setAttribute('tabindex', '0');
-    figure.setAttribute('aria-describedby', keyboardHintId);
+    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
     figure.addEventListener('keydown', function (e) {
       var r = visibleRange();
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
@@ -1180,7 +1059,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     };
     if (marks.length) {
       figure.setAttribute('tabindex', '0');
-      figure.setAttribute('aria-describedby', keyboardHintId);
+      figure.setAttribute('aria-describedby', 'gc-kbd-hint');
       figure.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); mi = Math.min(marks.length - 1, mi + 1); focusMark(); }
         else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); mi = Math.max(0, mi - 1); focusMark(); }
@@ -1196,8 +1075,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // ----------------------------------------------------- guided views
-  var viewStrip = scope.querySelector('.gc-views');
-  var viewNote = scope.querySelector('[data-gc-role="view-note"]');
+  var viewStrip = document.querySelector('.gc-views');
+  var viewNote = document.getElementById('gc-view-note');
   function applyView(id) {
     var v = (payload.views || []).find(function (x) { return x.id === id; });
     if (viewStrip) {
@@ -1263,7 +1142,5 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 })();
 </script>
-</div>
-<!-- GEN_CHART_COMPONENT_END -->
 </body>
 </html>
