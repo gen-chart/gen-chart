@@ -48,6 +48,18 @@
 :root[data-palette="warm"][data-palette-size="three"] { --cat-0: #F5D06C; --cat-1: #EE944B; --cat-2: #D03828; }
 :root[data-palette="primary"] { --cat-0: #E74C3C; --cat-1: #F06A5B; --cat-2: #F4D03F; --cat-3: #F7DC6F; --cat-4: #3498DB; --cat-5: #5DADE2; --seq-0: #E74C3C; --seq-ink-0: #000000; --div-0: #E74C3C; --div-ink-0: #000000; --seq-1: #F06A5B; --seq-ink-1: #000000; --div-1: #F06A5B; --div-ink-1: #000000; --seq-2: #F4D03F; --seq-ink-2: #000000; --div-2: #F4D03F; --div-ink-2: #000000; --seq-3: #F7DC6F; --seq-ink-3: #000000; --div-3: #F7DC6F; --div-ink-3: #000000; --seq-4: #3498DB; --seq-ink-4: #000000; --div-4: #3498DB; --div-ink-4: #000000; --seq-5: #5DADE2; --seq-ink-5: #000000; --div-5: #5DADE2; --div-ink-5: #000000; }
 :root[data-palette="primary"][data-palette-size="three"] { --cat-0: #E74C3C; --cat-1: #F4D03F; --cat-2: #3498DB; }
+:root { --sign-stock-positive: #059669; --sign-stock-neutral: #748296; --sign-stock-negative: #E11D48; }
+:root[data-theme="dark"] { --sign-stock-positive: #34D399; --sign-stock-neutral: #94A3B8; --sign-stock-negative: #FB7185; }
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --sign-stock-positive: #34D399; --sign-stock-neutral: #94A3B8; --sign-stock-negative: #FB7185; } }
+:root[data-palette="stock"] { --role-positive: var(--sign-stock-positive); --role-neutral: var(--sign-stock-neutral); --role-negative: var(--sign-stock-negative); }
+:root { --sign-blue-orange-positive: #2563EB; --sign-blue-orange-neutral: #748296; --sign-blue-orange-negative: #C2410C; }
+:root[data-theme="dark"] { --sign-blue-orange-positive: #60A5FA; --sign-blue-orange-neutral: #94A3B8; --sign-blue-orange-negative: #FB923C; }
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --sign-blue-orange-positive: #60A5FA; --sign-blue-orange-neutral: #94A3B8; --sign-blue-orange-negative: #FB923C; } }
+:root[data-palette="blue-orange"] { --role-positive: var(--sign-blue-orange-positive); --role-neutral: var(--sign-blue-orange-neutral); --role-negative: var(--sign-blue-orange-negative); }
+:root { --sign-teal-magenta-positive: #0F766E; --sign-teal-magenta-neutral: #748296; --sign-teal-magenta-negative: #BE185D; }
+:root[data-theme="dark"] { --sign-teal-magenta-positive: #2DD4BF; --sign-teal-magenta-neutral: #94A3B8; --sign-teal-magenta-negative: #F472B6; }
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --sign-teal-magenta-positive: #2DD4BF; --sign-teal-magenta-neutral: #94A3B8; --sign-teal-magenta-negative: #F472B6; } }
+:root[data-palette="teal-magenta"] { --role-positive: var(--sign-teal-magenta-positive); --role-neutral: var(--sign-teal-magenta-neutral); --role-negative: var(--sign-teal-magenta-negative); }
 * { box-sizing: border-box; margin: 0; }
 body {
   background: var(--bg); color: var(--ink);
@@ -130,6 +142,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-hot { filter: brightness(1.12); }
 .gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-horizontal-grid line { stroke-dasharray: none; }
+.gc-zero-axis { stroke: var(--ink); stroke-width: 1.5; }
+.gc-value-ticks text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-category-label { fill: var(--ink); font-size: 11px; font-family: inherit; }
+.gc-context-label { fill: var(--muted); font-size: 11px; font-family: inherit; font-weight: 600; }
+.gc-bar-value { fill: var(--muted); font-size: 10.5px; font-family: inherit; font-weight: 600; }
+.gc-diverging-bar { fill: var(--sc); }
+.gc-diverging-bar.gc-hot { stroke: var(--ink); stroke-width: 2; filter: brightness(1.06); }
 .gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
 .gc-sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -160,6 +180,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
 .gc-hit { cursor: crosshair; }
 .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
+.gc-sign-legend {
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem;
+  color: var(--ink); font-size: 0.82rem;
+}
+.gc-sign-item { display: inline-flex; align-items: center; gap: 0.45rem; }
 .gc-legend button {
   display: inline-flex; align-items: center; gap: 0.45rem; background: none; border: none;
   color: var(--ink); font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.15rem 0.2rem; border-radius: 0.3rem;
@@ -267,7 +292,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>What the numbers show</h2><ul><li>Total storage rose from 110 TB to 408 TB — 3.7× in five quarters.</li><li>Cold archive accounts for 234 TB of the 298 TB added, or 79% of all growth.</li><li>Hot storage grew only 16 TB over the same period, from 42 to 58 TB.</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Storage grew 3.7× in five quarters, four-fifths of it cold archive","unit":"TB","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[127.5,308.2,489,669.8,850.5],"xLabels":["2025 Q3","2025 Q4","2026 Q1","2026 Q2","2026 Q3"],"table":{"headers":["quarter","Hot","Warm","Cold archive"],"rows":[["2025 Q3",42,38,30],["2025 Q4",48,47,62],["2026 Q1",51,61,118],["2026 Q2",55,74,190],["2026 Q3",58,86,264]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"hot","label":"Hot","mark":"bar","color":"var(--cat-0)","values":[42,48,51,55,58],"formatted":["42","48","51","55","58"],"pixels":[451.9,446.4,443.7,440.1,437.3],"size":null,"stats":{"min":42,"max":58,"mean":50.8,"last":58,"count":5}},{"id":"warm","label":"Warm","mark":"bar","color":"var(--cat-1)","values":[38,47,61,74,86],"formatted":["38","47","61","74","86"],"pixels":[455.5,447.3,434.6,422.8,411.9],"size":null,"stats":{"min":38,"max":86,"mean":61.2,"last":86,"count":5}},{"id":"cold","label":"Cold archive","mark":"bar","color":"var(--cat-2)","values":[30,62,118,190,264],"formatted":["30","62","118","190","264"],"pixels":[462.8,433.7,382.9,317.5,250.3],"size":null,"stats":{"min":30,"max":264,"mean":132.8,"last":264,"count":5}}],"locale":"en","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Storage grew 3.7× in five quarters, four-fifths of it cold archive","unit":"TB","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[127.5,308.2,489,669.8,850.5],"xLabels":["2025 Q3","2025 Q4","2026 Q1","2026 Q2","2026 Q3"],"table":{"headers":["quarter","Hot","Warm","Cold archive"],"rows":[["2025 Q3",42,38,30],["2025 Q4",48,47,62],["2026 Q1",51,61,118],["2026 Q2",55,74,190],["2026 Q3",58,86,264]]},"plot":{"left":38,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"hot","label":"Hot","mark":"bar","color":"var(--cat-0)","values":[42,48,51,55,58],"formatted":["42","48","51","55","58"],"pixels":[451.9,446.4,443.7,440.1,437.3],"size":null,"stats":{"min":42,"max":58,"mean":50.8,"last":58,"count":5}},{"id":"warm","label":"Warm","mark":"bar","color":"var(--cat-1)","values":[38,47,61,74,86],"formatted":["38","47","61","74","86"],"pixels":[455.5,447.3,434.6,422.8,411.9],"size":null,"stats":{"min":38,"max":86,"mean":61.2,"last":86,"count":5}},{"id":"cold","label":"Cold archive","mark":"bar","color":"var(--cat-2)","values":[30,62,118,190,264],"formatted":["30","62","118","190","264"],"pixels":[462.8,433.7,382.9,317.5,250.3],"size":null,"stats":{"min":30,"max":264,"mean":132.8,"last":264,"count":5}}],"locale":"en","defaultPalette":"classic","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -280,7 +305,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
   var paletteIds = Object.keys(payload.palettes || {});
-  var currentPalette = 'classic';
+  var currentPalette = payload.defaultPalette || 'classic';
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -304,7 +329,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var parts = [];
     var theme = root.getAttribute('data-theme');
     if (theme !== 'auto') parts.push('theme=' + theme);
-    if (currentPalette !== 'classic') parts.push('palette=' + currentPalette);
+    if (currentPalette !== payload.defaultPalette) parts.push('palette=' + currentPalette);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
@@ -374,7 +399,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
     var s = payload.series.find(function (x) { return x.id === focusId; });
     var st = s.stats || {};
-    var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var u = payload.unit ? (payload.unit === '%' ? '%' : ' ' + esc(payload.unit)) : '';
     var L = payload.i18n;
     passport.innerHTML =
       '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
@@ -396,8 +421,17 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     return String(r).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   svg.addEventListener('click', function (e) {
-    if (!isAxis) return;
     var g = e.target.closest('.gc-series');
+    if (!isAxis) {
+      if (g && Array.isArray(payload.series)) {
+        var elementId = g.getAttribute('data-series');
+        if (elementId) {
+          setFocus(focusId === elementId ? null : elementId);
+          writeHash();
+        }
+      }
+      return;
+    }
     if (g) {
       var id = g.getAttribute('data-series');
       setFocus(focusId === id ? null : id);
@@ -589,7 +623,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // Element hover: any mark carrying data-tip describes itself.
-  if (!isAxis) {
+  if (!isAxis && payload.tooltip !== 'off') {
     svg.addEventListener('pointerover', function (evt) {
       var el = evt.target.closest('[data-tip]');
       if (!el) return;
@@ -686,6 +720,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     root.setAttribute('data-palette-size', colorCount > 0 && colorCount <= 3 ? 'three' : 'six');
     if (Array.isArray(payload.series) && payload.series.length) {
       payload.series.forEach(function (series, index) {
+        if (series.colorBy === 'sign') return;
         var color = paletteToken(index, colorCount);
         series.color = color;
         svg.querySelectorAll(
@@ -699,14 +734,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         element.style.setProperty('--sc', paletteToken(index, colorCount));
       });
     }
-    document.querySelectorAll('.gc-legend .gc-swatch').forEach(function (swatch, index) {
+    document.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
       swatch.style.setProperty('--sw', paletteToken(index, colorCount));
     });
     if (focusId) setFocus(focusId);
     hideTip();
   }
   function setPalette(id, updateHash) {
-    currentPalette = paletteIds.indexOf(id) === -1 ? 'classic' : id;
+    currentPalette = paletteIds.indexOf(id) === -1 ? payload.defaultPalette : id;
     root.setAttribute('data-palette', currentPalette);
     applyPaletteToChart();
     paletteOptions.forEach(function (option) {
@@ -755,7 +790,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       closeColorMenu(true);
     }
   });
-  colorReset.addEventListener('click', function () { setPalette('classic', true); });
+  colorReset.addEventListener('click', function () { setPalette(payload.defaultPalette, true); });
   colorMenu.addEventListener('click', function (e) {
     var option = e.target.closest('.gc-palette-option');
     if (option) setPalette(option.getAttribute('data-palette'), true);
@@ -1095,7 +1130,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       }
     });
   }
-  if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.focus && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
   if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);

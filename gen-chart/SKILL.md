@@ -7,7 +7,8 @@ description: >-
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
   graph, plot, or visualize data, metrics, or trends — line, bar, area, range,
-  scatter, bubble, pie/donut, histogram, boxplot, or heatmap — or to beautify an
+  scatter, bubble, horizontal diverging bar, pie/donut, histogram, boxplot, or
+  heatmap — or to beautify an
   existing chart.
 license: MIT
 metadata:
@@ -91,7 +92,7 @@ the family you routed to.
 
 | chart_type | Marks | Use for |
 |---|---|---|
-| `cartesian` | line, bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble | trends, comparisons, composition over time, uncertainty, actual-vs-target, correlation |
+| `cartesian` | line, bar, horizontal diverging bar, grouped bar, stacked bar, 100%-stacked, area, stacked area, range, bar+line, scatter, bubble | trends, comparisons, signed change, composition over time, uncertainty, actual-vs-target, correlation |
 | `distribution` | histogram, boxplot | spread, outliers, shape of raw observations |
 | `proportion` | pie, donut | parts of a whole (max 7 slices) |
 | `matrix` | heatmap | two categorical dimensions × intensity |
@@ -114,6 +115,18 @@ For a confidence band or min/max envelope, use `"mark": "range"` with
 of those bounds, such as `"95% confidence interval"` or `"observed min–max"`;
 validation rejects an unexplained band. Pair it with a line series when the
 data includes a central estimate.
+
+For a horizontal diverging bar chart, set top-level `orientation` to
+`"horizontal"`, use one unstacked bar series, and set `color_by` to `"sign"`.
+Keep the category column in `encoding.x` with a band scale and the supplied
+signed measure in `series[].y`; the renderer transposes only their screen
+directions. `encoding.x.context` may name one label-side column, while up to
+three `details` columns remain available in tooltips, the accessible table,
+and CSV. `value_labels` is `"auto"`, `"always"`, or `"off"`. Values are never
+sorted or recomputed. The Color picker defaults to contextual **Stock**
+(green/grey/red), with semantic **Blue–Orange** and **Teal–Magenta** alternatives;
+each preview matches its positive, neutral, and negative chart colors. See
+`examples/service-memory-change.cartesian.json` for the full shape.
 
 Set `"stack": true` for composition — parts adding to a total — or
 `"stack": "percent"` to normalise every position to 100%. Every series
@@ -171,6 +184,10 @@ with render-time stats, deep links (`#theme=`, `#palette=`, `#focus=`,
 provenance data CSV, 1200×630 share card) that always captures the canonical
 at-rest chart with the selected theme and palette. Everything is inline — one
 portable file, no CDN, works offline.
+
+Sign-colored horizontal bars use contextual Stock, Blue–Orange, and
+Teal–Magenta palettes whose previews match their positive, neutral, and
+negative colors.
 
 Every artifact is also accessible without a pointer: the plot is focusable,
 arrow keys walk the data points and announce them, and a visually hidden

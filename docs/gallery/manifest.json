@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": "gen-chart/scripts/build-gallery.mjs",
   "generatorVersion": "0.9.0",
-  "entryCount": 14,
+  "entryCount": 15,
   "entries": [
     {
       "id": "build-times",
@@ -19,11 +19,11 @@
       "artifact": "gallery/build-times.html",
       "bytes": {
         "source": 1234,
-        "artifact": 63868
+        "artifact": 67334
       },
       "sha256": {
         "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
-        "artifact": "b57407f62215cdc9d7cd37a045cc4395230d0de1a563e08c890b21d82938e0ee"
+        "artifact": "a097c44c3110f32a045761fd8b34e69e26c14d0be9a9ccc2a22bc0fd8a8d102b"
       },
       "validation": {
         "quality": "showcase",
@@ -47,11 +47,11 @@
       "artifact": "gallery/deploy-outcomes.html",
       "bytes": {
         "source": 1449,
-        "artifact": 64309
+        "artifact": 67775
       },
       "sha256": {
         "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
-        "artifact": "79c0540dfdf6830a8cc79171bcfe6ca083b78f2d6fce14dfd6065830f535f2a3"
+        "artifact": "00522eaa89151721752deedec6fb008fd706e23690b94680ea0d98972e4e863a"
       },
       "validation": {
         "quality": "showcase",
@@ -76,11 +76,11 @@
       "artifact": "gallery/forecast-range.html",
       "bytes": {
         "source": 2208,
-        "artifact": 65100
+        "artifact": 68566
       },
       "sha256": {
         "source": "8ae738c37600ad72613959dc447294a15ce9e9f6e104765e2df8055519772046",
-        "artifact": "fef2fa406813d60b014e3ebaef3eefb255c95999a94830ee13f1bc758f6b3297"
+        "artifact": "f49d3ba059287e95255848021e6c73ea27563408bc8651586954d958ab92725a"
       },
       "validation": {
         "quality": "showcase",
@@ -103,11 +103,11 @@
       "artifact": "gallery/latency-distribution.html",
       "bytes": {
         "source": 848,
-        "artifact": 64859
+        "artifact": 68325
       },
       "sha256": {
         "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
-        "artifact": "66cda8651f8b1b54371446c7a1062a395e6072542812de36fbbbf6e651123af6"
+        "artifact": "c8b67002f7abe45dedfb1035a7ca49ec372390692c0da537157581e9da339e1c"
       },
       "validation": {
         "quality": "showcase",
@@ -132,11 +132,11 @@
       "artifact": "gallery/mau-trend.html",
       "bytes": {
         "source": 2710,
-        "artifact": 66508
+        "artifact": 69974
       },
       "sha256": {
         "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
-        "artifact": "fa92cffc084daa62935dd5287e546805d7d408f7943557e9361e806e7f61538d"
+        "artifact": "a6f2b7c8c7ad1e8c10dee172d1d0d6116e8b3f3e07322a58ce7e477afbfa3444"
       },
       "validation": {
         "quality": "showcase",
@@ -160,11 +160,11 @@
       "artifact": "gallery/plan-mix.html",
       "bytes": {
         "source": 1370,
-        "artifact": 63922
+        "artifact": 67388
       },
       "sha256": {
         "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
-        "artifact": "16a6431586dfc9ca11629f7ce0e43a4afae32d71cc0f6f342020b624a4fafd0d"
+        "artifact": "09aa352079dcb82a236cdc8a7d5e0121b9fc7d8e8ae86998bad60fd62ca015d3"
       },
       "validation": {
         "quality": "showcase",
@@ -188,11 +188,11 @@
       "artifact": "gallery/request-growth.html",
       "bytes": {
         "source": 1192,
-        "artifact": 62717
+        "artifact": 66183
       },
       "sha256": {
         "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
-        "artifact": "cf90f2e23684f64756fa3fa20feb86dd4826d2d8302c1b0fa050b362ec55dd70"
+        "artifact": "85418ad814f3833efd86cf1f4844b3ee0ddb96385227a82de473fd8dd190d32a"
       },
       "validation": {
         "quality": "showcase",
@@ -215,11 +215,11 @@
       "artifact": "gallery/revenue-by-region.html",
       "bytes": {
         "source": 998,
-        "artifact": 63195
+        "artifact": 66661
       },
       "sha256": {
         "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
-        "artifact": "8cf4ca2923532678def9268c3fa4ff937b7afff59e95986887389b92750f8c02"
+        "artifact": "1882f83bf5102a05dc360c1e7e6d96d3012e417435afbba5b5af941ac33e40fc"
       },
       "validation": {
         "quality": "showcase",
@@ -243,11 +243,38 @@
       "artifact": "gallery/signups-vs-target.html",
       "bytes": {
         "source": 1126,
-        "artifact": 64376
+        "artifact": 67842
       },
       "sha256": {
         "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
-        "artifact": "53c95943edfd94d972a48465cc84c2f0369c5a94b05d370e94172310a50baf0a"
+        "artifact": "36d42cd236a376c91e2d6cf42d9b77f78502dc86b082b8085dd7f6ebe7e0b57c"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "service-memory-change",
+      "title": "Most services grew while a smaller group released memory",
+      "question": "Which services grew or released memory compared with the previous hour?",
+      "family": "cartesian",
+      "marks": [
+        "bar"
+      ],
+      "featured": false,
+      "prompt": "Use gen-chart to show the percentage change in memory by service as a horizontal diverging bar chart. Anchor every bar at zero and use semantic colors for increases, decreases, and no change. Show current memory beside each service and retain previous-hour memory in tooltips and exports.\n\n| Service | Current memory (MiB) | Change (%) | Previous-hour memory (MiB) |\n| --- | --- | --- | --- |\n| spanner | 141.2 | 35 | 104.6 |\n| analytics-intake | 292.3 | 28.8 | 226.9 |\n| trade-scheduler | 337.7 | 17.4 | 287.6 |\n| trade-receiver | 75.6 | 16.7 | 64.8 |\n| kafka | 806 | 13 | 713.3 |\n| emailer | 856.7 | 7.9 | 793.9 |\n| product-recommendation-db | 888.6 | 4.5 | 850.3 |\n| fraud-detector | 1740.8 | 3.4 | 1683.6 |\n| analytics-aggregator | 375.5 | 1.7 | 369.2 |\n| product-recommendation | 103.6 | 1.4 | 102.2 |\n| product-recommendation-lite | 79.7 | 0.8 | 79.1 |\n| balance-checker | 1638.4 | 0 | 1638.4 |\n| trade-executor | 973.6 | -2.4 | 997.5 |\n| authenticator | 525.6 | -3 | 541.9 |\n| trade-validator | 57.3 | -3.6 | 59.4 |\n| trade-enrichment | 51.5 | -6.1 | 54.8 |\n| notifier | 575.1 | -18.9 | 709.1 |\n| slow-kafka | 266.2 | -40.3 | 445.9 |\n",
+      "promptSha256": "80bb53b9be8bff988c55e3e63e20ff8e718911cb8eb1b3d92405901421039deb",
+      "source": "gallery/sources/service-memory-change.cartesian.json",
+      "artifact": "gallery/service-memory-change.html",
+      "bytes": {
+        "source": 2445,
+        "artifact": 82381
+      },
+      "sha256": {
+        "source": "4d0c43f18e6ec4c7f0c99d067a5a68e16ee57317713d08f9244b0e7ba17c0fff",
+        "artifact": "c0625f8a5612f0b230f514e727c765a05cd7188ad3e1811c47db5fef6d9501ff"
       },
       "validation": {
         "quality": "showcase",
@@ -271,11 +298,11 @@
       "artifact": "gallery/storage-mix.html",
       "bytes": {
         "source": 1806,
-        "artifact": 64308
+        "artifact": 67774
       },
       "sha256": {
         "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
-        "artifact": "92dbea829261a3aa599c9652e362d919196de3afdf341c467f80265a8da7d03e"
+        "artifact": "df1f1a1af17c78e80038b41dc1a9e410679c95584d5a9f388ab18f7a9d034c01"
       },
       "validation": {
         "quality": "showcase",
@@ -299,11 +326,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 70897
+        "artifact": 74363
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "6c6ebad5d67137595ec85c2aab180233cba055321c069dae21ce43e54c1637c5"
+        "artifact": "ce3a91d68bf0acc0c5a6d1cc86e9e26cef3331ddc30c6cf77049fe8240b113df"
       },
       "validation": {
         "quality": "showcase",
@@ -326,11 +353,11 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 64662
+        "artifact": 68128
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "cc0f1516d6a933e907fb73d410d9e90f86f1e439f1594afb3b60e9a3f8ae9340"
+        "artifact": "164bafc65568f0c82864507f37ee8afcf3e311f8fe9bad41c203205a78e7ba0a"
       },
       "validation": {
         "quality": "showcase",
@@ -353,11 +380,11 @@
       "artifact": "gallery/venue-performance.html",
       "bytes": {
         "source": 1383,
-        "artifact": 63837
+        "artifact": 67303
       },
       "sha256": {
         "source": "8b6308c2d4d232a1e97fbe3458891d51f7656e4610634e1820b26b795f4312bd",
-        "artifact": "4047bf96473a3b8ab0967eeea625a784006498c33e80ad8359695fe499f8e651"
+        "artifact": "9d43e63f37324201aca8d07332b1827694fc45a514a861f95f131f19180e5f67"
       },
       "validation": {
         "quality": "showcase",
@@ -380,11 +407,11 @@
       "artifact": "gallery/zh-revenue.html",
       "bytes": {
         "source": 1100,
-        "artifact": 63094
+        "artifact": 66538
       },
       "sha256": {
         "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
-        "artifact": "9cbe5e6ccaed971e7b539f2c94ba6a4bee886c19c9cb8c2de9d9c522b0a2d00f"
+        "artifact": "cd08f7ea9b883135c7dcf63e03d3b9148644d277449a99f6268581cc344d0a07"
       },
       "validation": {
         "quality": "showcase",

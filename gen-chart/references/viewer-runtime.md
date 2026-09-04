@@ -8,6 +8,9 @@ beyond the spec fields named here.
 
 - **Tooltip + crosshair** — nearest-x lookup, formatted values with units.
   `interactions.tooltip: "off"` disables.
+- **Horizontal diverging rows** — pointer or keyboard focus outlines the bar
+  and shows category, optional context, the signed value, and ordered detail
+  fields. Up/Down is the primary row movement; Left/Right is an alias.
 - **Legend toggle** — click hides/shows a series; double-click focuses it.
   Present automatically when ≥2 series; `legend_toggle: false` makes the
   legend static.
@@ -21,7 +24,11 @@ beyond the spec fields named here.
   each palette's three-color set; larger charts use its six-color set. The
   picker shows the same active three or six colors that the chart uses.
   Heatmap buckets use all six colors with contrast-aware label ink. Role
-  metadata and validation meaning remain intact. Reset restores Classic. Arrow
+  metadata and validation meaning remain intact. Horizontal bars colored by
+  sign use contextual Stock, Blue–Orange, and Teal–Magenta palettes. Every
+  preview is built from—and switches—the sign tokens together, ordered to
+  mirror the chart: negative, neutral, positive. Stock is the default. Reset
+  restores the chart's applicable default. Arrow
   keys move through choices; Enter or Space selects; Escape closes.
 - **Brush zoom** — `interactions.brush: "x"`, valid only for line and range
   marks over a time or linear x (validation enforces this). Drag selects an index
@@ -81,7 +88,8 @@ The selected theme and color palette are presentation choices and remain.
 - **SVG** — standalone, theme tokens resolved and inlined.
 - **Data CSV** — the exact embedded values, raw and unformatted, including
   separate lower and upper columns for range marks; headers
-  from the authored labels. This is the provenance export: a reader can
+  from the authored labels. Horizontal diverging exports contain category,
+  context, signed value, then authored details exactly once. This is the provenance export: a reader can
   rebuild the chart from it.
 - **Share card (1200×630)** — title plus the chart, fit on the theme
   background, for READMEs and social posts.

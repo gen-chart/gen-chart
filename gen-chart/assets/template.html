@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{LANG}}" data-theme="{{THEME}}" data-palette="classic" data-palette-size="{{PALETTE_SIZE}}">
+<html lang="{{LANG}}" data-theme="{{THEME}}" data-palette="{{PALETTE}}" data-palette-size="{{PALETTE_SIZE}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -123,6 +123,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-hot { filter: brightness(1.12); }
 .gc-slice.gc-hot { stroke: var(--ink); stroke-width: 2; }
 .gc-cell.gc-hot { stroke: var(--ink); stroke-width: 2; }
+.gc-horizontal-grid line { stroke-dasharray: none; }
+.gc-zero-axis { stroke: var(--ink); stroke-width: 1.5; }
+.gc-value-ticks text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-category-label { fill: var(--ink); font-size: 11px; font-family: inherit; }
+.gc-context-label { fill: var(--muted); font-size: 11px; font-family: inherit; font-weight: 600; }
+.gc-bar-value { fill: var(--muted); font-size: 10.5px; font-family: inherit; font-weight: 600; }
+.gc-diverging-bar { fill: var(--sc); }
+.gc-diverging-bar.gc-hot { stroke: var(--ink); stroke-width: 2; filter: brightness(1.06); }
 .gc-legend-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.78rem; }
 .gc-sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -153,6 +161,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-brush-rect { fill: var(--role-primary); opacity: 0.14; display: none; }
 .gc-hit { cursor: crosshair; }
 .gc-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem; }
+.gc-sign-legend {
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-top: 0.9rem;
+  color: var(--ink); font-size: 0.82rem;
+}
+.gc-sign-item { display: inline-flex; align-items: center; gap: 0.45rem; }
 .gc-legend button {
   display: inline-flex; align-items: center; gap: 0.45rem; background: none; border: none;
   color: var(--ink); font: inherit; font-size: 0.82rem; cursor: pointer; padding: 0.15rem 0.2rem; border-radius: 0.3rem;
@@ -273,7 +286,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var activeView = null;
   var zoom = null; // [i0, i1] data-index window, or null
   var paletteIds = Object.keys(payload.palettes || {});
-  var currentPalette = 'classic';
+  var currentPalette = payload.defaultPalette || 'classic';
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
@@ -297,7 +310,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var parts = [];
     var theme = root.getAttribute('data-theme');
     if (theme !== '{{THEME}}') parts.push('theme=' + theme);
-    if (currentPalette !== 'classic') parts.push('palette=' + currentPalette);
+    if (currentPalette !== payload.defaultPalette) parts.push('palette=' + currentPalette);
     if (focusId) parts.push('focus=' + encodeURIComponent(focusId));
     var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
@@ -367,7 +380,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     }
     var s = payload.series.find(function (x) { return x.id === focusId; });
     var st = s.stats || {};
-    var u = payload.unit ? ' ' + esc(payload.unit) : '';
+    var u = payload.unit ? (payload.unit === '%' ? '%' : ' ' + esc(payload.unit)) : '';
     var L = payload.i18n;
     passport.innerHTML =
       '<span class="gc-pp-name"><span class="gc-pp-dot" style="background:' + s.color + '"></span>' + esc(s.label) + '</span>' +
@@ -389,8 +402,17 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     return String(r).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   svg.addEventListener('click', function (e) {
-    if (!isAxis) return;
     var g = e.target.closest('.gc-series');
+    if (!isAxis) {
+      if (g && Array.isArray(payload.series)) {
+        var elementId = g.getAttribute('data-series');
+        if (elementId) {
+          setFocus(focusId === elementId ? null : elementId);
+          writeHash();
+        }
+      }
+      return;
+    }
     if (g) {
       var id = g.getAttribute('data-series');
       setFocus(focusId === id ? null : id);
@@ -582,7 +604,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // Element hover: any mark carrying data-tip describes itself.
-  if (!isAxis) {
+  if (!isAxis && payload.tooltip !== 'off') {
     svg.addEventListener('pointerover', function (evt) {
       var el = evt.target.closest('[data-tip]');
       if (!el) return;
@@ -679,6 +701,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     root.setAttribute('data-palette-size', colorCount > 0 && colorCount <= 3 ? 'three' : 'six');
     if (Array.isArray(payload.series) && payload.series.length) {
       payload.series.forEach(function (series, index) {
+        if (series.colorBy === 'sign') return;
         var color = paletteToken(index, colorCount);
         series.color = color;
         svg.querySelectorAll(
@@ -692,14 +715,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         element.style.setProperty('--sc', paletteToken(index, colorCount));
       });
     }
-    document.querySelectorAll('.gc-legend .gc-swatch').forEach(function (swatch, index) {
+    document.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
       swatch.style.setProperty('--sw', paletteToken(index, colorCount));
     });
     if (focusId) setFocus(focusId);
     hideTip();
   }
   function setPalette(id, updateHash) {
-    currentPalette = paletteIds.indexOf(id) === -1 ? 'classic' : id;
+    currentPalette = paletteIds.indexOf(id) === -1 ? payload.defaultPalette : id;
     root.setAttribute('data-palette', currentPalette);
     applyPaletteToChart();
     paletteOptions.forEach(function (option) {
@@ -748,7 +771,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       closeColorMenu(true);
     }
   });
-  colorReset.addEventListener('click', function () { setPalette('classic', true); });
+  colorReset.addEventListener('click', function () { setPalette(payload.defaultPalette, true); });
   colorMenu.addEventListener('click', function (e) {
     var option = e.target.closest('.gc-palette-option');
     if (option) setPalette(option.getAttribute('data-palette'), true);
@@ -1088,7 +1111,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       }
     });
   }
-  if (h.focus && isAxis && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
+  if (h.focus && payload.series.some(function (s) { return s.id === h.focus; })) setFocus(h.focus);
   if (h.view && (payload.views || []).some(function (v) { return v.id === h.view; })) applyView(h.view);
   if (h.brush && payload.brush === 'x') {
     var m = /^(\d+)~(\d+)$/.exec(h.brush);

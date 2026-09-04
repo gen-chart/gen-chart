@@ -7,19 +7,33 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { escapeXml } from './format.mjs';
 import { t, templateStrings, resolveLocale } from './i18n.mjs';
-import { DEFAULT_PALETTE, PALETTES, paletteCss, paletteIds, palettePreviewColors } from './palette.mjs';
+import {
+  DEFAULT_PALETTE, DEFAULT_SIGN_PALETTE, PALETTES, SIGN_PALETTES,
+  paletteCss, paletteIds, palettePreviewColors, signPaletteIds, signPalettePreviewColors
+} from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
 
 // legend is one of:
 //   { kind: 'series', toggleable, items: [{id, label, color, mark}],
 //     sizes?: [{label, unit, items: [{value, radius}]}] }
+//   { kind: 'sign', items: [{sign, labelKey, color}], valueLabelsOmitted }
 //   { kind: 'note', text }
 //   null
 function legendHtml(legend, locale) {
   if (!legend) return '';
   if (legend.kind === 'note') {
     return `<p class="gc-legend-note">${escapeXml(legend.text)}</p>`;
+  }
+  if (legend.kind === 'sign') {
+    const items = legend.items.map((it) =>
+      `<span class="gc-sign-item"><span class="gc-swatch" data-semantic="${escapeXml(it.sign)}" ` +
+      `data-mark="bar" style="--sw:${it.color}"></span>${escapeXml(t(locale, it.labelKey))}</span>`
+    ).join('');
+    const note = legend.valueLabelsOmitted
+      ? `<p class="gc-legend-note">${escapeXml(t(locale, 'note.horizontal-value-labels'))}</p>`
+      : '';
+    return `<div class="gc-sign-legend" role="group" aria-label="${escapeXml(t(locale, 'legend.sign'))}">${items}</div>${note}`;
   }
   const items = legend.items.map((it) =>
     `<button type="button" data-series="${escapeXml(it.id)}" aria-pressed="true"${legend.toggleable ? '' : ' disabled'}>` +
@@ -88,13 +102,16 @@ function transformNoteHtml(payload, locale) {
   }))}</p>`;
 }
 
-function paletteOptionsHtml(locale, colorCount) {
-  return paletteIds().map((id) => {
-    const preview = palettePreviewColors(id, colorCount).map((color) =>
+function paletteOptionsHtml(locale, colorCount, ids, defaultPalette) {
+  return ids.map((id) => {
+    const colors = Object.hasOwn(SIGN_PALETTES, id)
+      ? signPalettePreviewColors(id)
+      : palettePreviewColors(id, colorCount);
+    const preview = colors.map((color) =>
       `<span class="gc-palette-swatch" style="--preview:${color}"></span>`
     ).join('');
     return `<button class="gc-palette-option" type="button" role="option" data-palette="${id}" ` +
-      `aria-selected="${id === DEFAULT_PALETTE ? 'true' : 'false'}" tabindex="${id === DEFAULT_PALETTE ? '0' : '-1'}">` +
+      `aria-selected="${id === defaultPalette ? 'true' : 'false'}" tabindex="${id === defaultPalette ? '0' : '-1'}">` +
       `<span class="gc-palette-preview" aria-hidden="true">${preview}</span>` +
       `<span>${escapeXml(t(locale, `ui.palette.${id}`))}</span>` +
       '<span class="gc-palette-check" aria-hidden="true">✓</span></button>';
@@ -108,6 +125,9 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     ? payload.series.length
     : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
   const paletteSize = colorCount > 0 && colorCount <= 3 ? 'three' : 'six';
+  const signColored = payload.series?.some((series) => series.colorBy === 'sign') ?? false;
+  const availablePaletteIds = signColored ? signPaletteIds() : paletteIds();
+  const defaultPalette = signColored ? DEFAULT_SIGN_PALETTE : DEFAULT_PALETTE;
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
@@ -116,8 +136,12 @@ export function assembleHtml(spec, svg, payload, legend = null) {
   const withStrings = {
     ...payload,
     locale,
+    defaultPalette,
     i18n: templateStrings(locale),
-    palettes: Object.fromEntries(paletteIds().map((id) => [id, {
+    palettes: Object.fromEntries(availablePaletteIds.map((id) => [id, Object.hasOwn(SIGN_PALETTES, id) ? {
+      six: [...SIGN_PALETTES[id].light],
+      three: [...SIGN_PALETTES[id].light]
+    } : {
       six: [...PALETTES[id].six],
       three: [...PALETTES[id].three]
     }]))
@@ -128,12 +152,13 @@ export function assembleHtml(spec, svg, payload, legend = null) {
   let html = template
     .replaceAll('{{LANG}}', locale)
     .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
+    .replaceAll('{{PALETTE}}', defaultPalette)
     .replaceAll('{{PALETTE_SIZE}}', paletteSize)
     .replace('{{PALETTE_CSS}}', paletteCss())
     .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
     .replace('      {{SUBTITLE_BLOCK}}', subtitle ? `      ${subtitle}` : '')
     .replace('  {{VIEWS}}', views ? `  ${views}` : '')
-    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale, colorCount))
+    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale, colorCount, availablePaletteIds, defaultPalette))
     .replace('{{SVG}}', svg)
     .replace('{{LEGEND}}', legendHtml(legend, locale) + transformNoteHtml(payload, locale))
     .replace('{{DATA_TABLE}}', tableHtml(payload, locale))

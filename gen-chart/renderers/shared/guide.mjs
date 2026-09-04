@@ -11,6 +11,7 @@ const FAMILIES = {
 
 // Each rule: regex over the lowercased scenario, target family/marks, weight.
 const RULES = [
+  { re: /\b(horizontal diverging|diverging (bar|bars|bar chart)|signed horizontal|positive and negative bars|increase.*decrease.*bar)\b/, family: 'cartesian', marks: ['bar'], w: 6 },
   { re: /\b(confidence band|confidence interval|prediction interval|uncertainty band|min[\s/-]*max (range|envelope)|range (band|envelope)|forecast (range|uncertainty))\b/, family: 'cartesian', marks: ['range', 'line'], w: 5 },
   { re: /\b(trend|over time|timeline|growth|history|trajectory|per (day|week|month|quarter|year)|daily|weekly|monthly|quarterly|yearly|annual)\b/, family: 'cartesian', marks: ['line'], w: 3 },
   { re: /\b(mau|dau|wau|active users|revenue over|burn rate|time series|timeseries)\b/, family: 'cartesian', marks: ['line'], w: 3 },
@@ -49,6 +50,10 @@ export function guide(scenario) {
     confidence = scores.get(family) >= 4 ? 'high' : 'medium';
   }
   const familyMarks = [...(marks.get(family) ?? new Set(['line']))];
+  const orientation = family === 'cartesian' &&
+    /\b(horizontal diverging|diverging (bar|bars|bar chart)|signed horizontal|positive and negative bars|increase.*decrease.*bar)\b/.test(s)
+    ? 'horizontal'
+    : null;
 
   const cautions = [];
   if (/\b(pie|donut)\b/.test(s) && /\b(\d{2,}|many|dozens?|lots of)\b.*\b(categor|slice|segment|group)/.test(s)) {
@@ -81,6 +86,7 @@ export function guide(scenario) {
     recommendation: {
       chart_type: family,
       marks: familyMarks,
+      ...(orientation ? { orientation } : {}),
       implemented: info.implemented && unimplementedMarks.length === 0,
       confidence,
       planned: info.implemented ? null : info.planned,

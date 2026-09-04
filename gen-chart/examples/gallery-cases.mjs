@@ -112,6 +112,18 @@ export const GALLERY_CASES = [
     }
   },
   {
+    id: 'service-memory-change',
+    spec: 'service-memory-change.cartesian.json',
+    question: 'Which services grew or released memory compared with the previous hour?',
+    prompt: {
+      request: 'Show the percentage change in memory by service as a horizontal diverging bar chart.',
+      requirements: [
+        'Anchor every bar at zero and use semantic colors for increases, decreases, and no change.',
+        'Show current memory beside each service and retain previous-hour memory in tooltips and exports.'
+      ]
+    }
+  },
+  {
     id: 'storage-mix',
     spec: 'storage-mix.cartesian.json',
     question: 'Which storage tier drove growth over the last five quarters?',

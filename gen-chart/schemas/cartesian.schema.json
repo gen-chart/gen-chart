@@ -18,6 +18,12 @@
     "chart_type": {
       "const": "cartesian"
     },
+    "orientation": {
+      "enum": [
+        "vertical",
+        "horizontal"
+      ]
+    },
     "meta": {
       "type": "object",
       "additionalProperties": false,
@@ -100,6 +106,21 @@
             },
             "label": {
               "$ref": "common.schema.json#/$defs/shortText"
+            },
+            "context": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "column"
+              ],
+              "properties": {
+                "column": {
+                  "$ref": "common.schema.json#/$defs/id"
+                },
+                "label": {
+                  "$ref": "common.schema.json#/$defs/shortText"
+                }
+              }
             }
           }
         },
@@ -172,6 +193,37 @@
           },
           "size": {
             "$ref": "common.schema.json#/$defs/id"
+          },
+          "color_by": {
+            "enum": [
+              "sign"
+            ]
+          },
+          "value_labels": {
+            "enum": [
+              "auto",
+              "always",
+              "off"
+            ]
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "column"
+              ],
+              "properties": {
+                "column": {
+                  "$ref": "common.schema.json#/$defs/id"
+                },
+                "label": {
+                  "$ref": "common.schema.json#/$defs/shortText"
+                }
+              }
+            }
           }
         },
         "allOf": [
