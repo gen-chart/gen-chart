@@ -47,7 +47,9 @@ tooltips, legend toggling, click-to-focus Data Passport with render-time
 statistics, a Color picker for Classic, Cool, Warm, and Primary chart
 palettes, opt-in brush zoom that never rescales y, up to five authored guided
 views, deep links, and exports (PNG, standalone SVG, provenance CSV, 1200×630
-share card) that always capture the canonical chart at rest.
+share card). The grouped export menu separates images from share/data actions;
+image and share-card exports include the legend and always capture the
+canonical chart at rest.
 
 **Accessibility.** A visually hidden data table with the exact values on
 every chart, keyboard walking of every family with live-region announcements,

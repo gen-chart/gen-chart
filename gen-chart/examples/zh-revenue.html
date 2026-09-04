@@ -91,6 +91,12 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
 }
 .gc-menu button:hover { background: var(--grid); }
 .gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
+.gc-export-menu { min-width: 220px; padding: 0.5rem; }
+.gc-export-group + .gc-export-group { border-top: 1px solid var(--border); margin-top: 0.35rem; padding-top: 0.35rem; }
+.gc-export-heading {
+  color: var(--muted); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.12em;
+  margin: 0; padding: 0.3rem 0.6rem 0.2rem; text-transform: uppercase;
+}
 .gc-palette-menu { min-width: 250px; padding: 0.5rem; }
 .gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
 .gc-palette-head h2 { font-size: 0.82rem; font-weight: 700; }
@@ -224,12 +230,13 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   position: fixed; z-index: 10; pointer-events: none; display: none;
   background: var(--tooltip-bg); color: var(--tooltip-ink);
   border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: min(420px, calc(100vw - 16px));
 }
 .gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
-.gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.gc-tooltip .gc-tt-row { display: grid; grid-template-columns: auto minmax(0, 1fr) max-content; align-items: start; gap: 0.4rem; }
+.gc-tooltip .gc-tt-row:not(:has(.gc-tt-dot)) { grid-template-columns: minmax(0, 1fr) max-content; }
 .gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-.gc-tooltip .gc-tt-val { margin-left: auto; font-variant-numeric: tabular-nums; padding-left: 0.8rem; }
+.gc-tooltip .gc-tt-val { font-variant-numeric: tabular-nums; padding-left: 0.45rem; white-space: nowrap; }
 .gc-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin-top: 1rem; }
 .gc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.9rem 1.1rem; }
 .gc-card h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.45rem; }
@@ -261,11 +268,17 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">导出</button>
       <button class="gc-btn" id="gc-theme" type="button" aria-label="切换配色主题">主题</button>
       <button class="gc-btn" id="gc-color-btn" type="button" aria-label="选择图表配色" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">颜色</button>
-      <div class="gc-menu" id="gc-export-menu" role="menu">
-        <button type="button" data-export="png" role="menuitem">下载 PNG（2×）</button>
-        <button type="button" data-export="svg" role="menuitem">下载 SVG</button>
-        <button type="button" data-export="csv" role="menuitem">下载数据 CSV</button>
-        <button type="button" data-export="card" role="menuitem">分享卡片（1200×630）</button>
+      <div class="gc-menu gc-export-menu" id="gc-export-menu" role="menu">
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-image-heading">
+          <p class="gc-export-heading" id="gc-export-image-heading">图片</p>
+          <button type="button" data-export="png" role="menuitem">下载 PNG（2×）</button>
+          <button type="button" data-export="svg" role="menuitem">下载 SVG</button>
+        </div>
+        <div class="gc-export-group" role="group" aria-labelledby="gc-export-share-heading">
+          <p class="gc-export-heading" id="gc-export-share-heading">分享与数据</p>
+          <button type="button" data-export="card" role="menuitem">分享卡片（1200×630）</button>
+          <button type="button" data-export="csv" role="menuitem">下载数据 CSV</button>
+        </div>
       </div>
       <div class="gc-menu gc-palette-menu" id="gc-color-menu">
         <div class="gc-palette-head">
@@ -293,7 +306,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   <div class="gc-cards"><section class="gc-card"><h2>结论</h2><ul><li>直销与渠道伙伴营收均逐季增长，第四季度合计达 2,900 万元。</li><li>两者全年增速接近（直销 +39%，渠道伙伴 +37%），渠道结构基本稳定在 41% 左右。</li></ul></section></div>
 </div>
 <div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"各渠道季度营收","unit":"万元","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[152.5,377.8,603.2,828.5],"xLabels":["第一季度","第二季度","第三季度","第四季度"],"table":{"headers":["quarter","直销","渠道伙伴"],"rows":[["第一季度",1240,860],["第二季度",1380,910],["第三季度",1510,1040],["第四季度",1720,1180]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"direct","label":"直销","mark":"bar","color":"var(--role-primary)","values":[1240,1380,1510,1720],"formatted":["1,240","1,380","1,510","1,720"],"pixels":[208.5,176.7,147.2,99.6],"size":null,"stats":{"min":1240,"max":1720,"mean":1462.5,"last":1720,"count":4}},{"id":"partner","label":"渠道伙伴","mark":"bar","color":"var(--role-comparison)","values":[860,910,1040,1180],"formatted":["860","910","1,040","1,180"],"pixels":[294.8,283.4,253.9,222.1],"size":null,"stats":{"min":860,"max":1180,"mean":997.5,"last":1180,"count":4}}],"locale":"zh-CN","defaultPalette":"classic","i18n":{"ui.theme":"主题","ui.theme.toggle":"切换配色主题","ui.color":"颜色","ui.color.open":"选择图表配色","ui.color.heading":"图表配色","ui.color.reset":"重置","ui.palette.classic":"经典","ui.palette.cool":"冷色","ui.palette.warm":"暖色","ui.palette.primary":"原色","ui.palette.stock":"股市","ui.palette.blue-orange":"蓝橙","ui.palette.teal-magenta":"青紫","ui.export":"导出","ui.export.png":"下载 PNG（2×）","ui.export.svg":"下载 SVG","ui.export.csv":"下载数据 CSV","ui.export.card":"分享卡片（1200×630）","ui.reset":"重置缩放","ui.close":"关闭","ui.series":"数据系列","ui.chapters":"导览视图","ui.views.clear":"清除视图","ui.chart":"图表","ui.keyboard.hint":"使用方向键浏览数据点。","ui.table.caption":"图表数据","legend.sign":"变化方向","legend.positive":"增加","legend.negative":"减少","legend.zero":"无变化","stat.min":"最小值","stat.max":"最大值","stat.mean":"平均值","stat.last":"最新值","stat.points":"数据点","stat.count":"数量","stat.share":"占比","stat.value":"数值","stat.n":"样本数","stat.median":"中位数","stat.q1":"下四分位","stat.q3":"上四分位","axis.count":"数量","note.boxplot":"箱体为四分位距，须线延伸至 1.5×IQR，圆点为离群值。","note.histogram":"{n} 个观测值分为 {bins} 个区间（Freedman-Diaconis 建议 {suggested} 个）","note.matrix":"{rows} × {cols} 网格，{kind}色阶，{buckets} 个分段","note.horizontal-value-labels":"条形末端数值无法在不重叠的情况下排版，可在提示和数据表中查看。","scale.sequential":"连续","scale.diverging":"发散"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"各渠道季度营收","unit":"万元","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[152.5,377.8,603.2,828.5],"xLabels":["第一季度","第二季度","第三季度","第四季度"],"table":{"headers":["quarter","直销","渠道伙伴"],"rows":[["第一季度",1240,860],["第二季度",1380,910],["第三季度",1510,1040],["第四季度",1720,1180]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"direct","label":"直销","mark":"bar","color":"var(--role-primary)","unit":"万元","values":[1240,1380,1510,1720],"formatted":["1,240","1,380","1,510","1,720"],"pixels":[208.5,176.7,147.2,99.6],"size":null,"stats":{"min":1240,"max":1720,"mean":1462.5,"last":1720,"count":4}},{"id":"partner","label":"渠道伙伴","mark":"bar","color":"var(--role-comparison)","unit":"万元","values":[860,910,1040,1180],"formatted":["860","910","1,040","1,180"],"pixels":[294.8,283.4,253.9,222.1],"size":null,"stats":{"min":860,"max":1180,"mean":997.5,"last":1180,"count":4}}],"locale":"zh-CN","defaultPalette":"classic","i18n":{"ui.theme":"主题","ui.theme.toggle":"切换配色主题","ui.color":"颜色","ui.color.open":"选择图表配色","ui.color.heading":"图表配色","ui.color.reset":"重置","ui.palette.classic":"经典","ui.palette.cool":"冷色","ui.palette.warm":"暖色","ui.palette.primary":"原色","ui.palette.stock":"股市","ui.palette.blue-orange":"蓝橙","ui.palette.teal-magenta":"青紫","ui.export":"导出","ui.export.image":"图片","ui.export.share":"分享与数据","ui.export.png":"下载 PNG（2×）","ui.export.svg":"下载 SVG","ui.export.csv":"下载数据 CSV","ui.export.card":"分享卡片（1200×630）","ui.reset":"重置缩放","ui.close":"关闭","ui.series":"数据系列","ui.chapters":"导览视图","ui.views.clear":"清除视图","ui.chart":"图表","ui.keyboard.hint":"使用方向键浏览数据点。","ui.table.caption":"图表数据","legend.sign":"变化方向","legend.positive":"增加","legend.negative":"减少","legend.zero":"无变化","stat.min":"最小值","stat.max":"最大值","stat.mean":"平均值","stat.last":"最新值","stat.points":"数据点","stat.count":"数量","stat.share":"占比","stat.value":"数值","stat.n":"样本数","stat.median":"中位数","stat.q1":"下四分位","stat.q3":"上四分位","axis.count":"数量","note.boxplot":"箱体为四分位距，须线延伸至 1.5×IQR，圆点为离群值。","note.histogram":"{n} 个观测值分为 {bins} 个区间（Freedman-Diaconis 建议 {suggested} 个）","note.matrix":"{rows} × {cols} 网格，{kind}色阶，{buckets} 个分段","note.horizontal-value-labels":"条形末端数值无法在不重叠的情况下排版，可在提示和数据表中查看。","scale.sequential":"连续","scale.diverging":"发散"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
@@ -593,7 +606,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
         + esc(seriesLabel) + '<span class="gc-tt-val">' + esc(v === null ? '—' : v)
-        + (payload.unit && s.values[i] !== null ? ' ' + esc(payload.unit) : '') + '</span></div>';
+        + (s.unit && s.values[i] !== null ? ' ' + esc(s.unit) : '') + '</span></div>';
       if (s.size) {
         var sizeValue = s.size.formatted[i];
         html += '<div class="gc-tt-row"><span class="gc-tt-dot" style="background:' + s.color + '"></span>'
@@ -854,6 +867,78 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-row-label{fill:var(--muted);font-size:11px}' +
     '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
 
+  function appendExportLegend(clone) {
+    var items = [];
+    document.querySelectorAll('.gc-legend button, .gc-sign-legend .gc-sign-item').forEach(function (item) {
+      var swatch = item.querySelector('.gc-swatch');
+      if (!swatch) return;
+      items.push({
+        label: item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(swatch).backgroundColor,
+        mark: swatch.getAttribute('data-mark') || 'line'
+      });
+    });
+    document.querySelectorAll('.gc-size-legend .gc-size-item').forEach(function (item) {
+      items.push({
+        label: item.getAttribute('aria-label') || item.textContent.trim().replace(/\s+/g, ' '),
+        color: getComputedStyle(root).getPropertyValue('--role-primary').trim(),
+        mark: 'bubble'
+      });
+    });
+    if (!items.length) return payload.height;
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var group = document.createElementNS(ns, 'g');
+    group.setAttribute('class', 'gc-export-legend');
+    group.setAttribute('aria-hidden', 'true');
+    var left = 24;
+    var right = payload.width - 24;
+    var x = left;
+    var y = payload.height + 24;
+    var lineHeight = 26;
+    items.forEach(function (item) {
+      var itemWidth = Math.min(right - left, 34 + item.label.length * 7);
+      if (x > left && x + itemWidth > right) { x = left; y += lineHeight; }
+      var mark;
+      if (item.mark === 'line') {
+        mark = document.createElementNS(ns, 'line');
+        mark.setAttribute('x1', x);
+        mark.setAttribute('x2', x + 16);
+        mark.setAttribute('y1', y);
+        mark.setAttribute('y2', y);
+        mark.setAttribute('stroke', item.color);
+        mark.setAttribute('stroke-width', '4');
+        mark.setAttribute('stroke-linecap', 'round');
+      } else if (item.mark === 'scatter' || item.mark === 'bubble') {
+        mark = document.createElementNS(ns, 'circle');
+        mark.setAttribute('cx', x + 8);
+        mark.setAttribute('cy', y);
+        mark.setAttribute('r', '5');
+        mark.setAttribute('fill', item.color);
+      } else {
+        mark = document.createElementNS(ns, 'rect');
+        mark.setAttribute('x', x);
+        mark.setAttribute('y', y - (item.mark === 'range' ? 5 : 6));
+        mark.setAttribute('width', '16');
+        mark.setAttribute('height', item.mark === 'range' ? '10' : '12');
+        mark.setAttribute('rx', '2');
+        mark.setAttribute('fill', item.color);
+        if (item.mark === 'range') mark.setAttribute('fill-opacity', '0.65');
+      }
+      group.appendChild(mark);
+      var label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', x + 24);
+      label.setAttribute('y', y + 4);
+      label.setAttribute('fill', 'var(--ink)');
+      label.setAttribute('font-size', '13');
+      label.textContent = item.label;
+      group.appendChild(label);
+      x += itemWidth + 12;
+    });
+    clone.appendChild(group);
+    return y + 18;
+  }
+
   // Canonical export: full authored chart at rest — no hover layer, no
   // hidden/dimmed series, no zoom remap.
   function exportSvgString() {
@@ -905,8 +990,10 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
     style.textContent = 'svg{' + tokens + '}' + SVG_CSS;
     clone.insertBefore(style, clone.firstChild);
+    var exportHeight = appendExportLegend(clone);
+    clone.setAttribute('viewBox', '0 0 ' + payload.width + ' ' + exportHeight);
     clone.setAttribute('width', payload.width);
-    clone.setAttribute('height', payload.height);
+    clone.setAttribute('height', exportHeight);
     return new XMLSerializer().serializeToString(clone);
   }
   function download(name, blob) {
@@ -921,9 +1008,11 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     var img = new Image();
     var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
     img.onload = function () {
+      var sourceWidth = img.naturalWidth || payload.width;
+      var sourceHeight = img.naturalHeight || payload.height;
       var canvas = document.createElement('canvas');
-      canvas.width = payload.width * scale;
-      canvas.height = payload.height * scale;
+      canvas.width = sourceWidth * scale;
+      canvas.height = sourceHeight * scale;
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1016,7 +1105,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       if (hidden[s.id]) { if (dots[s.id]) dots[s.id].style.display = 'none'; return; }
       var seriesLabel = s.meaning ? s.label + ' — ' + s.meaning : s.label;
       parts.push(seriesLabel + ' ' + (s.formatted[i] === null ? '—' : s.formatted[i]) +
-        (payload.unit && s.values[i] !== null ? ' ' + payload.unit : ''));
+        (s.unit && s.values[i] !== null ? ' ' + s.unit : ''));
       if (s.size) {
         parts.push(s.size.label + ' ' + (s.size.formatted[i] === null ? '—' : s.size.formatted[i]) +
           (s.size.unit && s.size.values[i] !== null ? ' ' + s.size.unit : ''));

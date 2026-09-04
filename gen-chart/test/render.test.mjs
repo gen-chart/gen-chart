@@ -80,6 +80,11 @@ test('M3 viewer features are present: brush plumbing, exports, deep links', () =
   assert.ok(svg.includes('data-ox='), 'annotations carry original-x for zoom re-projection');
   assert.ok(html.includes('gc-export-menu'));
   assert.ok(html.includes('data-export="csv"'));
+  assert.match(html, /id="gc-export-image-heading">Image</);
+  assert.match(html, /id="gc-export-share-heading">Share &amp; data</);
+  assert.ok(html.indexOf('data-export="png"') < html.indexOf('data-export="card"'));
+  assert.ok(html.indexOf('data-export="card"') < html.indexOf('data-export="csv"'));
+  assert.match(html, /\.gc-tt-row \{ display: grid/);
   assert.ok(html.includes('gc-passport'));
   const payload = JSON.parse(/<script id="gc-payload" type="application\/json">(.*?)<\/script>/s.exec(html)[1]);
   assert.equal(payload.brush, 'x');
