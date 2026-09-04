@@ -4,6 +4,19 @@ Read this only when the user asks about the generated artifact's
 interactions, exports, or deep links. None of it requires authoring work
 beyond the spec fields named here.
 
+## Presentation modes
+
+- **Standalone** is a complete HTML document and stores interaction state in
+  the URL hash. It remains the default.
+- **Inline** is a shell-free fragment rooted at `.gc-embed`. CSS, DOM queries,
+  theme, palette, keyboard state, tooltip position, and menus are scoped to
+  that root. Runtime IDs are unique per mounted instance, so identical
+  fragments can share a page. Narrow behavior responds to the parent
+  container and scrolls only inside the chart panel.
+- **Both** builds both presentations from one validation and SVG-render pass.
+  The files are independent and therefore each contains the full stylesheet,
+  payload, SVG, accessibility table, and runtime.
+
 ## Interactions
 
 - **Tooltip + crosshair** — nearest-x lookup, formatted values with units.
@@ -77,6 +90,11 @@ stay comparable across locales. `<html lang>` follows the locale.
 `#view=<viewId>`. Combined with `&`. The viewer restores them on load and
 keeps the hash current as the reader explores. Classic is omitted because it
 is the palette default.
+
+Deep links apply only to standalone output. Inline output never reads or
+writes the host URL; it dispatches a bubbling `gen-chart:state-change` event
+from its root with `{ detail: { hash } }` when local state changes. A qualified
+host adapter may persist that value without coupling the renderer to a host.
 
 ## Exports
 

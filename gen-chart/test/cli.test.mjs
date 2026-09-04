@@ -68,6 +68,64 @@ test('deliver writes the artifact atomically with hashes in the receipt', () => 
   assert.equal(r.bytes.html, readFileSync(out).byteLength);
 });
 
+test('render --format inline writes a fragment and describes its host requirements', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.inline.html');
+  const r = JSON.parse(run(['render', 'cartesian', example, out, '--format', 'inline', '--json']));
+  const html = readFileSync(out, 'utf8');
+  assert.equal(r.ok, true);
+  assert.equal(r.format, 'inline');
+  assert.equal(r.output, out);
+  assert.equal(r.presentation.kind, 'html-fragment');
+  assert.equal(r.presentation.requires_script, true);
+  assert.deepEqual(r.presentation.required_primitives,
+    ['inline-script', 'blob-url', 'canvas-for-raster-exports']);
+  assert.doesNotMatch(html, /<!doctype|<\/?(?:html|head|body)\b/i);
+  assert.match(html, /data-gc-format="inline"/);
+});
+
+test('deliver --format both writes a linked standalone and inline pair', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  const inline = join(dir, 'chart.inline.html');
+  const r = JSON.parse(run(['deliver', 'cartesian', example, out, '--format', 'both', '--json']));
+  assert.equal(r.ok, true);
+  assert.equal(r.format, 'both');
+  assert.equal(r.outputs.standalone.path, out);
+  assert.equal(r.outputs.inline.path, inline);
+  assert.ok(existsSync(out));
+  assert.ok(existsSync(inline));
+  assert.match(r.outputs.standalone.sha256, /^[0-9a-f]{64}$/);
+  assert.match(r.outputs.inline.sha256, /^[0-9a-f]{64}$/);
+  assert.equal(r.outputs.standalone.bytes, readFileSync(out).byteLength);
+  assert.equal(r.outputs.inline.bytes, readFileSync(inline).byteLength);
+});
+
+test('a failed paired deliver preserves both previous artifacts', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  const inline = join(dir, 'chart.inline.html');
+  run(['deliver', 'cartesian', example, out, '--format', 'both', '--json']);
+  const previous = [readFileSync(out, 'utf8'), readFileSync(inline, 'utf8')];
+  const spec = JSON.parse(readFileSync(example, 'utf8'));
+  spec.series[0].y = 'missing';
+  const bad = join(dir, 'bad.json');
+  writeFileSync(bad, JSON.stringify(spec));
+  const err = runFail(['deliver', 'cartesian', bad, out, '--format', 'both', '--json']);
+  assert.equal(err.status, 1);
+  assert.equal(readFileSync(out, 'utf8'), previous[0]);
+  assert.equal(readFileSync(inline, 'utf8'), previous[1]);
+});
+
+test('--format is rejected where unsupported and validates its allowed values', () => {
+  assert.match(runFail(['validate', 'cartesian', example, '--format', 'inline']).stderr, /unknown option --format/);
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  assert.match(
+    runFail(['render', 'cartesian', example, join(dir, 'chart.html'), '--format', 'widget']).stderr,
+    /--format must be standalone, inline, or both/
+  );
+});
+
 test('a failed deliver preserves the previous artifact', () => {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
   const out = join(dir, 'chart.html');

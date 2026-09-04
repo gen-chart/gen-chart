@@ -87,6 +87,50 @@ Adds to the receipt:
 Report the path, the error and warning counts, and the SHA-256 pair. A
 non-zero exit can never be described as success.
 
+### Output formats
+
+`render` and `deliver` accept `--format standalone|inline|both`.
+`standalone` is the unchanged default. `inline` writes a self-contained HTML
+fragment at the positional output path. `both` writes the standalone document
+there and inserts `.inline` before `.html` for the fragment sibling. Validation,
+analysis, SVG geometry, payload construction, and legend construction run once;
+only the presentation assembly, hashing, and writes are repeated.
+
+Paired delivery stages both candidates before replacing either destination and
+restores both prior files if the commit cannot complete. Its receipt replaces
+the single `output` field with independently hashed entries:
+
+```json
+{
+  "format": "both",
+  "outputs": {
+    "standalone": {
+      "path": "/abs/path/chart.html",
+      "media_type": "text/html",
+      "bytes": 64000,
+      "sha256": "…"
+    },
+    "inline": {
+      "path": "/abs/path/chart.inline.html",
+      "media_type": "text/html",
+      "bytes": 65000,
+      "sha256": "…",
+      "presentation": {
+        "kind": "html-fragment",
+        "self_contained": true,
+        "requires_script": true,
+        "required_primitives": ["inline-script", "blob-url", "canvas-for-raster-exports"],
+        "host_display": "not-verified"
+      }
+    }
+  }
+}
+```
+
+`host_display: "not-verified"` is intentional: the CLI can prove what it
+wrote, but it cannot prove that a chat or artifact host accepted and displayed
+the fragment. See `inline-output.md` for handoff rules.
+
 ## visual-check
 
 ```bash
