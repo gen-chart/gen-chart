@@ -67,6 +67,7 @@ body {
   padding: 2rem 1.25rem; display: flex; justify-content: center;
   transition: background 150ms, color 150ms;
 }
+.gc-embed { width: 100%; display: flex; justify-content: center; }
 .gc-wrap { width: 100%; max-width: 1040px; }
 header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
@@ -90,6 +91,7 @@ h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.015em; }
   font: inherit; font-size: 0.8rem; padding: 0.42rem 0.6rem; border-radius: 0.4rem; cursor: pointer;
 }
 .gc-menu button:hover { background: var(--grid); }
+.gc-menu button:disabled { cursor: not-allowed; opacity: 0.55; }
 .gc-menu button:focus-visible { outline: 2px solid var(--role-primary); outline-offset: -2px; }
 .gc-palette-menu { min-width: 250px; padding: 0.5rem; }
 .gc-palette-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.2rem 0.35rem 0.45rem; }
@@ -225,6 +227,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   border-radius: 0.5rem; padding: 0.5rem 0.7rem; font-size: 0.78rem; line-height: 1.45;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-width: 260px;
 }
+.gc-embed[data-gc-format="inline"] {
+  position: relative; isolation: isolate; background: var(--bg); color: var(--ink);
+  padding: 1.25rem; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  transition: background 150ms, color 150ms; container-type: inline-size;
+}
+.gc-embed[data-gc-format="inline"] .gc-tooltip { position: absolute; }
 .gc-tooltip .gc-tt-x { font-weight: 700; margin-bottom: 0.2rem; }
 .gc-tooltip .gc-tt-row { display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
 .gc-tooltip .gc-tt-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
@@ -239,9 +247,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
    inside its own panel instead, so the page body never scrolls sideways. */
 @media (max-width: 700px) {
   body { padding: 1.25rem 0.75rem; }
+  .gc-embed[data-gc-format="inline"] { padding: 0.75rem; }
   header { flex-wrap: wrap; }
   .gc-toolbar { margin-left: auto; }
   .gc-palette-menu { max-width: calc(100vw - 1.5rem); }
+  .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
+  svg.gc-chart { min-width: 560px; }
+  .gc-panel { padding: 1rem 0.85rem; }
+}
+@container (max-width: 700px) {
+  header { flex-wrap: wrap; }
+  .gc-toolbar { margin-left: auto; }
+  .gc-palette-menu { max-width: calc(100cqw - 2.5rem); }
   .gc-figure { overflow-x: auto; overscroll-behavior-x: contain; }
   svg.gc-chart { min-width: 560px; }
   .gc-panel { padding: 1rem 0.85rem; }
@@ -250,6 +267,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 </style>
 </head>
 <body>
+<!-- GEN_CHART_COMPONENT_START -->
+<div class="gc-embed" data-gc-root data-gc-format="standalone" data-theme="auto" data-palette="classic" data-palette-size="three">
 <div class="gc-wrap">
   <header>
     <div>
@@ -257,19 +276,19 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 
     </div>
     <div class="gc-toolbar">
-      <button class="gc-btn" id="gc-export-btn" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
-      <button class="gc-btn" id="gc-theme" type="button" aria-label="Toggle color theme">Theme</button>
-      <button class="gc-btn" id="gc-color-btn" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
-      <div class="gc-menu" id="gc-export-menu" role="menu">
+      <button class="gc-btn" id="gc-export-btn" data-gc-role="export-button" type="button" aria-haspopup="menu" aria-expanded="false">Export</button>
+      <button class="gc-btn" id="gc-theme" data-gc-role="theme-button" type="button" aria-label="Toggle color theme">Theme</button>
+      <button class="gc-btn" id="gc-color-btn" data-gc-role="color-button" type="button" aria-label="Choose chart color palette" aria-haspopup="listbox" aria-expanded="false" aria-controls="gc-color-menu">Color</button>
+      <div class="gc-menu" id="gc-export-menu" data-gc-role="export-menu" role="menu">
         <button type="button" data-export="png" role="menuitem">Download PNG (2×)</button>
         <button type="button" data-export="svg" role="menuitem">Download SVG</button>
         <button type="button" data-export="csv" role="menuitem">Download data CSV</button>
         <button type="button" data-export="card" role="menuitem">Share card (1200×630)</button>
       </div>
-      <div class="gc-menu gc-palette-menu" id="gc-color-menu">
+      <div class="gc-menu gc-palette-menu" id="gc-color-menu" data-gc-role="color-menu">
         <div class="gc-palette-head">
           <h2 id="gc-color-heading">Color palette</h2>
-          <button class="gc-palette-reset" id="gc-color-reset" type="button">Reset</button>
+          <button class="gc-palette-reset" id="gc-color-reset" data-gc-role="color-reset" type="button">Reset</button>
         </div>
         <div class="gc-palette-options" id="gc-palette-options" role="listbox" aria-labelledby="gc-color-heading">
           <button class="gc-palette-option" type="button" role="option" data-palette="classic" aria-selected="true" tabindex="0"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#5996E7"></span><span class="gc-palette-swatch" style="--preview:#8AA7F5"></span><span class="gc-palette-swatch" style="--preview:#F6D985"></span></span><span>Classic</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="cool" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#AAD7BA"></span><span class="gc-palette-swatch" style="--preview:#68ACCD"></span><span class="gc-palette-swatch" style="--preview:#417AB3"></span></span><span>Cool</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="warm" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#F5D06C"></span><span class="gc-palette-swatch" style="--preview:#EE944B"></span><span class="gc-palette-swatch" style="--preview:#D03828"></span></span><span>Warm</span><span class="gc-palette-check" aria-hidden="true">✓</span></button><button class="gc-palette-option" type="button" role="option" data-palette="primary" aria-selected="false" tabindex="-1"><span class="gc-palette-preview" aria-hidden="true"><span class="gc-palette-swatch" style="--preview:#E74C3C"></span><span class="gc-palette-swatch" style="--preview:#F4D03F"></span><span class="gc-palette-swatch" style="--preview:#3498DB"></span></span><span>Primary</span><span class="gc-palette-check" aria-hidden="true">✓</span></button>
@@ -279,26 +298,53 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   </header>
 
   <div class="gc-panel">
-    <button class="gc-btn gc-reset" id="gc-reset" type="button">Reset zoom</button>
-    <div class="gc-figure" id="gc-figure" role="application" aria-label="Chart">
+    <button class="gc-btn gc-reset" id="gc-reset" data-gc-role="reset" type="button">Reset zoom</button>
+    <div class="gc-figure" id="gc-figure" data-gc-role="figure" role="application" aria-label="Chart">
       <svg class="gc-chart" viewBox="0 0 960 520" role="img" aria-label="Q2 Revenue by Region" xmlns="http://www.w3.org/2000/svg"><g class="gc-grid"><line x1="41" y1="490" x2="940" y2="490"/><line x1="41" y1="376.5" x2="940" y2="376.5"/><line x1="41" y1="263" x2="940" y2="263"/><line x1="41" y1="149.5" x2="940" y2="149.5"/><line x1="41" y1="36" x2="940" y2="36"/></g><g class="gc-yticks"><text x="33" y="493.5" text-anchor="end">0</text><text x="33" y="380" text-anchor="end">500</text><text x="33" y="266.5" text-anchor="end">1k</text><text x="33" y="153" text-anchor="end">1.5k</text><text x="33" y="39.5" text-anchor="end">2k</text></g><line class="gc-axis" x1="41" y1="490" x2="940" y2="490"/><g class="gc-xticks"><text x="130.2" y="506" text-anchor="middle">North America</text><text x="310.3" y="506" text-anchor="middle">Europe</text><text x="490.5" y="506" text-anchor="middle">Asia-Pacific</text><text x="670.7" y="506" text-anchor="middle">Latin America</text><text x="850.8" y="506" text-anchor="middle">Middle East &amp; Africa</text></g><text class="gc-axis-label" x="41" y="26" text-anchor="start">Revenue (USD k)</text><g class="gc-series" data-series="q1" style="--sc:var(--role-comparison)"><rect x="67.3" y="115.5" width="58.1" height="374.5" rx="1.5"/><rect x="247.5" y="176.7" width="58.1" height="313.3" rx="1.5"/><rect x="427.7" y="303.9" width="58.1" height="186.1" rx="1.5"/><rect x="607.8" y="403.7" width="58.1" height="86.3" rx="1.5"/><rect x="788" y="433.3" width="58.1" height="56.8" rx="1.5"/></g><g class="gc-series" data-series="q2" style="--sc:var(--role-primary)"><rect x="134.9" y="72.3" width="58.1" height="417.7" rx="1.5"/><rect x="315.1" y="167.7" width="58.1" height="322.3" rx="1.5"/><rect x="495.2" y="265.3" width="58.1" height="224.7" rx="1.5"/><rect x="675.4" y="396.9" width="58.1" height="93.1" rx="1.5"/><rect x="855.5" y="431" width="58.1" height="59" rx="1.5"/></g><g class="gc-hover" aria-hidden="true"><rect class="gc-brush-rect" x="0" y="0" width="0" height="0"/><line class="gc-crosshair" x1="0" y1="36" x2="0" y2="490" style="display:none"/><rect class="gc-hit" x="41" y="36" width="899" height="454" fill="none" pointer-events="all"/></g></svg>
     </div>
-    <p class="gc-sr-only" id="gc-kbd-hint">Use arrow keys to walk the data points.</p>
-    <p class="gc-sr-only" id="gc-live" aria-live="polite"></p>
+    <p class="gc-sr-only" id="gc-kbd-hint" data-gc-role="keyboard-hint">Use arrow keys to walk the data points.</p>
+    <p class="gc-sr-only" id="gc-live" data-gc-role="live" aria-live="polite"></p>
     <table class="gc-sr-only gc-data-table"><caption>Chart data</caption><thead><tr><th scope="col">region</th><th scope="col">Q1</th><th scope="col">Q2</th></tr></thead><tbody><tr><th scope="row">North America</th><td>1650</td><td>1840</td></tr><tr><th scope="row">Europe</th><td>1380</td><td>1420</td></tr><tr><th scope="row">Asia-Pacific</th><td>820</td><td>990</td></tr><tr><th scope="row">Latin America</th><td>380</td><td>410</td></tr><tr><th scope="row">Middle East &amp; Africa</th><td>250</td><td>260</td></tr></tbody></table>
     <div class="gc-legend" role="group" aria-label="Series"><button type="button" data-series="q1" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--role-comparison)"></span>Q1</button><button type="button" data-series="q2" aria-pressed="true"><span class="gc-swatch" data-mark="bar" style="--sw:var(--role-primary)"></span>Q2</button></div>
-    <div class="gc-passport" id="gc-passport" aria-live="polite"></div>
+    <div class="gc-passport" id="gc-passport" data-gc-role="passport" aria-live="polite"></div>
   </div>
   <div class="gc-cards"><section class="gc-card"><h2>Takeaway</h2><ul><li>Every region grew quarter over quarter; Asia-Pacific grew fastest at +21%.</li><li>North America still contributes 37% of total revenue.</li></ul></section></div>
 </div>
-<div class="gc-tooltip" id="gc-tooltip" role="status"></div>
-<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Q2 Revenue by Region","unit":"USD k","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[130.2,310.3,490.5,670.7,850.8],"xLabels":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"table":{"headers":["region","Q1","Q2"],"rows":[["North America",1650,1840],["Europe",1380,1420],["Asia-Pacific",820,990],["Latin America",380,410],["Middle East & Africa",250,260]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"q1","label":"Q1","mark":"bar","color":"var(--role-comparison)","values":[1650,1380,820,380,250],"formatted":["1,650","1,380","820","380","250"],"pixels":[115.5,176.7,303.9,403.7,433.3],"size":null,"stats":{"min":250,"max":1650,"mean":896,"last":250,"count":5}},{"id":"q2","label":"Q2","mark":"bar","color":"var(--role-primary)","values":[1840,1420,990,410,260],"formatted":["1,840","1,420","990","410","260"],"pixels":[72.3,167.7,265.3,396.9,431],"size":null,"stats":{"min":260,"max":1840,"mean":984,"last":260,"count":5}}],"locale":"en","defaultPalette":"classic","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
+<div class="gc-tooltip" id="gc-tooltip" data-gc-role="tooltip" role="status"></div>
+<script id="gc-payload" type="application/json">{"family":"cartesian","hover":"axis","title":"Q2 Revenue by Region","unit":"USD k","xType":"band","tooltip":"auto","legendToggle":true,"brush":null,"views":[],"xPixels":[130.2,310.3,490.5,670.7,850.8],"xLabels":["North America","Europe","Asia-Pacific","Latin America","Middle East & Africa"],"table":{"headers":["region","Q1","Q2"],"rows":[["North America",1650,1840],["Europe",1380,1420],["Asia-Pacific",820,990],["Latin America",380,410],["Middle East & Africa",250,260]]},"plot":{"left":41,"top":36,"right":940,"bottom":490},"width":960,"height":520,"series":[{"id":"q1","label":"Q1","mark":"bar","color":"var(--role-comparison)","values":[1650,1380,820,380,250],"formatted":["1,650","1,380","820","380","250"],"pixels":[115.5,176.7,303.9,403.7,433.3],"size":null,"stats":{"min":250,"max":1650,"mean":896,"last":250,"count":5}},{"id":"q2","label":"Q2","mark":"bar","color":"var(--role-primary)","values":[1840,1420,990,410,260],"formatted":["1,840","1,420","990","410","260"],"pixels":[72.3,167.7,265.3,396.9,431],"size":null,"stats":{"min":260,"max":1840,"mean":984,"last":260,"count":5}}],"locale":"en","defaultPalette":"classic","i18n":{"ui.theme":"Theme","ui.theme.toggle":"Toggle color theme","ui.color":"Color","ui.color.open":"Choose chart color palette","ui.color.heading":"Color palette","ui.color.reset":"Reset","ui.palette.classic":"Classic","ui.palette.cool":"Cool","ui.palette.warm":"Warm","ui.palette.primary":"Primary","ui.palette.stock":"Stock","ui.palette.blue-orange":"Blue–Orange","ui.palette.teal-magenta":"Teal–Magenta","ui.export":"Export","ui.export.png":"Download PNG (2×)","ui.export.svg":"Download SVG","ui.export.csv":"Download data CSV","ui.export.card":"Share card (1200×630)","ui.export.unavailable":"Unavailable in this host","ui.reset":"Reset zoom","ui.close":"Close","ui.series":"Series","ui.chapters":"Guided views","ui.views.clear":"Clear view","ui.chart":"Chart","ui.keyboard.hint":"Use arrow keys to walk the data points.","ui.table.caption":"Chart data","legend.sign":"Direction","legend.positive":"Increase","legend.negative":"Decrease","legend.zero":"No change","stat.min":"min","stat.max":"max","stat.mean":"mean","stat.last":"last","stat.points":"points","stat.count":"count","stat.share":"share","stat.value":"value","stat.n":"n","stat.median":"median","stat.q1":"q1","stat.q3":"q3","axis.count":"Count","note.boxplot":"Box spans the interquartile range; whiskers reach 1.5×IQR; dots are outliers.","note.histogram":"{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})","note.matrix":"{rows} × {cols} grid, {kind} scale in {buckets} buckets","note.horizontal-value-labels":"Bar-end values are available in tooltips and the data table because they do not fit without overlap.","scale.sequential":"sequential","scale.diverging":"diverging"},"palettes":{"classic":{"six":["#A2C9FB","#5996E7","#D5C4FC","#7563DB","#F6D147","#FBF19F"],"three":["#5996E7","#8AA7F5","#F6D985"]},"cool":{"six":["#CCE7C1","#AAD7BA","#88C7C6","#68ACCD","#5494C0","#417AB3"],"three":["#AAD7BA","#68ACCD","#417AB3"]},"warm":{"six":["#F6E287","#F8DB82","#F2B75C","#EE944B","#E85E38","#D03828"],"three":["#F5D06C","#EE944B","#D03828"]},"primary":{"six":["#E74C3C","#F06A5B","#F4D03F","#F7DC6F","#3498DB","#5DADE2"],"three":["#E74C3C","#F4D03F","#3498DB"]}}}</script>
 <script>
 (function () {
   'use strict';
-  var payload = JSON.parse(document.getElementById('gc-payload').textContent);
-  var root = document.documentElement;
-  var svg = document.querySelector('svg.gc-chart');
+  var runtimeScript = document.currentScript;
+  var scope = runtimeScript && runtimeScript.closest('[data-gc-root]');
+  if (!scope) return;
+  var inline = scope.getAttribute('data-gc-format') === 'inline';
+  var root = inline ? scope : document.documentElement;
+  var payloadElement = scope.querySelector('[id="gc-payload"]');
+  var payload = JSON.parse(payloadElement.textContent);
+  if (inline) {
+    var instanceId = 'gc-' + (globalThis.crypto && globalThis.crypto.randomUUID
+      ? globalThis.crypto.randomUUID()
+      : Math.random().toString(36).slice(2));
+    var ids = {};
+    scope.querySelectorAll('[id]').forEach(function (element) {
+      var old = element.id;
+      var replacement = instanceId + '-' + old;
+      ids[old] = replacement;
+      element.id = replacement;
+    });
+    ['aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(function (attribute) {
+      scope.querySelectorAll('[' + attribute + ']').forEach(function (element) {
+        var value = element.getAttribute(attribute).split(/\s+/).map(function (id) {
+          return ids[id] || id;
+        }).join(' ');
+        element.setAttribute(attribute, value);
+      });
+    });
+    scope.setAttribute('data-gc-instance', instanceId);
+  }
+  var svg = scope.querySelector('svg.gc-chart');
+  var keyboardHintId = scope.querySelector('[data-gc-role="keyboard-hint"]').id;
   var plot = payload.plot;
   var hidden = {};
   var focusId = null;
@@ -319,13 +365,14 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // ---------------------------------------------------------- deep links
   function readHash() {
     var out = {};
+    if (inline) return out;
     location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
       var i = kv.indexOf('=');
       if (i > 0) out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
     });
     return out;
   }
-  function writeHash() {
+  function currentState() {
     var parts = [];
     var theme = root.getAttribute('data-theme');
     if (theme !== 'auto') parts.push('theme=' + theme);
@@ -335,11 +382,21 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     if (off.length) parts.push('hidden=' + off.map(encodeURIComponent).join(','));
     if (zoom) parts.push('brush=' + zoom[0] + '~' + zoom[1]);
     if (activeView) parts.push('view=' + encodeURIComponent(activeView));
+    return parts;
+  }
+  function writeHash() {
+    var parts = currentState();
+    if (inline) {
+      scope.dispatchEvent(new CustomEvent('gen-chart:state-change', {
+        bubbles: true, detail: { hash: parts.length ? '#' + parts.join('&') : '' }
+      }));
+      return;
+    }
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname);
   }
 
   // -------------------------------------------------------------- theme
-  document.getElementById('gc-theme').addEventListener('click', function () {
+  scope.querySelector('[data-gc-role="theme-button"]').addEventListener('click', function () {
     var current = root.getAttribute('data-theme');
     if (current === 'auto') {
       current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -351,7 +408,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   var isAxis = payload.hover === 'axis';
 
   // ------------------------------------------------------------- legend
-  var legend = document.querySelector('.gc-legend');
+  var legend = scope.querySelector('.gc-legend');
   function applyHidden(id) {
     var g = svg.querySelector('.gc-series[data-series="' + CSS.escape(id) + '"]');
     if (g) g.classList.toggle('gc-off', !!hidden[id]);
@@ -384,7 +441,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // ------------------------------------------------------ data passport
   // Passport, zoom, and crosshair are axis-family features. Element-hover
   // families (distribution, proportion, matrix) read per-mark instead.
-  var passport = document.getElementById('gc-passport');
+  var passport = scope.querySelector('[data-gc-role="passport"]');
   function setFocus(id) {
     var target = payload.series.find(function (s) { return s.id === id; });
     focusId = id && !hidden[id] && (!target || target.focusable !== false) ? id : null;
@@ -442,7 +499,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // --------------------------------------------------------- brush zoom
   // Zoom is an affine remap of original x pixels; y never rescales, so the
   // reading stays honest. Line and range marks over time/linear x support it.
-  var resetBtn = document.getElementById('gc-reset');
+  var resetBtn = scope.querySelector('[data-gc-role="reset"]');
   var brushRect = svg.querySelector('.gc-brush-rect');
   function zoomX(ox) {
     if (!zoom) return ox;
@@ -545,12 +602,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     writeHash();
   }
   resetBtn.addEventListener('click', function () { setZoom(null); });
-  document.addEventListener('keydown', function (e) {
+  scope.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { setZoom(null); setFocus(null); writeHash(); }
   });
 
   // ------------------------------------------------- tooltip + pointer
-  var tooltip = document.getElementById('gc-tooltip');
+  var tooltip = scope.querySelector('[data-gc-role="tooltip"]');
   var crosshair = svg.querySelector('.gc-crosshair');
   var hit = svg.querySelector('.gc-hit');
   var dots = {};
@@ -610,12 +667,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     });
     tooltip.innerHTML = html;
     tooltip.style.display = 'block';
-    var pad = 14;
-    var tw = tooltip.offsetWidth;
-    var x = clientX + pad;
-    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
-    tooltip.style.left = x + 'px';
-    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
+    positionTip(clientX, clientY);
   }
   if (isAxis && payload.tooltip !== 'off' && hit) {
     hit.addEventListener('pointermove', function (evt) { if (!brushing) showTip(evt); });
@@ -649,12 +701,22 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
   function moveTip(evt) { moveTipTo(evt.clientX, evt.clientY); }
   function moveTipTo(clientX, clientY) {
+    positionTip(clientX, clientY);
+  }
+  function positionTip(clientX, clientY) {
     var pad = 14;
     var tw = tooltip.offsetWidth;
-    var x = clientX + pad;
-    if (x + tw > window.innerWidth - 8) x = clientX - tw - pad;
+    var th = tooltip.offsetHeight;
+    var bounds = inline ? scope.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+    var px = clientX - bounds.left;
+    var py = clientY - bounds.top;
+    var x = px + pad;
+    if (x + tw > bounds.width - 8) x = px - tw - pad;
+    x = Math.max(8, Math.min(x, Math.max(8, bounds.width - tw - 8)));
+    var y = Math.max(8, py - th / 2);
+    if (inline) y = Math.min(y, Math.max(8, scope.clientHeight - th - 8));
     tooltip.style.left = x + 'px';
-    tooltip.style.top = Math.max(8, clientY - tooltip.offsetHeight / 2) + 'px';
+    tooltip.style.top = y + 'px';
   }
 
   // Brush drag on the hit rect.
@@ -691,12 +753,34 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // ------------------------------------------------------------ exports
-  var exportBtn = document.getElementById('gc-export-btn');
-  var exportMenu = document.getElementById('gc-export-menu');
-  var colorBtn = document.getElementById('gc-color-btn');
-  var colorMenu = document.getElementById('gc-color-menu');
-  var colorReset = document.getElementById('gc-color-reset');
-  var paletteOptions = Array.from(document.querySelectorAll('.gc-palette-option'));
+  var exportBtn = scope.querySelector('[data-gc-role="export-button"]');
+  var exportMenu = scope.querySelector('[data-gc-role="export-menu"]');
+  var colorBtn = scope.querySelector('[data-gc-role="color-button"]');
+  var colorMenu = scope.querySelector('[data-gc-role="color-menu"]');
+  var colorReset = scope.querySelector('[data-gc-role="color-reset"]');
+  var paletteOptions = Array.from(scope.querySelectorAll('.gc-palette-option'));
+  var basicExports = typeof Blob === 'function' && typeof URL !== 'undefined' &&
+    typeof URL.createObjectURL === 'function' && typeof URL.revokeObjectURL === 'function';
+  var canvasProbe = document.createElement('canvas');
+  var canvasContext = null;
+  try { canvasContext = canvasProbe.getContext('2d'); } catch (error) {}
+  var rasterExports = basicExports && typeof Image === 'function' &&
+    Boolean(canvasContext) && typeof canvasProbe.toBlob === 'function';
+  function exportUnavailable(button) {
+    var reason = payload.i18n['ui.export.unavailable'];
+    button.disabled = true;
+    button.title = reason;
+    button.setAttribute('aria-label', button.textContent.trim() + '. ' + reason);
+  }
+  scope.querySelectorAll('[data-export]').forEach(function (button) {
+    var kind = button.getAttribute('data-export');
+    var available = basicExports && (kind === 'svg' || kind === 'csv' || rasterExports);
+    if (!available) exportUnavailable(button);
+  });
+  if (!basicExports) {
+    exportBtn.disabled = true;
+    exportBtn.title = payload.i18n['ui.export.unavailable'];
+  }
 
   function closeExportMenu() {
     exportMenu.removeAttribute('data-open');
@@ -734,7 +818,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         element.style.setProperty('--sc', paletteToken(index, colorCount));
       });
     }
-    document.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
+    scope.querySelectorAll('.gc-legend .gc-swatch:not([data-semantic])').forEach(function (swatch, index) {
       swatch.style.setProperty('--sw', paletteToken(index, colorCount));
     });
     if (focusId) setFocus(focusId);
@@ -814,7 +898,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       setPalette(option.getAttribute('data-palette'), true);
     }
   });
-  document.addEventListener('click', function (e) {
+  scope.addEventListener('click', function (e) {
     if (!e.target.closest('.gc-toolbar')) {
       closeExportMenu();
       closeColorMenu(false);
@@ -905,27 +989,58 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     clone.setAttribute('height', payload.height);
     return new XMLSerializer().serializeToString(clone);
   }
-  function download(name, blob) {
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  function exportFailure(kind, error) {
+    var button = scope.querySelector('[data-export="' + kind + '"]');
+    if (button) exportUnavailable(button);
+    scope.dispatchEvent(new CustomEvent('gen-chart:export-error', {
+      bubbles: true,
+      detail: { kind: kind, message: error && error.message ? error.message : String(error) }
+    }));
   }
-  function svgToCanvas(scale, cb) {
+  function download(name, blob, kind) {
+    try {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      scope.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        try { URL.revokeObjectURL(a.href); } catch (error) {}
+        a.remove();
+      }, 1000);
+    } catch (error) {
+      exportFailure(kind, error);
+    }
+  }
+  function svgToCanvas(scale, kind, cb) {
     var img = new Image();
-    var url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
+    var url;
+    try {
+      url = URL.createObjectURL(new Blob([exportSvgString()], { type: 'image/svg+xml' }));
+    } catch (error) {
+      exportFailure(kind, error);
+      return;
+    }
     img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = payload.width * scale;
-      canvas.height = payload.height * scale;
-      var ctx = canvas.getContext('2d');
-      ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      cb(canvas);
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = payload.width * scale;
+        canvas.height = payload.height * scale;
+        var ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('2D canvas context is unavailable');
+        ctx.fillStyle = getComputedStyle(root).getPropertyValue('--panel').trim();
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        cb(canvas);
+      } catch (error) {
+        try { URL.revokeObjectURL(url); } catch (revokeError) {}
+        exportFailure(kind, error);
+      }
+    };
+    img.onerror = function () {
+      try { URL.revokeObjectURL(url); } catch (error) {}
+      exportFailure(kind, new Error('SVG image decoding is unavailable'));
     };
     img.src = url;
   }
@@ -945,15 +1060,18 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     kind = kind.getAttribute('data-export');
     exportMenu.removeAttribute('data-open');
     if (kind === 'svg') {
-      download(slug() + '.svg', new Blob([exportSvgString()], { type: 'image/svg+xml' }));
+      download(slug() + '.svg', new Blob([exportSvgString()], { type: 'image/svg+xml' }), kind);
     } else if (kind === 'csv') {
-      download(slug() + '.csv', new Blob([csvString()], { type: 'text/csv' }));
+      download(slug() + '.csv', new Blob([csvString()], { type: 'text/csv' }), kind);
     } else if (kind === 'png') {
-      svgToCanvas(2, function (canvas) {
-        canvas.toBlob(function (b) { download(slug() + '.png', b); }, 'image/png');
+      svgToCanvas(2, kind, function (canvas) {
+        canvas.toBlob(function (b) {
+          if (b) download(slug() + '.png', b, kind);
+          else exportFailure(kind, new Error('PNG encoding is unavailable'));
+        }, 'image/png');
       });
     } else if (kind === 'card') {
-      svgToCanvas(2, function (chart) {
+      svgToCanvas(2, kind, function (chart) {
         var cs = getComputedStyle(root);
         var canvas = document.createElement('canvas');
         canvas.width = 1200;
@@ -970,7 +1088,10 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         var w = chart.width * s;
         var h = chart.height * s;
         ctx.drawImage(chart, (1200 - w) / 2, 100 + (boxH - h) / 2, w, h);
-        canvas.toBlob(function (b) { download(slug() + '-share.png', b); }, 'image/png');
+        canvas.toBlob(function (b) {
+          if (b) download(slug() + '-share.png', b, kind);
+          else exportFailure(kind, new Error('PNG encoding is unavailable'));
+        }, 'image/png');
       });
     }
   });
@@ -979,12 +1100,12 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   // The chart is focusable and arrow keys walk the data points, so the
   // reading does not depend on a pointer. Each step announces the value
   // through the live region for screen readers.
-  var figure = document.getElementById('gc-figure');
-  var live = document.getElementById('gc-live');
+  var figure = scope.querySelector('[data-gc-role="figure"]');
+  var live = scope.querySelector('[data-gc-role="live"]');
   var cursor = null;
   if (isAxis && figure) {
     figure.setAttribute('tabindex', '0');
-    figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+    figure.setAttribute('aria-describedby', keyboardHintId);
     figure.addEventListener('keydown', function (e) {
       var r = visibleRange();
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
@@ -1059,7 +1180,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     };
     if (marks.length) {
       figure.setAttribute('tabindex', '0');
-      figure.setAttribute('aria-describedby', 'gc-kbd-hint');
+      figure.setAttribute('aria-describedby', keyboardHintId);
       figure.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); mi = Math.min(marks.length - 1, mi + 1); focusMark(); }
         else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); mi = Math.max(0, mi - 1); focusMark(); }
@@ -1075,8 +1196,8 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 
   // ----------------------------------------------------- guided views
-  var viewStrip = document.querySelector('.gc-views');
-  var viewNote = document.getElementById('gc-view-note');
+  var viewStrip = scope.querySelector('.gc-views');
+  var viewNote = scope.querySelector('[data-gc-role="view-note"]');
   function applyView(id) {
     var v = (payload.views || []).find(function (x) { return x.id === id; });
     if (viewStrip) {
@@ -1142,5 +1263,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
   }
 })();
 </script>
+</div>
+<!-- GEN_CHART_COMPONENT_END -->
 </body>
 </html>

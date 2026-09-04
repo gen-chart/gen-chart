@@ -2,7 +2,7 @@
 name: gen-chart
 description: >-
   Create polished, validated, interactive charts as self-contained standalone
-  HTML with inline SVG, dark/light themes, crosshair tooltips, legend
+  HTML and container-scoped inline HTML fragments with inline SVG, dark/light themes, crosshair tooltips, legend
   toggling, and honest-by-construction axes. Accept pasted data
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
@@ -87,6 +87,33 @@ the family you routed to.
    whether the chart reads well, so its result is never "visual QA passed"
    or "verified in light and dark". If you opened a screenshot, say what you
    saw. If you did not, say only that containment was measured.
+
+## Inline and paired output
+
+**Default to one standalone HTML file.** Run `deliver` without `--format`
+unless the current caller exposes a native inline-visualization channel that
+can accept and execute a gen-chart HTML fragment directly in the response.
+
+If that inline channel is actually available, generate both presentations so
+the response can show the chart inline and still offer a larger browser view:
+
+```bash
+node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> \
+  --quality showcase --format both --json
+```
+
+This writes `<output.html>` plus a sibling with `.inline` inserted before the
+`.html` suffix. Send the inline sibling through that native channel and link
+the standalone sibling. A file preview, attachment, downloadable HTML,
+Artifact, canvas, or side panel does **not** by itself establish inline
+response support. Do not infer support from the product name, invent a
+Markdown token, or claim inline display merely because the fragment exists.
+
+Use `--format inline` only when the caller specifically needs the fragment
+without a standalone file. If no qualifying inline-visualization channel is
+exposed, omit `--format`: generating only standalone is faster, uses less disk,
+and is the truthful default. Read `references/inline-output.md` for the
+fragment and host-qualification contract.
 
 ## Type router
 
@@ -174,13 +201,13 @@ receipt shapes, exit codes, and the repair loop in detail.
 
 ## Viewer capabilities (no extra authoring work)
 
-Generated HTML already contains: dark/light theme toggle honoring
+Generated standalone and inline HTML already contain: dark/light theme toggle honoring
 `prefers-color-scheme`, a Color picker for Classic, Cool, Warm, and Primary
 chart palettes (applied to every displayed series in order), crosshair
 tooltip with formatted values and units,
 legend series toggling (auto when ≥2 series), click-to-focus Data Passport
 with render-time stats, deep links (`#theme=`, `#palette=`, `#focus=`,
-`#hidden=`, `#brush=`), and an Export menu (PNG 2×, standalone SVG,
+`#hidden=`, `#brush=` in standalone mode), and an Export menu (PNG 2×, standalone SVG,
 provenance data CSV, 1200×630 share card) that always captures the canonical
 at-rest chart with the selected theme and palette. Everything is inline — one
 portable file, no CDN, works offline.
@@ -189,7 +216,9 @@ Sign-colored horizontal bars use contextual Stock, Blue–Orange, and
 Teal–Magenta palettes whose previews match their positive, neutral, and
 negative colors.
 
-Every artifact is also accessible without a pointer: the plot is focusable,
+Inline instances keep interaction state on their own root and emit
+`gen-chart:state-change`; they never change the host page URL. Every artifact
+is also accessible without a pointer: the plot is focusable,
 arrow keys walk the data points and announce them, and a visually hidden
 data table carries the exact numbers for screen readers.
 
@@ -221,6 +250,12 @@ provenance is noise until someone asks for it.
 - the path to the HTML file
 - one short line on checking, e.g. `Validated at showcase quality — 0 errors,
   0 warnings.`
+
+When a qualifying channel actually rendered the fragment inside the response,
+lead with that inline result and include the standalone file link as the
+full-window fallback. Otherwise generate and hand off one standalone file.
+Opening HTML in an Artifact or side panel is not inline display. Say which
+presentation happened; artifact generation alone proves nothing about display.
 
 **Add the rest only when asked, when something failed, or when the caller is
 automation rather than a person:** SHA-256 receipts, per-viewport containment
