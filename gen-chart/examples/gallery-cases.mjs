@@ -64,6 +64,30 @@ export const GALLERY_CASES = [
     }
   },
   {
+    id: 'observability-errors-by-version',
+    spec: 'observability-errors-by-version.cartesian.json',
+    question: 'Do application error spikes align with deployment events?',
+    prompt: {
+      request: 'Plot error counts by application version with deployment events overlaid.',
+      requirements: [
+        'Keep all nine authored versions and use vertical stems with compact top-edge deployment markers.',
+        'Use the intraday UTC timeline, legend toggling, and x-axis brush zoom without claiming causation.'
+      ]
+    }
+  },
+  {
+    id: 'observability-ci-duration',
+    spec: 'observability-ci-duration.cartesian.json',
+    question: 'Do CI duration spikes align with web-ui merge activity?',
+    prompt: {
+      request: 'Plot maximum CI job duration by branch with every authored web-ui merge event overlaid.',
+      requirements: [
+        'Render merge events as a compact top-edge event strip over the intraday UTC timeline.',
+        'Preserve every duration and event while describing temporal alignment without claiming causation.'
+      ]
+    }
+  },
+  {
     id: 'plan-mix',
     spec: 'plan-mix.cartesian.json',
     question: 'How did the account mix change as paid plans grew?',

@@ -35,6 +35,8 @@ subject, measured evidence, and a closed set of supported fixes:
   deterministically downsample only the rendered marks while retaining every
   source row
 - sequential heatmap ramps reject negatives; diverging ramps require a midpoint
+- authored operational events render as labelled lines or compact top-edge
+  strips on Cartesian charts, with semantic colors and intraday UTC timestamps
 
 **Composition checks.** Tick collision (rotate → thin → fail), annotation
 overlap, point density, stack depth, matrix density and sparseness, and
@@ -62,7 +64,7 @@ containment evidence, `demo`, `doctor`, a deterministic package build, and CI
 across Node 22 and 24.
 
 **Interactive instruction gallery.** One staged, deterministic build delivers
-all 15 examples at showcase quality before replacing the published site. The
+all 17 examples at showcase quality before replacing the published site. The
 homepage provides four-agent installation commands and teaches the complete
 Install → Copy prompt → Typed JSON IR → Interactive chart workflow. Every
 example binds a concise data-bearing message prompt, exact source/artifact bytes,
@@ -100,6 +102,10 @@ Roughly in the order they would earn their place.
 
 ### Ergonomics
 
+- **Multi-chart artifacts from one prompt.** Allow one authored dataset and
+  one request to produce multiple coordinated chart specs and combine them in
+  a single interactive HTML artifact, with shared event data and aligned time
+  domains where appropriate.
 - **Selectable palette accessibility hardening.** Preserve the exact approved
   three- and six-color sets while resolving the measured light-panel contrast
   and adjacent-series ΔE gaps through proven non-color boundary treatments.

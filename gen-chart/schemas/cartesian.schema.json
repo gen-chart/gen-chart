@@ -71,7 +71,7 @@
         "columns": {
           "type": "array",
           "minItems": 1,
-          "maxItems": 12,
+          "maxItems": 16,
           "items": {
             "$ref": "common.schema.json#/$defs/column"
           }
@@ -147,7 +147,7 @@
     "series": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 8,
+      "maxItems": 12,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -274,7 +274,7 @@
     },
     "annotations": {
       "type": "array",
-      "maxItems": 6,
+      "maxItems": 64,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -290,7 +290,8 @@
           "kind": {
             "enum": [
               "x-line",
-              "y-line"
+              "y-line",
+              "event-strip"
             ]
           },
           "at": {
@@ -301,6 +302,9 @@
           },
           "label": {
             "$ref": "common.schema.json#/$defs/shortText"
+          },
+          "role": {
+            "$ref": "common.schema.json#/$defs/colorRole"
           }
         }
       }

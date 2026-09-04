@@ -73,10 +73,14 @@ export function bandScale(count, rangeMin, rangeMax, { paddingInner = 0.25, padd
   };
 }
 
-const DAY = 86400000;
+const MINUTE = 60000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 // Bounded calendar intervals, finest first. Each yields UTC tick timestamps.
 const INTERVALS = [
+  { unit: 'minute', steps: [1, 5, 15, 30] },
+  { unit: 'hour', steps: [1, 2, 3, 6, 12] },
   { unit: 'day', steps: [1, 2, 7, 14] },
   { unit: 'month', steps: [1, 2, 3, 6] },
   { unit: 'year', steps: [1, 2, 5, 10, 20, 50] }
@@ -84,6 +88,8 @@ const INTERVALS = [
 
 function firstTickOnOrAfter(ms, unit, step) {
   const d = new Date(ms);
+  if (unit === 'minute') return Math.ceil(ms / (step * MINUTE)) * step * MINUTE;
+  if (unit === 'hour') return Math.ceil(ms / (step * HOUR)) * step * HOUR;
   if (unit === 'year') {
     const y = Math.ceil(d.getUTCFullYear() / step) * step;
     return Date.UTC(y, 0, 1);
@@ -105,6 +111,8 @@ function firstTickOnOrAfter(ms, unit, step) {
 
 function nextTick(ms, unit, step) {
   const d = new Date(ms);
+  if (unit === 'minute') return ms + step * MINUTE;
+  if (unit === 'hour') return ms + step * HOUR;
   if (unit === 'year') return Date.UTC(d.getUTCFullYear() + step, 0, 1);
   if (unit === 'month') {
     const total = d.getUTCFullYear() * 12 + d.getUTCMonth() + step;
@@ -133,7 +141,7 @@ export function timeTicks(minMs, maxMs, granularity, maxCount = 8) {
   return { ticks: [minMs], unit: granularity, step: 1 };
 }
 
-// Parses "2026" | "2026-01" | "2026-01-15" as UTC; returns null when invalid.
+// Parses calendar granularities and UTC ISO timestamps; returns null when invalid.
 export function parseDateValue(s) {
   if (typeof s !== 'string') return null;
   let m = /^(\d{4})$/.exec(s);
@@ -150,6 +158,20 @@ export function parseDateValue(s) {
     const d = new Date(ms);
     if (d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return null;
     return { ms, granularity: 'day' };
+  }
+  m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?Z$/.exec(s);
+  if (m) {
+    const [, year, month, day, hour, minute, second = '0', fraction = '0'] = m;
+    const parts = [year, month, day, hour, minute, second].map(Number);
+    const [y, mo, d, h, min, sec] = parts;
+    if (mo < 1 || mo > 12 || h > 23 || min > 59 || sec > 59) return null;
+    const millis = Number(fraction.padEnd(3, '0'));
+    const ms = Date.UTC(y, mo - 1, d, h, min, sec, millis);
+    const check = new Date(ms);
+    if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 ||
+        check.getUTCDate() !== d || check.getUTCHours() !== h ||
+        check.getUTCMinutes() !== min || check.getUTCSeconds() !== sec) return null;
+    return { ms, granularity: 'minute' };
   }
   return null;
 }

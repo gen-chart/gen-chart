@@ -47,7 +47,7 @@ export function checkData(spec) {
           diagnostics.push(diag('data/date-parse', 'error', `${subject}/values/${j}`,
             `column "${col.id}" is typed date but values[${j}] is ${JSON.stringify(col.values[j])}`, {
               evidence: { value: col.values[j] },
-              supportedFixes: ['use ISO date strings: "2026", "2026-01", or "2026-01-15"']
+              supportedFixes: ['use ISO dates or UTC timestamps: "2026", "2026-01", "2026-01-15", or "2026-01-15T09:30:00Z"']
             }));
           return;
         }

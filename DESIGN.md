@@ -178,9 +178,8 @@ change, Increase. Missing signs are omitted without reordering those present.
 dark-panel contrast check, but several pale colors do not clear 3:1 against
 the light panel, and some same-family neighbours fall below the current ΔE 9
 threshold. The exact fills are part of the approved visual identity and must
-not be replaced with unrelated compliant colors. The measured audit and the
-non-color boundary-treatment option live in
-`CHART-COLOUR-PALETTE-PICKER-PLAN.md`.
+not be replaced with unrelated compliant colors. The remaining non-color
+boundary-treatment work is tracked in the roadmap.
 
 ### Named rules
 

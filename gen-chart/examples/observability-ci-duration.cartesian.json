@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "chart_type": "cartesian",
+  "meta": {
+    "title": "CI job max duration by branch with all web-ui merge events",
+    "subtitle": "Same authored timestamps and events as the error chart",
+    "quality_profile": "standard",
+    "width": 1200,
+    "height": 520
+  },
+  "data": {
+    "columns": [
+      {
+        "id": "timestamp",
+        "type": "date",
+        "values": [
+          "2026-09-01T18:00:00.000Z",
+          "2026-09-01T21:00:00.000Z",
+          "2026-09-02T00:00:00.000Z",
+          "2026-09-02T03:00:00.000Z",
+          "2026-09-02T06:00:00.000Z",
+          "2026-09-02T09:00:00.000Z",
+          "2026-09-02T12:00:00.000Z",
+          "2026-09-02T15:00:00.000Z",
+          "2026-09-02T18:00:00.000Z",
+          "2026-09-02T21:00:00.000Z",
+          "2026-09-03T00:00:00.000Z",
+          "2026-09-03T03:00:00.000Z",
+          "2026-09-03T06:00:00.000Z",
+          "2026-09-03T09:00:00.000Z",
+          "2026-09-03T12:00:00.000Z",
+          "2026-09-03T15:00:00.000Z",
+          "2026-09-03T18:00:00.000Z",
+          "2026-09-03T21:00:00.000Z",
+          "2026-09-04T00:00:00.000Z",
+          "2026-09-04T03:00:00.000Z",
+          "2026-09-04T06:00:00.000Z",
+          "2026-09-04T09:00:00.000Z",
+          "2026-09-04T12:00:00.000Z",
+          "2026-09-04T15:00:00.000Z",
+          "2026-09-04T18:00:00.000Z",
+          "2026-09-04T21:00:00.000Z",
+          "2026-09-05T00:00:00.000Z",
+          "2026-09-05T03:00:00.000Z",
+          "2026-09-05T06:00:00.000Z"
+        ]
+      },
+      {
+        "id": "main",
+        "type": "number",
+        "unit": "minutes",
+        "values": [
+          20,
+          40,
+          55,
+          70,
+          120,
+          210,
+          35,
+          260,
+          25,
+          710,
+          40,
+          190,
+          30,
+          85,
+          120,
+          180,
+          210,
+          300,
+          45,
+          830,
+          650,
+          70,
+          40,
+          280,
+          190,
+          250,
+          50,
+          820,
+          45
+        ]
+      },
+      {
+        "id": "release",
+        "type": "number",
+        "unit": "minutes",
+        "values": [
+          null,
+          null,
+          null,
+          null,
+          80,
+          230,
+          210,
+          45,
+          40,
+          390,
+          280,
+          720,
+          35,
+          40,
+          25,
+          30,
+          45,
+          120,
+          160,
+          690,
+          710,
+          80,
+          35,
+          250,
+          130,
+          220,
+          40,
+          740,
+          35
+        ]
+      },
+      {
+        "id": "hotfix",
+        "type": "number",
+        "unit": "minutes",
+        "values": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          20,
+          35,
+          40,
+          60,
+          150,
+          200,
+          210,
+          190,
+          170,
+          120,
+          80,
+          60,
+          45,
+          35,
+          null,
+          null,
+          null
+        ]
+      }
+    ]
+  },
+  "encoding": {
+    "x": {
+      "column": "timestamp",
+      "scale": "time"
+    },
+    "y": {
+      "zero": true,
+      "label": "Minutes"
+    }
+  },
+  "series": [
+    {
+      "id": "main",
+      "mark": "line",
+      "y": "main",
+      "label": "main",
+      "point": false,
+      "role": "primary"
+    },
+    {
+      "id": "release",
+      "mark": "line",
+      "y": "release",
+      "label": "release",
+      "point": false,
+      "role": "comparison"
+    },
+    {
+      "id": "hotfix",
+      "mark": "line",
+      "y": "hotfix",
+      "label": "hotfix",
+      "point": false,
+      "role": "positive"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "merge-01",
+      "kind": "event-strip",
+      "at": "2026-09-02T06:00:00.000Z",
+      "label": "web-ui merge 1842",
+      "role": "negative"
+    },
+    {
+      "id": "merge-02",
+      "kind": "event-strip",
+      "at": "2026-09-02T12:00:00.000Z",
+      "label": "web-ui merge 1847",
+      "role": "negative"
+    },
+    {
+      "id": "merge-03",
+      "kind": "event-strip",
+      "at": "2026-09-02T15:00:00.000Z",
+      "label": "web-ui merge 1850",
+      "role": "negative"
+    },
+    {
+      "id": "merge-04",
+      "kind": "event-strip",
+      "at": "2026-09-02T21:00:00.000Z",
+      "label": "web-ui merge 1854",
+      "role": "negative"
+    },
+    {
+      "id": "merge-05",
+      "kind": "event-strip",
+      "at": "2026-09-03T00:00:00.000Z",
+      "label": "web-ui merge 1858",
+      "role": "negative"
+    },
+    {
+      "id": "merge-06",
+      "kind": "event-strip",
+      "at": "2026-09-03T12:00:00.000Z",
+      "label": "web-ui merge 1864",
+      "role": "negative"
+    },
+    {
+      "id": "merge-07",
+      "kind": "event-strip",
+      "at": "2026-09-03T15:00:00.000Z",
+      "label": "web-ui merge 1865",
+      "role": "negative"
+    },
+    {
+      "id": "merge-08",
+      "kind": "event-strip",
+      "at": "2026-09-03T18:00:00.000Z",
+      "label": "web-ui merge 1869",
+      "role": "negative"
+    },
+    {
+      "id": "merge-09",
+      "kind": "event-strip",
+      "at": "2026-09-03T21:00:00.000Z",
+      "label": "web-ui merge 1871",
+      "role": "negative"
+    },
+    {
+      "id": "merge-10",
+      "kind": "event-strip",
+      "at": "2026-09-04T00:00:00.000Z",
+      "label": "web-ui merge 1873",
+      "role": "negative"
+    },
+    {
+      "id": "merge-11",
+      "kind": "event-strip",
+      "at": "2026-09-04T03:00:00.000Z",
+      "label": "web-ui merge 1876",
+      "role": "negative"
+    },
+    {
+      "id": "merge-12",
+      "kind": "event-strip",
+      "at": "2026-09-04T06:00:00.000Z",
+      "label": "web-ui merge 1880",
+      "role": "negative"
+    },
+    {
+      "id": "merge-13",
+      "kind": "event-strip",
+      "at": "2026-09-04T09:00:00.000Z",
+      "label": "web-ui merge 1884",
+      "role": "negative"
+    },
+    {
+      "id": "merge-14",
+      "kind": "event-strip",
+      "at": "2026-09-04T15:00:00.000Z",
+      "label": "web-ui merge 1889",
+      "role": "negative"
+    }
+  ],
+  "interactions": {
+    "tooltip": "auto",
+    "legend_toggle": true,
+    "brush": "x"
+  },
+  "cards": [
+    {
+      "title": "What to inspect",
+      "items": [
+        "The top-edge strip records every authored web-ui merge event.",
+        "Duration spikes can be compared against the shared event timeline without implying causation."
+      ]
+    }
+  ]
+}

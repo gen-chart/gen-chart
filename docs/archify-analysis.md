@@ -311,5 +311,5 @@ chart must be regenerated or verified from that source before the card is
 published. A card is therefore not merely a screenshot-like example; it is a
 small executable lesson in the skill's real workflow.
 
-The implementation plan is in
-[`INTERACTIVE-GALLERY-INSTRUCTION-PAGE-PLAN.md`](INTERACTIVE-GALLERY-INSTRUCTION-PAGE-PLAN.md).
+The shipped implementation is documented in the project roadmap and generated
+gallery manifest.

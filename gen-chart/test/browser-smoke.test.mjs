@@ -5,20 +5,24 @@
 // behavior: no uncaught errors, a positioned tooltip, working keyboard
 // navigation, valid export blobs, and containment on a phone viewport.
 //
-// Skips (rather than fails) when no browser is available, so CI without
-// Chrome stays green; GEN_CHART_CHROME overrides discovery.
+// Runs automatically in CI and only by explicit opt-in locally, so a routine
+// `npm test` never launches the user's installed desktop browser. Set
+// GEN_CHART_BROWSER_TESTS=1 locally; GEN_CHART_CHROME overrides discovery.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, readdirSync, openSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, readdirSync, openSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { findChrome } from '../renderers/shared/visual-check.mjs';
 
-const chrome = findChrome();
-const skip = chrome ? false : 'no Chrome/Chromium found';
+const browserTestsEnabled = process.env.CI === 'true' || process.env.GEN_CHART_BROWSER_TESTS === '1';
+const chrome = browserTestsEnabled ? findChrome() : null;
+const skip = !browserTestsEnabled
+  ? 'set GEN_CHART_BROWSER_TESTS=1 to run real-browser tests locally'
+  : (chrome ? false : 'no Chrome/Chromium found');
 const examplesDir = fileURLToPath(new URL('../examples/', import.meta.url));
 const galleryPage = fileURLToPath(new URL('../../docs/index.html', import.meta.url));
 const SPEC_RE = /\.(cartesian|distribution|proportion|matrix)\.json$/;
@@ -47,6 +51,7 @@ window.addEventListener('load', function () {
   try {
     dom = execFileSync(chrome, [
       '--headless=new', '--disable-gpu', '--hide-scrollbars',
+      '--no-first-run', '--no-default-browser-check', '--no-error-dialogs',
       '--no-sandbox', '--disable-dev-shm-usage',
       `--window-size=${width},${height}`, `--virtual-time-budget=${budget}`,
       '--dump-dom', `file://${probePath}${query}${hash}`
@@ -56,12 +61,15 @@ window.addEventListener('load', function () {
   }
   const m = /data-probe="([^"]+)"/.exec(dom);
   if (!m) {
-    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true, query, hash });
     let err = '';
     try { err = readFileSync(stderrPath, 'utf8').trim().split('\n').slice(-6).join(' | '); } catch {}
+    rmSync(dir, { recursive: true, force: true });
+    if (!retried) return run(htmlPath, script, { width, height, budget: budget * 3, retried: true, query, hash });
     assert.fail(`probe never ran for ${htmlPath} (budget ${budget}ms). ${crash} chrome stderr: ${err || '(empty)'}`);
   }
-  return JSON.parse(m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'));
+  const result = JSON.parse(m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'));
+  rmSync(dir, { recursive: true, force: true });
+  return result;
 }
 
 const HOVER_PROBE = `async function () {
