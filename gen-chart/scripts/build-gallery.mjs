@@ -384,6 +384,13 @@ export function buildGalleryStage(stage, {
 
 export function commitStagedDocs(stage, target) {
   mkdirSync(dirname(target), { recursive: true });
+  if (existsSync(target)) {
+    for (const entry of readdirSync(target, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith('.md') && !existsSync(join(stage, entry.name))) {
+        copyFileSync(join(target, entry.name), join(stage, entry.name));
+      }
+    }
+  }
   let backup = null;
   let oldMoved = false;
   if (existsSync(target)) {

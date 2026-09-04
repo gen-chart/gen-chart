@@ -60,16 +60,18 @@ test('committed gallery manifest binds prompts, sources, artifacts, and page car
   assert.doesNotMatch(page, /class="prompt-details"/);
 });
 
-test('transactional docs commit replaces the whole tree, including stale files', () => {
+test('transactional docs commit replaces generated files and preserves authored Markdown', () => {
   const parent = mkdtempSync(join(tmpdir(), 'gen-chart-gallery-'));
   const target = join(parent, 'docs');
   const stage = join(parent, 'stage');
   mkdirSync(target);
   mkdirSync(stage);
   writeFileSync(join(target, 'stale.txt'), 'old');
+  writeFileSync(join(target, 'README.zh-CN.md'), 'authored');
   writeFileSync(join(stage, 'index.html'), 'new');
   commitStagedDocs(stage, target);
   assert.equal(readFileSync(join(target, 'index.html'), 'utf8'), 'new');
+  assert.equal(readFileSync(join(target, 'README.zh-CN.md'), 'utf8'), 'authored');
   assert.equal(existsSync(join(target, 'stale.txt')), false);
   assert.equal(existsSync(stage), false);
 });
