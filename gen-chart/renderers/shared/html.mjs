@@ -93,6 +93,15 @@ function viewsHtml(payload, locale) {
     '<p class="gc-view-note" id="gc-view-note" aria-live="polite"></p>';
 }
 
+function transformNoteHtml(payload, locale) {
+  const density = payload.pointDensity;
+  if (!density) return '';
+  return `<p class="gc-legend-note">${escapeXml(t(locale, 'note.point-density', {
+    rendered: density.renderedPoints,
+    source: density.sourcePoints
+  }))}</p>`;
+}
+
 function paletteOptionsHtml(locale, colorCount, ids, defaultPalette) {
   return ids.map((id) => {
     const colors = Object.hasOwn(SIGN_PALETTES, id)
@@ -151,7 +160,7 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     .replace('  {{VIEWS}}', views ? `  ${views}` : '')
     .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale, colorCount, availablePaletteIds, defaultPalette))
     .replace('{{SVG}}', svg)
-    .replace('{{LEGEND}}', legendHtml(legend, locale))
+    .replace('{{LEGEND}}', legendHtml(legend, locale) + transformNoteHtml(payload, locale))
     .replace('{{DATA_TABLE}}', tableHtml(payload, locale))
     .replace('{{CARDS_BLOCK}}', cardsHtml(spec))
     .replace('{{PAYLOAD}}', payloadJson);

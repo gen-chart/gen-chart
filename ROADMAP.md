@@ -31,7 +31,9 @@ subject, measured evidence, and a closed set of supported fixes:
 - directional colour roles rejected over mixed-sign data
 - range bands require an explicit meaning, paired bounds, and lower ≤ upper
 - horizontal diverging bars require one unstacked signed series, a shared zero baseline, and sign-stable semantic colors
-- scatter and bubble plots warn above 2,000 visible points, before overplotting hides the distribution
+- scatter and bubble plots warn above 2,000 visible points, and can
+  deterministically downsample only the rendered marks while retaining every
+  source row
 - sequential heatmap ramps reject negatives; diverging ramps require a midpoint
 
 **Composition checks.** Tick collision (rotate → thin → fail), annotation
@@ -80,9 +82,9 @@ Roughly in the order they would earn their place.
 - **Dual axes.** Currently unsupported, which `guide` explains. Supporting
   them honestly means requiring distinct units, per-axis legend labelling,
   and refusing the alignment tricks that manufacture a correlation.
-- **Point-density transforms.** The deterministic 2,000-point warning ships;
-  renderer-side downsampling or aggregation remains future work and must
-  disclose its method while preserving the source rows for provenance.
+- **Point-density aggregation.** Deterministic renderer-side downsampling now
+  ships; meaningful binning or grouping remains future work for cases where a
+  sampled point cloud still cannot communicate the distribution.
 - **Trend annotations.** If a fitted line is ever added, it must be computed
   deterministically, labelled with its method, and never implied to be data.
 

@@ -325,6 +325,17 @@
         }
       }
     },
+    "transforms": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "point_density": {
+          "enum": [
+            "downsample"
+          ]
+        }
+      }
+    },
     "cards": {
       "$ref": "common.schema.json#/$defs/cards"
     },

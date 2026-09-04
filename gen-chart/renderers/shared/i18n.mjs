@@ -52,6 +52,7 @@ const STRINGS = {
     'note.histogram': '{n} observations in {bins} bins (Freedman-Diaconis suggested {suggested})',
     'note.matrix': '{rows} × {cols} grid, {kind} scale in {buckets} buckets',
     'note.horizontal-value-labels': 'Bar-end values are available in tooltips and the data table because they do not fit without overlap.',
+    'note.point-density': 'Showing {rendered} of {source} visible points using deterministic systematic row-order sampling. The data table and CSV retain all source rows.',
     'scale.sequential': 'sequential',
     'scale.diverging': 'diverging',
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -104,6 +105,7 @@ const STRINGS = {
     'note.histogram': '{n} 个观测值分为 {bins} 个区间（Freedman-Diaconis 建议 {suggested} 个）',
     'note.matrix': '{rows} × {cols} 网格，{kind}色阶，{buckets} 个分段',
     'note.horizontal-value-labels': '条形末端数值无法在不重叠的情况下排版，可在提示和数据表中查看。',
+    'note.point-density': '使用确定性的系统行顺序抽样显示 {source} 个可见数据点中的 {rendered} 个。数据表和 CSV 保留全部源数据行。',
     'scale.sequential': '连续',
     'scale.diverging': '发散',
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
@@ -137,7 +139,9 @@ export function templateStrings(locale) {
   const table = STRINGS[resolveLocale(locale)];
   const out = {};
   for (const key of Object.keys(table)) {
-    if (key === 'months') continue;
+    // Point-density disclosure is rendered into HTML on the server and does
+    // not need to enlarge every chart's viewer payload.
+    if (key === 'months' || key === 'note.point-density') continue;
     out[key] = t(locale, key);
   }
   return out;
