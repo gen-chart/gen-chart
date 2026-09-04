@@ -9,6 +9,8 @@ import { findChrome } from '../renderers/shared/visual-check.mjs';
 
 const cli = fileURLToPath(new URL('../bin/gen-chart.mjs', import.meta.url));
 const example = fileURLToPath(new URL('../examples/mau-trend.cartesian.json', import.meta.url));
+const browserTestsEnabled = process.env.CI === 'true' || process.env.GEN_CHART_BROWSER_TESTS === '1';
+const browserTestChrome = browserTestsEnabled ? findChrome() : null;
 
 function run(args) {
   return execFileSync(process.execPath, [cli, ...args], { encoding: 'utf8' });
@@ -30,7 +32,11 @@ test('help prints the command surface', () => {
   assert.match(out, /--preview png/);
 });
 
-test('deliver --preview png writes a sibling static image from the accepted HTML', { skip: findChrome() ? false : 'no Chrome/Chromium found' }, () => {
+test('deliver --preview png writes a sibling static image from the accepted HTML', {
+  skip: !browserTestsEnabled
+    ? 'set GEN_CHART_BROWSER_TESTS=1 to run real-browser tests locally'
+    : (browserTestChrome ? false : 'no Chrome/Chromium found')
+}, () => {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
   const out = join(dir, 'chart.html');
   const r = JSON.parse(run(['deliver', 'cartesian', example, out, '--quality', 'showcase', '--preview', 'png', '--json']));

@@ -60,12 +60,15 @@ diagnostic catalog, or repair rules.
   direction half the values contradict. An all-positive column under a
   `negative` role is fine — churn is a positive number that means something
   bad.
-- `annotations[]`: `kind: "x-line"` (at = category string, ISO date, or
-  number matching the x scale) or `"y-line"` (at = number inside the y
-  domain). Out-of-domain annotations are dropped with a warning.
+- `annotations[]`: up to 64 authored annotations. Use `kind: "x-line"`
+  (at = category string, ISO date/timestamp, or number matching the x scale),
+  `"y-line"` (at = number inside the y domain), or `"event-strip"` for a
+  compact top-edge event marker. Each may carry an optional semantic `role`;
+  event strips use `label` as their accessible event description.
+  Out-of-domain annotations are dropped with a warning.
 - `data.columns[].values`: numbers-or-null for `number`, ISO strings for
   `date` (one granularity, strictly increasing), non-empty strings for
-  `string`. All columns share one length. Max 5000 rows, 12 columns.
+  `string`. All columns share one length. Max 5000 rows, 16 columns.
 - `meta.width` 640–1600, `meta.height` 360–1200 (default 960×520).
 - `interactions`: `tooltip: "auto" | "off"`, `legend_toggle: boolean`
   (default true), `brush: "x"` (opt-in zoom; line/range marks over time/linear x
@@ -148,7 +151,7 @@ diagnostic catalog, or repair rules.
 | `honesty/percent-zero-total` | error | a position sums to zero and cannot be normalised |
 | `composition/percent-hides-total` | warning | normalising conceals a shifting denominator |
 | `composition/adjacent-color` | error | touching segments are perceptually confusable (CIEDE2000) |
-| `composition/series-count` | warning | more than 5 series |
+| `composition/series-count` | warning | more than 9 series |
 | `composition/x-tick-thinned` | warning | labels rotated + thinned to fit |
 | `composition/x-tick-overflow` | error | labels cannot fit at all |
 | `composition/diverging-one-sided` | warning | requested sign coloring contains no positive or no negative observations |

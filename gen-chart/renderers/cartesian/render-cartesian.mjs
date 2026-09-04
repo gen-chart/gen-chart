@@ -811,9 +811,9 @@ export function analyzeCartesian(spec) {
     }
   }
 
-  if (spec.series.length > 5) {
+  if (spec.series.length > 9) {
     diagnostics.push(diag('composition/series-count', 'warning', '/series',
-      `${spec.series.length} series compete for attention; more than 5 usually buries the message`, {
+      `${spec.series.length} series compete for attention; more than 9 usually buries the message`, {
         evidence: { count: spec.series.length },
         supportedFixes: ['drop secondary series', 'split into two charts', 'move detail into cards']
       }));
@@ -1379,12 +1379,19 @@ export function renderSvg(spec, analysis) {
     for (const a of annotations) {
       if (a.kind === 'x-line') {
         const x = round(a.x);
-        out.push(`<line data-ox="${x}" x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}"/>`);
-        if (a.label) out.push(`<text data-ox="${x}" x="${x + 5}" y="${plotTop + 11}" text-anchor="start">${escapeXml(a.label)}</text>`);
+        const style = a.role ? ` style="--annotation-color:${roleColor(a.role)}"` : '';
+        out.push(`<line data-ox="${x}" x1="${x}" y1="${plotTop}" x2="${x}" y2="${plotBottom}"${style}/>`);
+        if (a.label) out.push(`<text data-ox="${x}" x="${x + 5}" y="${plotTop + 11}" text-anchor="start"${style}>${escapeXml(a.label)}</text>`);
+      } else if (a.kind === 'event-strip') {
+        const x = round(a.x);
+        const label = a.label ?? a.id;
+        const color = roleColor(a.role ?? 'highlight');
+        out.push(`<g class="gc-event-strip" role="img" aria-label="${escapeXml(label)}" style="--event-color:${color}"><rect data-ox="${x}" x="${x - 3}" y="${plotTop}" width="6" height="9" rx="1"/><title>${escapeXml(label)}</title></g>`);
       } else {
         const y = round(a.y);
-        out.push(`<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}"/>`);
-        if (a.label) out.push(`<text x="${plotRight - 4}" y="${y - 5}" text-anchor="end">${escapeXml(a.label)}</text>`);
+        const style = a.role ? ` style="--annotation-color:${roleColor(a.role)}"` : '';
+        out.push(`<line x1="${plotLeft}" y1="${y}" x2="${plotRight}" y2="${y}"${style}/>`);
+        if (a.label) out.push(`<text x="${plotRight - 4}" y="${y - 5}" text-anchor="end"${style}>${escapeXml(a.label)}</text>`);
       }
     }
     out.push('</g>');

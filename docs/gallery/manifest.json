@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": "gen-chart/scripts/build-gallery.mjs",
   "generatorVersion": "0.9.0",
-  "entryCount": 15,
+  "entryCount": 17,
   "entries": [
     {
       "id": "build-times",
@@ -19,11 +19,11 @@
       "artifact": "gallery/build-times.html",
       "bytes": {
         "source": 1234,
-        "artifact": 67334
+        "artifact": 67733
       },
       "sha256": {
         "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
-        "artifact": "a097c44c3110f32a045761fd8b34e69e26c14d0be9a9ccc2a22bc0fd8a8d102b"
+        "artifact": "72944599a82bd3814ed8b5d81081f2aa2c84d4fc1e79ce9fe19a773be2969d64"
       },
       "validation": {
         "quality": "showcase",
@@ -47,11 +47,11 @@
       "artifact": "gallery/deploy-outcomes.html",
       "bytes": {
         "source": 1449,
-        "artifact": 67775
+        "artifact": 68174
       },
       "sha256": {
         "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
-        "artifact": "00522eaa89151721752deedec6fb008fd706e23690b94680ea0d98972e4e863a"
+        "artifact": "31071392b690db7084c8d1fa16f93f6a79bbfa5813946490ca00827f260efedc"
       },
       "validation": {
         "quality": "showcase",
@@ -76,11 +76,11 @@
       "artifact": "gallery/forecast-range.html",
       "bytes": {
         "source": 2208,
-        "artifact": 68566
+        "artifact": 68965
       },
       "sha256": {
         "source": "8ae738c37600ad72613959dc447294a15ce9e9f6e104765e2df8055519772046",
-        "artifact": "f49d3ba059287e95255848021e6c73ea27563408bc8651586954d958ab92725a"
+        "artifact": "efb7d59b6da5a673142c84a4679530e3f315dde8bb4e29a0c0e75adc558dea72"
       },
       "validation": {
         "quality": "showcase",
@@ -103,11 +103,11 @@
       "artifact": "gallery/latency-distribution.html",
       "bytes": {
         "source": 848,
-        "artifact": 68325
+        "artifact": 68724
       },
       "sha256": {
         "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
-        "artifact": "c8b67002f7abe45dedfb1035a7ca49ec372390692c0da537157581e9da339e1c"
+        "artifact": "fc8d70e81c64135b03ba0b0feedf1360dfdc9db938a1999a4789865324ac5f8c"
       },
       "validation": {
         "quality": "showcase",
@@ -132,11 +132,67 @@
       "artifact": "gallery/mau-trend.html",
       "bytes": {
         "source": 2710,
-        "artifact": 69974
+        "artifact": 70373
       },
       "sha256": {
         "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
-        "artifact": "a6f2b7c8c7ad1e8c10dee172d1d0d6116e8b3f3e07322a58ce7e477afbfa3444"
+        "artifact": "d0f9147b3c9ff5449dca9d4d4930423e0fabe101d53a4ede7bfb5bb50a0f1ae2"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "observability-errors-by-version",
+      "title": "Dataviz error count by version with web-ui deployment events",
+      "question": "Do application error spikes align with deployment events?",
+      "family": "cartesian",
+      "marks": [
+        "line",
+        "brush zoom"
+      ],
+      "featured": false,
+      "prompt": "Use gen-chart to plot error counts by application version with deployment events overlaid. Keep all nine authored versions and use vertical stems with compact top-edge deployment markers. Use the intraday UTC timeline, legend toggling, and x-axis brush zoom without claiming causation.\n\n| timestamp | 35.13768234 (errors) | 35.13769661 (errors) | 35.13774006 (errors) | 35.13786505 (errors) | 35.13812235 (errors) | 35.13813899 (errors) | 35.13815196 (errors) | 35.13826381 (errors) | 35.13829174 (errors) |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| 2026-09-01T18:00:00.000Z | 420 | null | null | null | null | null | null | null | null |\n| 2026-09-01T21:00:00.000Z | 260 | null | null | null | null | null | null | null | null |\n| 2026-09-02T00:00:00.000Z | 70 | 60 | null | null | null | null | null | null | null |\n| 2026-09-02T03:00:00.000Z | 45 | 430 | null | null | null | null | null | null | null |\n| 2026-09-02T06:00:00.000Z | 110 | 440 | 80 | null | null | null | null | null | null |\n| 2026-09-02T09:00:00.000Z | 80 | 90 | 210 | null | null | null | null | null | null |\n| 2026-09-02T12:00:00.000Z | 140 | 120 | 520 | null | null | null | null | null | null |\n| 2026-09-02T15:00:00.000Z | 90 | 210 | 170 | 280 | null | null | null | null | null |\n| 2026-09-02T18:00:00.000Z | null | 70 | 55 | 90 | null | null | null | null | null |\n| 2026-09-02T21:00:00.000Z | null | 40 | 30 | 35 | null | null | null | null | null |\n| 2026-09-03T00:00:00.000Z | null | null | 20 | 2410 | 220 | null | null | null | null |\n| 2026-09-03T03:00:00.000Z | null | null | null | 55 | 350 | null | null | null | null |\n| 2026-09-03T06:00:00.000Z | null | null | null | 760 | 310 | 110 | null | null | null |\n| 2026-09-03T09:00:00.000Z | null | null | null | 110 | 460 | 240 | null | null | null |\n| 2026-09-03T12:00:00.000Z | null | null | null | null | 180 | 360 | null | null | null |\n| 2026-09-03T15:00:00.000Z | null | null | null | null | 240 | 610 | null | null | null |\n| 2026-09-03T18:00:00.000Z | null | null | null | null | 90 | 190 | null | null | null |\n| 2026-09-03T21:00:00.000Z | null | null | null | null | 35 | 520 | 260 | 170 | null |\n| 2026-09-04T00:00:00.000Z | null | null | null | null | null | 70 | 2830 | 2740 | null |\n| 2026-09-04T03:00:00.000Z | null | null | null | null | null | 20 | 1710 | 920 | null |\n| 2026-09-04T06:00:00.000Z | null | null | null | null | null | null | 160 | 90 | 40 |\n| 2026-09-04T09:00:00.000Z | null | null | null | null | null | null | 45 | 25 | 25 |\n| 2026-09-04T12:00:00.000Z | null | null | null | null | null | null | 20 | null | 80 |\n| 2026-09-04T15:00:00.000Z | null | null | null | null | null | null | null | null | 140 |\n| 2026-09-04T18:00:00.000Z | null | null | null | null | null | null | null | null | 55 |\n| 2026-09-04T21:00:00.000Z | null | null | null | null | null | null | null | null | 220 |\n| 2026-09-05T00:00:00.000Z | null | null | null | null | null | null | null | null | 75 |\n| 2026-09-05T03:00:00.000Z | null | null | null | null | null | null | null | null | 310 |\n| 2026-09-05T06:00:00.000Z | null | null | null | null | null | null | null | null | 60 |\n",
+      "promptSha256": "311a36571bbf6c175b38f3dae1bee4c5005be9f708287e3dbd6d78d37f94de20",
+      "source": "gallery/sources/observability-errors-by-version.cartesian.json",
+      "artifact": "gallery/observability-errors-by-version.html",
+      "bytes": {
+        "source": 10393,
+        "artifact": 84928
+      },
+      "sha256": {
+        "source": "0297ff8507f007a5f0275194837e1c150187e7e3fd44361bf861eb58395bbb08",
+        "artifact": "373cc62f8449acb5a58264a7850688772bd35e4c164e6b06abf92a709ee192b4"
+      },
+      "validation": {
+        "quality": "showcase",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    {
+      "id": "observability-ci-duration",
+      "title": "CI job max duration by branch with all web-ui merge events",
+      "question": "Do CI duration spikes align with web-ui merge activity?",
+      "family": "cartesian",
+      "marks": [
+        "line",
+        "brush zoom"
+      ],
+      "featured": false,
+      "prompt": "Use gen-chart to plot maximum CI job duration by branch with every authored web-ui merge event overlaid. Render merge events as a compact top-edge event strip over the intraday UTC timeline. Preserve every duration and event while describing temporal alignment without claiming causation.\n\n| timestamp | main (minutes) | release (minutes) | hotfix (minutes) |\n| --- | --- | --- | --- |\n| 2026-09-01T18:00:00.000Z | 20 | null | null |\n| 2026-09-01T21:00:00.000Z | 40 | null | null |\n| 2026-09-02T00:00:00.000Z | 55 | null | null |\n| 2026-09-02T03:00:00.000Z | 70 | null | null |\n| 2026-09-02T06:00:00.000Z | 120 | 80 | null |\n| 2026-09-02T09:00:00.000Z | 210 | 230 | null |\n| 2026-09-02T12:00:00.000Z | 35 | 210 | null |\n| 2026-09-02T15:00:00.000Z | 260 | 45 | null |\n| 2026-09-02T18:00:00.000Z | 25 | 40 | null |\n| 2026-09-02T21:00:00.000Z | 710 | 390 | null |\n| 2026-09-03T00:00:00.000Z | 40 | 280 | null |\n| 2026-09-03T03:00:00.000Z | 190 | 720 | null |\n| 2026-09-03T06:00:00.000Z | 30 | 35 | 20 |\n| 2026-09-03T09:00:00.000Z | 85 | 40 | 35 |\n| 2026-09-03T12:00:00.000Z | 120 | 25 | 40 |\n| 2026-09-03T15:00:00.000Z | 180 | 30 | 60 |\n| 2026-09-03T18:00:00.000Z | 210 | 45 | 150 |\n| 2026-09-03T21:00:00.000Z | 300 | 120 | 200 |\n| 2026-09-04T00:00:00.000Z | 45 | 160 | 210 |\n| 2026-09-04T03:00:00.000Z | 830 | 690 | 190 |\n| 2026-09-04T06:00:00.000Z | 650 | 710 | 170 |\n| 2026-09-04T09:00:00.000Z | 70 | 80 | 120 |\n| 2026-09-04T12:00:00.000Z | 40 | 35 | 80 |\n| 2026-09-04T15:00:00.000Z | 280 | 250 | 60 |\n| 2026-09-04T18:00:00.000Z | 190 | 130 | 45 |\n| 2026-09-04T21:00:00.000Z | 250 | 220 | 35 |\n| 2026-09-05T00:00:00.000Z | 50 | 40 | null |\n| 2026-09-05T03:00:00.000Z | 820 | 740 | null |\n| 2026-09-05T06:00:00.000Z | 45 | 35 | null |\n",
+      "promptSha256": "16b5572048dc7b3d73ca10599f155f704f78897e5ba054d7ee54b53ffcee6a2b",
+      "source": "gallery/sources/observability-ci-duration.cartesian.json",
+      "artifact": "gallery/observability-ci-duration.html",
+      "bytes": {
+        "source": 6526,
+        "artifact": 76838
+      },
+      "sha256": {
+        "source": "8bad215bfffd724414faba5f74d037ee1b3ecb622513968987c23d7a7390cf10",
+        "artifact": "3ebaf76c9d9cc03defa4169ed02751f556b0492f78556e139b6aaf61244cf7b2"
       },
       "validation": {
         "quality": "showcase",
@@ -160,11 +216,11 @@
       "artifact": "gallery/plan-mix.html",
       "bytes": {
         "source": 1370,
-        "artifact": 67388
+        "artifact": 67787
       },
       "sha256": {
         "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
-        "artifact": "09aa352079dcb82a236cdc8a7d5e0121b9fc7d8e8ae86998bad60fd62ca015d3"
+        "artifact": "e0b615bf8911a669058ae3217fba3a0636c2fba2c9b218147d03d15f522b794e"
       },
       "validation": {
         "quality": "showcase",
@@ -188,11 +244,11 @@
       "artifact": "gallery/request-growth.html",
       "bytes": {
         "source": 1192,
-        "artifact": 66183
+        "artifact": 66582
       },
       "sha256": {
         "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
-        "artifact": "85418ad814f3833efd86cf1f4844b3ee0ddb96385227a82de473fd8dd190d32a"
+        "artifact": "21086bb0a934db9449820f428f89d37524018ca864a52d8d848a9536203c3b3f"
       },
       "validation": {
         "quality": "showcase",
@@ -215,11 +271,11 @@
       "artifact": "gallery/revenue-by-region.html",
       "bytes": {
         "source": 998,
-        "artifact": 66661
+        "artifact": 67060
       },
       "sha256": {
         "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
-        "artifact": "1882f83bf5102a05dc360c1e7e6d96d3012e417435afbba5b5af941ac33e40fc"
+        "artifact": "5b12f352ad63cc3145b765f913e93412f2f15173e5082af245cadf5f908dc16c"
       },
       "validation": {
         "quality": "showcase",
@@ -243,11 +299,11 @@
       "artifact": "gallery/signups-vs-target.html",
       "bytes": {
         "source": 1126,
-        "artifact": 67842
+        "artifact": 68241
       },
       "sha256": {
         "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
-        "artifact": "36d42cd236a376c91e2d6cf42d9b77f78502dc86b082b8085dd7f6ebe7e0b57c"
+        "artifact": "2a2d3ed020f69bfc8fb36675b8e1efbcd2c05493b7789c4333b3459dedaab61d"
       },
       "validation": {
         "quality": "showcase",
@@ -270,11 +326,11 @@
       "artifact": "gallery/service-memory-change.html",
       "bytes": {
         "source": 2445,
-        "artifact": 82381
+        "artifact": 82780
       },
       "sha256": {
         "source": "4d0c43f18e6ec4c7f0c99d067a5a68e16ee57317713d08f9244b0e7ba17c0fff",
-        "artifact": "c0625f8a5612f0b230f514e727c765a05cd7188ad3e1811c47db5fef6d9501ff"
+        "artifact": "fece8a7d9ba756431346765318f00a1c8b0ec612f755e0c60849e4c9ee8cf738"
       },
       "validation": {
         "quality": "showcase",
@@ -298,11 +354,11 @@
       "artifact": "gallery/storage-mix.html",
       "bytes": {
         "source": 1806,
-        "artifact": 67774
+        "artifact": 68173
       },
       "sha256": {
         "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
-        "artifact": "df1f1a1af17c78e80038b41dc1a9e410679c95584d5a9f388ab18f7a9d034c01"
+        "artifact": "1e3d0a0ead19aa04b4a0e08aaa1c83c6de46f462dac90616022a4376e5316ee3"
       },
       "validation": {
         "quality": "showcase",
@@ -326,11 +382,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 74363
+        "artifact": 74762
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "ce3a91d68bf0acc0c5a6d1cc86e9e26cef3331ddc30c6cf77049fe8240b113df"
+        "artifact": "6150a36163ffc8d49cd1aeaa9d779c23b34e83017186711371150208bb1a2265"
       },
       "validation": {
         "quality": "showcase",
@@ -353,11 +409,11 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 68128
+        "artifact": 68527
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "164bafc65568f0c82864507f37ee8afcf3e311f8fe9bad41c203205a78e7ba0a"
+        "artifact": "9d4e60cb17e4d3f26f70dd41100e7453a8db3d0e2a3941c12eda51eee2e0ed08"
       },
       "validation": {
         "quality": "showcase",
@@ -380,11 +436,11 @@
       "artifact": "gallery/venue-performance.html",
       "bytes": {
         "source": 1383,
-        "artifact": 67303
+        "artifact": 67702
       },
       "sha256": {
         "source": "8b6308c2d4d232a1e97fbe3458891d51f7656e4610634e1820b26b795f4312bd",
-        "artifact": "9d43e63f37324201aca8d07332b1827694fc45a514a861f95f131f19180e5f67"
+        "artifact": "55d6705461ee8d365f675a4aefd5d1c8a4575e7cf5a7c6d0f63a297d967cdd90"
       },
       "validation": {
         "quality": "showcase",
@@ -407,11 +463,11 @@
       "artifact": "gallery/zh-revenue.html",
       "bytes": {
         "source": 1100,
-        "artifact": 66538
+        "artifact": 66937
       },
       "sha256": {
         "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
-        "artifact": "cd08f7ea9b883135c7dcf63e03d3b9148644d277449a99f6268581cc344d0a07"
+        "artifact": "1066f922bdf004a8f8d6d2c5c26506a11cdbc420dc733400110b41d90fed89d9"
       },
       "validation": {
         "quality": "showcase",

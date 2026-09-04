@@ -29,13 +29,25 @@ test('band scale centers are evenly spaced and inside the range', () => {
   for (const g of gaps) assert.ok(Math.abs(g - gaps[0]) < 1e-9);
 });
 
-test('date parsing accepts the three ISO granularities and rejects junk', () => {
+test('date parsing accepts ISO calendar granularities and UTC timestamps and rejects junk', () => {
   assert.equal(parseDateValue('2026').granularity, 'year');
   assert.equal(parseDateValue('2026-02').granularity, 'month');
   assert.equal(parseDateValue('2026-02-28').granularity, 'day');
+  assert.equal(parseDateValue('2026-02-28T09:30:00Z').granularity, 'minute');
+  assert.equal(parseDateValue('2026-02-28T09:30:00.250Z').ms, Date.UTC(2026, 1, 28, 9, 30, 0, 250));
   assert.equal(parseDateValue('2026-13'), null);
   assert.equal(parseDateValue('2026-02-30'), null);
+  assert.equal(parseDateValue('2026-02-28T25:00:00Z'), null);
+  assert.equal(parseDateValue('2026-02-28T09:30:00+01:00'), null);
   assert.equal(parseDateValue('Feb 2026'), null);
+});
+
+test('time ticks over an intraday domain choose a bounded UTC hour interval', () => {
+  const min = parseDateValue('2026-09-01T18:00:00Z').ms;
+  const max = parseDateValue('2026-09-05T06:00:00Z').ms;
+  const t = timeTicks(min, max, 'minute');
+  assert.equal(t.unit, 'hour');
+  assert.ok(t.ticks.length >= 3 && t.ticks.length <= 8);
 });
 
 test('time ticks over a year of months pick a bounded month interval', () => {

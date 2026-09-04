@@ -15,7 +15,7 @@ function specFor(entry) {
 
 test('gallery registry has exact one-to-one coverage and one featured case', () => {
   assert.doesNotThrow(() => validateGalleryRegistry(GALLERY_CASES, examplesDir));
-  assert.equal(GALLERY_CASES.length, 15);
+  assert.equal(GALLERY_CASES.length, 17);
   assert.equal(GALLERY_CASES.filter((entry) => entry.featured).length, 1);
 });
 

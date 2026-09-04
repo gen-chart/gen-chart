@@ -26,6 +26,7 @@ test('date formatting respects granularity and year flag', () => {
   assert.equal(fmtDate(m, 'month', { withYear: true }), 'Feb 2026');
   assert.equal(fmtDate(parseDateValue('2026-02-28').ms, 'day', { withYear: true }), 'Feb 28, 2026');
   assert.equal(fmtDate(parseDateValue('2026').ms, 'year'), '2026');
+  assert.equal(fmtDate(parseDateValue('2026-02-28T09:30:00Z').ms, 'minute', { withYear: true }), 'Feb 28, 2026 09:30 UTC');
 });
 
 test('xml escaping covers markup-significant characters', () => {

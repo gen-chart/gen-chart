@@ -171,8 +171,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
 .gc-legend button[disabled] { cursor: default; opacity: 1; }
 .gc-series.gc-off { display: none; }
 .gc-series.gc-dim { opacity: 0.22; }
-.gc-annotations line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }
-.gc-annotations text { fill: var(--muted); font-size: 10.5px; font-family: inherit; }
+.gc-annotations line { stroke: var(--annotation-color, var(--muted)); stroke-width: 1; stroke-dasharray: 4 3; }
+.gc-annotations text { fill: var(--annotation-color, var(--muted)); font-size: 10.5px; font-family: inherit; }
+.gc-annotations .gc-event-strip rect { fill: var(--event-color); stroke: none; }
 .gc-annotations [data-gone] { display: none; }
 .gc-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 2 3; }
 .gc-hover-dot { fill: var(--sc); stroke: var(--bg); stroke-width: 1.5; }
@@ -514,6 +515,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
       var inside = nx >= plot.left - 0.5 && nx <= plot.right + 0.5;
       el.toggleAttribute('data-gone', !inside);
       if (el.tagName === 'line') { el.setAttribute('x1', nx); el.setAttribute('x2', nx); }
+      else if (el.tagName === 'rect') el.setAttribute('x', nx - 3);
       else el.setAttribute('x', nx + 5);
     });
     rebuildXTicks();
@@ -835,8 +837,9 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '.gc-series rect{fill:var(--sc)}' +
     '.gc-line{fill:none;stroke:var(--sc);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}' +
     '.gc-point{fill:var(--sc)}' +
-    '.gc-annotations line{stroke:var(--muted);stroke-dasharray:4 3}' +
-    '.gc-annotations text{fill:var(--muted);font-size:10.5px}' +
+    '.gc-annotations line{stroke:var(--annotation-color,var(--muted));stroke-dasharray:4 3}' +
+    '.gc-annotations text{fill:var(--annotation-color,var(--muted));font-size:10.5px}' +
+    '.gc-annotations .gc-event-strip rect{fill:var(--event-color);stroke:none}' +
     '.gc-dot{fill:var(--sc);fill-opacity:.78}.gc-bin{fill:var(--sc)}' +
     '.gc-area{fill:var(--sc);fill-opacity:.55;stroke:var(--sc);stroke-width:1.5;stroke-linejoin:round}' +
     '.gc-range{fill:var(--sc);fill-opacity:.2;stroke:var(--sc);stroke-opacity:.65;stroke-width:1;stroke-linejoin:round}' +
@@ -893,6 +896,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
         var ox = Number(el.getAttribute('data-ox'));
         el.removeAttribute('data-gone');
         if (el.tagName === 'line') { el.setAttribute('x1', ox); el.setAttribute('x2', ox); }
+        else if (el.tagName === 'rect') el.setAttribute('x', ox - 3);
         else el.setAttribute('x', ox + 5);
       });
     }

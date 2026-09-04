@@ -1,3 +1,5 @@
+English · [简体中文](docs/README.zh-CN.md)
+
 # gen-chart
 
 **Turn data, a description, or a pasted table into a polished, interactive chart — directly in chat.**
@@ -13,9 +15,9 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
 ![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-203-0891b2?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-226-0891b2?style=flat-square)
 
-**[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
+**[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[中文路线图](docs/ROADMAP.zh-CN.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
 The project page is also the quickest start: choose Cursor, Codex, Claude Code, or
 OpenCode, copy the matching install command, then use any verified example to
@@ -170,12 +172,12 @@ Validation caps a pie at 7 slices, so instead of quietly producing an unreadable
 
 ## Choose the right chart
 
-| Family           | Marks                                                    | Best for                                   | Include in your prompt              |
-| ---------------- | -------------------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| Family           | Marks                                                                   | Best for                                                   | Include in your prompt                 |
+| ---------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------- |
 | **Cartesian**    | line, bar, grouped, stacked, 100%-stacked, area, range, scatter, bubble | trends, comparisons, composition, uncertainty, correlation | x, y or bounds, series, unit, and size |
-| **Distribution** | histogram, boxplot                                       | spread, outliers, shape                    | the raw observations, not a summary |
-| **Proportion**   | pie, donut                                               | parts of a whole (max 7)                   | the categories and their values     |
-| **Matrix**       | heatmap                                                  | two categories × intensity                 | rows, columns, and the value        |
+| **Distribution** | histogram, boxplot                                                      | spread, outliers, shape                                    | the raw observations, not a summary    |
+| **Proportion**   | pie, donut                                                              | parts of a whole (max 7)                                   | the categories and their values        |
+| **Matrix**       | heatmap                                                                 | two categories × intensity                                 | rows, columns, and the value           |
 
 Not sure? Ask the router — it also argues against bad fits:
 
@@ -183,7 +185,21 @@ Not sure? Ask the router — it also argues against bad fits:
 node bin/gen-chart.mjs guide "composition of accounts by plan tier over time" --json
 ```
 
-Scales are linear, time, band, and logarithmic. Distribution charts take **raw observations**: the renderer computes bins, quartiles, and Tukey fences itself, then states on the chart what it computed.
+Scales are linear, time, band, and logarithmic. Time scales accept UTC ISO
+timestamps as well as year, month, and day calendar values. Distribution
+charts take **raw observations**: the renderer computes bins, quartiles, and
+Tukey fences itself, then states on the chart what it computed.
+
+Cartesian charts can overlay authored operational events. Use labelled
+`x-line` annotations for important deployments or alerts, and `event-strip`
+annotations for a compact top-edge event lane. Both stay aligned during brush
+zoom and in canonical exports; event strips accept an optional semantic color
+role and accessible label.
+
+Local `npm test` runs without launching an installed desktop browser. Set
+`GEN_CHART_BROWSER_TESTS=1` to opt into the real-Chrome smoke and PNG tests;
+they run automatically in CI when Chrome is available. Explicit headless
+launches suppress first-run, default-browser, and error-dialog UI.
 
 ## What it refuses
 
@@ -206,14 +222,14 @@ Plus composition checks for tick collisions, annotation overlap, point density, 
 
 ## How it works
 
-| Step         | What happens                                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| **Route**    | `guide` picks the family from your question, or argues for a better one                                                    |
-| **Profile**  | `inspect-data` returns typed column profiles, so numbers are never retyped from memory                                     |
-| **Author**   | The agent writes a typed JSON spec with your data embedded verbatim                                                        |
-| **Validate** | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts                        |
-| **Deliver**  | Renders, checks, and atomically commits interactive HTML plus an optional PNG chat preview with SHA-256 receipts            |
-| **Verify on request** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                     |
+| Step                  | What happens                                                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Route**             | `guide` picks the family from your question, or argues for a better one                                          |
+| **Profile**           | `inspect-data` returns typed column profiles, so numbers are never retyped from memory                           |
+| **Author**            | The agent writes a typed JSON spec with your data embedded verbatim                                              |
+| **Validate**          | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts              |
+| **Deliver**           | Renders, checks, and atomically commits interactive HTML plus an optional PNG chat preview with SHA-256 receipts |
+| **Verify on request** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                    |
 
 For the fast default path, run `deliver` directly—it performs showcase
 validation before atomically writing the HTML. Use `validate` separately only
@@ -252,7 +268,7 @@ Everything below is already in the file — no extra authoring:
 
 Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush=`, `#view=`. The HTML toolbar includes a Color picker for Classic, Cool, Warm, and Primary palettes; an explicit choice recolors every displayed series in order, including role-authored series and heatmap buckets. Charts with up to three colors use the palette's three-color set; larger charts and heatmaps use all six. Exports capture the selected theme and palette on the canonical chart at rest — hover, dimming, and zoom never leak into them.
 
-**Accessibility.** Every chart carries a visually hidden data table with the exact values, keyboard walking for every family with live-region announcements, non-colour state cues, and semantic-role and heatmap colors checked against WCAG AA in both themes. Selectable categorical palette hardening remains tracked in the feature plan. Below 700px the chart holds a legible minimum width and scrolls inside its own panel rather than shrinking its type.
+**Accessibility.** Every chart carries a visually hidden data table with the exact values, keyboard walking for every family with live-region announcements, non-colour state cues, and semantic-role and heatmap colors checked against WCAG AA in both themes. Selectable categorical palette hardening remains tracked in the roadmap. Below 700px the chart holds a legible minimum width and scrolls inside its own panel rather than shrinking its type.
 
 ## Why gen-chart
 
@@ -260,7 +276,7 @@ Deep links restore state: `#theme=`, `#palette=`, `#focus=`, `#hidden=`, `#brush
 - **Failures come with a repair receipt** — a stable code, the exact subject path, measured evidence, and only the fixes that will work, instead of a stack trace.
 - **Provenance survives** — the CSV export is the exact embedded data, so a reader can rebuild the chart from the artifact.
 - **Hand-rolled SVG, zero runtime dependencies** — byte-stable golden output and validation that understands the chart are only possible when we own the geometry.
-- **Verified, not asserted** — 203 tests, including real-browser suites, WCAG AA contrast maths, and CIEDE2000 checked against published test vectors. CI runs everything on Node 22 and 24, then proves the package builds byte-identically and runs standalone when extracted.
+- **Verified, not asserted** — 226 tests, including real-browser suites, WCAG AA contrast maths, and CIEDE2000 checked against published test vectors. CI runs everything on Node 22 and 24, then proves the package builds byte-identically and runs standalone when extracted.
 
 ## Where it installs
 

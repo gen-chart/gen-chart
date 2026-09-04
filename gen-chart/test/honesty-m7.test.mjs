@@ -68,6 +68,39 @@ test('well-spaced annotations pass', () => {
   assert.deepEqual(codes(spec), []);
 });
 
+test('authored event-strip annotations render as semantic top-edge markers', () => {
+  const spec = load('mau-trend.cartesian.json');
+  spec.annotations = [
+    { id: 'deploy', kind: 'event-strip', at: '2026-02', label: 'Production deploy', role: 'negative' }
+  ];
+  const analysis = cartesian.analyze(spec);
+  assert.deepEqual(analysis.diagnostics, []);
+  const svg = cartesian.renderSvg(spec, analysis);
+  assert.match(svg, /class="gc-event-strip"/);
+  assert.match(svg, /aria-label="Production deploy"/);
+  assert.match(svg, /--event-color:var\(--role-negative\)/);
+  assert.match(svg, /<rect data-ox=/);
+});
+
+test('raised Cartesian limits accept twelve series and sixty-four annotations', () => {
+  const spec = load('mau-trend.cartesian.json');
+  const base = spec.data.columns[1];
+  spec.data.columns = [spec.data.columns[0]];
+  spec.series = [];
+  for (let i = 0; i < 12; i++) {
+    const id = `metric-${i}`;
+    spec.data.columns.push({ ...base, id, values: base.values.map((value) => value + i) });
+    spec.series.push({ id, mark: 'line', y: id, label: `Metric ${i}` });
+  }
+  spec.annotations = Array.from({ length: 64 }, (_, i) => ({
+    id: `event-${i}`,
+    kind: 'event-strip',
+    at: spec.data.columns[0].values[i % spec.data.columns[0].values.length]
+  }));
+  const diagnostics = cartesian.analyze(spec).diagnostics;
+  assert.ok(!diagnostics.some((d) => d.code === 'schema/invalid'));
+});
+
 // ------------------------------------------------------------------- log axis
 
 test('log tick generation covers decades and subdivides a narrow domain', () => {

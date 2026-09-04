@@ -135,6 +135,15 @@ of those bounds, such as `"95% confidence interval"` or `"observed min–max"`;
 validation rejects an unexplained band. Pair it with a line series when the
 data includes a central estimate.
 
+For authored operational events over a Cartesian time series, use `x-line`
+annotations for the few events that need labelled stems and `event-strip`
+annotations for a compact top-edge event lane. An event strip accepts an
+optional semantic `role` and accessible `label`; it defaults to `highlight`.
+Line annotations also accept a semantic `role` when their meaning warrants it.
+Events must fall inside the authored x domain. Use at most 64 annotations and
+prefer strips when labels would collide. These are embedded observations, not
+live event queries.
+
 For a horizontal diverging bar chart, set top-level `orientation` to
 `"horizontal"`, use one unstacked bar series, and set `color_by` to `"sign"`.
 Keep the category column in `encoding.x` with a band scale and the supplied
