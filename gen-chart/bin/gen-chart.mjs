@@ -4,15 +4,16 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { resolve, basename, join, extname } from 'node:path';
+import { resolve, join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { rendererFor, families } from '../renderers/shared/registry.mjs';
-import { assembleHtml, assembleInlineHtml } from '../renderers/shared/html.mjs';
+import { assembleHtml } from '../renderers/shared/html.mjs';
 import { receipt, accepted } from '../renderers/shared/diagnostics.mjs';
 import { guide } from '../renderers/shared/guide.mjs';
 import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
-import { runVisualCheck } from '../renderers/shared/visual-check.mjs';
+import { findChrome, runVisualCheck } from '../renderers/shared/visual-check.mjs';
+import { renderPngPreview } from '../renderers/shared/preview.mjs';
 import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 
 const VERSION = '0.9.0';
@@ -22,8 +23,8 @@ function usage() {
 
 Usage:
   gen-chart validate <chart_type> <spec.json> [--quality standard|showcase] [--json]
-  gen-chart render   <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--format standalone|inline|both] [--json]
-  gen-chart deliver  <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--format standalone|inline|both] [--json]
+  gen-chart render   <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--preview png] [--json]
+  gen-chart deliver  <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--preview png] [--json]
   gen-chart guide "<scenario>" [--json]
   gen-chart inspect-data <file.csv|.tsv|.json> [--spec-out <draft.json>] [--json]
   gen-chart demo <output-directory>
@@ -34,23 +35,26 @@ Chart types: ${families().join(' | ')}
 `;
 }
 
-function parseArgs(argv, { allowFormat = false } = {}) {
+function parseArgs(argv, { allowPreview = false } = {}) {
   const positional = [];
-  const options = { json: false, quality: null, specOut: null, format: 'standalone' };
+  const options = { json: false, quality: null, specOut: null, preview: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--json') options.json = true;
     else if (a === '--quality') options.quality = argv[++i];
     else if (a === '--spec-out') options.specOut = argv[++i];
-    else if (a === '--format' && allowFormat) options.format = argv[++i];
+    else if (a === '--preview' && allowPreview) {
+      options.preview = argv[++i];
+      if (!options.preview) fail('--preview requires a value (supported: png)');
+    }
     else if (a.startsWith('--')) fail(`unknown option ${a}\n\n${usage()}`);
     else positional.push(a);
   }
   if (options.quality && !['standard', 'showcase'].includes(options.quality)) {
     fail(`--quality must be standard or showcase, got "${options.quality}"`);
   }
-  if (!['standalone', 'inline', 'both'].includes(options.format)) {
-    fail(`--format must be standalone, inline, or both, got "${options.format}"`);
+  if (options.preview && options.preview !== 'png') {
+    fail(`--preview must be png, got "${options.preview}"`);
   }
   return { positional, options };
 }
@@ -97,11 +101,7 @@ function emit(r, options) {
       for (const f of d.supportedFixes ?? []) console.log(`      fix: ${f}`);
     }
     if (r.output) console.log(`  output: ${r.output} (${r.bytes.html} bytes, sha256 ${r.sha256.html.slice(0, 16)}…)`);
-    if (r.outputs) {
-      for (const [format, output] of Object.entries(r.outputs)) {
-        console.log(`  ${format}: ${output.path} (${output.bytes} bytes, sha256 ${output.sha256.slice(0, 16)}…)`);
-      }
-    }
+    if (r.preview) console.log(`  preview: ${r.preview.output} (${r.preview.width}x${r.preview.height}, ${r.preview.bytes} bytes)`);
   }
   process.exit(r.ok ? 0 : 1);
 }
@@ -120,12 +120,8 @@ function sha256(s) {
   return createHash('sha256').update(s).digest('hex');
 }
 
-function inlineSibling(path) {
-  return path.replace(/\.html$/, '.inline.html');
-}
-
 function cmdRenderOrDeliver(command, argv) {
-  const { positional, options } = parseArgs(argv, { allowFormat: true });
+  const { positional, options } = parseArgs(argv, { allowPreview: true });
   const [chartType, input, output] = positional;
   if (!chartType || !input || !output || positional.length > 3) fail(usage());
   if (!output.endsWith('.html')) fail('output path must end with .html');
@@ -141,59 +137,48 @@ function cmdRenderOrDeliver(command, argv) {
   const renderer = rendererFor(chartType);
   const svg = renderer.renderSvg(spec, analysis);
   const payload = renderer.buildPayload(spec, analysis);
-  const legend = renderer.buildLegend(spec, analysis);
+  const html = assembleHtml(spec, svg, payload, renderer.buildLegend(spec, analysis));
   const outAbs = resolve(output);
-  const outputs = [];
-  if (options.format === 'standalone' || options.format === 'both') {
-    outputs.push({ format: 'standalone', path: outAbs, html: assembleHtml(spec, svg, payload, legend) });
-  }
-  if (options.format === 'inline' || options.format === 'both') {
-    const path = options.format === 'both' ? inlineSibling(outAbs) : outAbs;
-    outputs.push({ format: 'inline', path, html: assembleInlineHtml(spec, svg, payload, legend) });
-  }
-  if (new Set(outputs.map((item) => item.path)).size !== outputs.length) {
-    fail('standalone and inline output paths must be different');
+  const outputs = [{ path: outAbs, content: html }];
+  let preview = null;
+
+  if (options.preview === 'png') {
+    try {
+      const rendered = renderPngPreview(html);
+      const previewOutput = outAbs.replace(/\.html$/, '.png');
+      outputs.push({ path: previewOutput, content: rendered.png });
+      preview = {
+        output: previewOutput,
+        media_type: 'image/png',
+        width: rendered.width,
+        height: rendered.height,
+        theme: rendered.theme,
+        bytes: rendered.png.byteLength,
+        sha256: sha256(rendered.png)
+      };
+    } catch (e) {
+      fail(`PNG preview failed before delivery: ${e.code ? `${e.code}: ` : ''}${e.message}`);
+    }
   }
 
   if (command === 'deliver') {
     try {
       commitAtomically(outputs);
     } catch (e) {
-      fail(`delivery failed while committing the artifact: ${e.message}`);
+      fail(`delivery failed while committing the artifact set: ${e.message}`);
     }
   } else {
-    for (const item of outputs) writeFileSync(item.path, item.html);
+    for (const artifact of outputs) writeFileSync(artifact.path, artifact.content);
   }
 
-  const outputReceipts = Object.fromEntries(outputs.map((item) => [item.format, {
-    path: item.path,
-    media_type: 'text/html',
-    bytes: Buffer.byteLength(item.html),
-    sha256: sha256(item.html),
-    ...(item.format === 'inline' ? {
-      presentation: {
-        kind: 'html-fragment', self_contained: true, requires_script: true,
-        required_primitives: ['inline-script', 'blob-url', 'canvas-for-raster-exports'],
-        host_display: 'not-verified'
-      }
-    } : {})
-  }]));
-  const single = outputs.length === 1 ? outputReceipts[outputs[0].format] : null;
   emit(receipt({
     command, chartType, quality,
     diagnostics: analysis.diagnostics,
     extra: {
-      format: options.format,
-      ...(single ? {
-        output: single.path,
-        bytes: { spec: Buffer.byteLength(raw), html: single.bytes },
-        sha256: { spec: sha256(raw), html: single.sha256 },
-        ...(single.presentation ? { presentation: single.presentation } : {})
-      } : {
-        outputs: outputReceipts,
-        bytes: { spec: Buffer.byteLength(raw) },
-        sha256: { spec: sha256(raw) }
-      })
+      output: outAbs,
+      bytes: { spec: Buffer.byteLength(raw), html: Buffer.byteLength(html) },
+      sha256: { spec: sha256(raw), html: sha256(html) },
+      ...(preview ? { preview } : {})
     }
   }), options);
 }
@@ -320,6 +305,8 @@ function doctor() {
     console.log(`${rel.replace('../', '')} ${ok ? 'OK' : 'MISSING'}`);
   }
   console.log(`renderers: ${families().join(', ')}`);
+  const chrome = findChrome();
+  console.log(`PNG preview: ${chrome ? `OK (${chrome})` : 'UNAVAILABLE (set GEN_CHART_CHROME; HTML delivery still works)'}`);
   process.exit(nodeOk && assetsOk ? 0 : 1);
 }
 

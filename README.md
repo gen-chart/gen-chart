@@ -212,7 +212,7 @@ Plus composition checks for tick collisions, annotation overlap, point density, 
 | **Profile**  | `inspect-data` returns typed column profiles, so numbers are never retyped from memory                                     |
 | **Author**   | The agent writes a typed JSON spec with your data embedded verbatim                                                        |
 | **Validate** | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts                        |
-| **Deliver**  | Renders, checks, and atomically commits the HTML with SHA-256 receipts — a failed delivery leaves the previous file intact |
+| **Deliver**  | Renders, checks, and atomically commits interactive HTML plus an optional PNG chat preview with SHA-256 receipts            |
 | **Verify on request** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                     |
 
 For the fast default path, run `deliver` directly—it performs showcase
@@ -220,7 +220,7 @@ validation before atomically writing the HTML. Use `validate` separately only
 when you need diagnostics without writing an accepted artifact.
 
 ```bash
-node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --json
+node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --preview png --json
 ```
 
 ```bash
@@ -231,7 +231,10 @@ node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
 node bin/gen-chart.mjs inspect-data data.csv --spec-out draft.json --json
 ```
 
-Also available: `render`, `visual-check`, `guide`, `demo`, and `doctor`.
+The command above also writes `chart.png`, suitable for an inline Markdown
+preview; link `chart.html` for the interactive, accessible version. Without
+`--preview png`, delivery remains HTML-only. Also available: `render`,
+`visual-check`, `guide`, `demo`, and `doctor`.
 
 ## In the delivered chart
 

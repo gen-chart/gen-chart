@@ -13,71 +13,6 @@ import {
 } from './palette.mjs';
 
 const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
-const COMPONENT_START = '<!-- GEN_CHART_COMPONENT_START -->';
-const COMPONENT_END = '<!-- GEN_CHART_COMPONENT_END -->';
-
-function matchingBrace(source, openAt) {
-  let depth = 0;
-  let quote = null;
-  let comment = false;
-  for (let i = openAt; i < source.length; i++) {
-    const c = source[i];
-    const next = source[i + 1];
-    if (comment) {
-      if (c === '*' && next === '/') { comment = false; i++; }
-      continue;
-    }
-    if (!quote && c === '/' && next === '*') { comment = true; i++; continue; }
-    if (quote) {
-      if (c === '\\') { i++; continue; }
-      if (c === quote) quote = null;
-      continue;
-    }
-    if (c === '"' || c === "'") { quote = c; continue; }
-    if (c === '{') depth++;
-    else if (c === '}' && --depth === 0) return i;
-  }
-  throw new Error('unbalanced viewer CSS');
-}
-
-function scopedSelector(selector) {
-  const s = selector.trim();
-  if (s === '*') return '.gc-embed, .gc-embed *';
-  if (s === ':root' || s === 'html' || s === 'body') return '.gc-embed';
-  if (s.startsWith(':root')) return `.gc-embed${s.slice(5)}`;
-  if (s.startsWith('html')) return `.gc-embed${s.slice(4)}`;
-  if (s.startsWith('body')) return `.gc-embed${s.slice(4)}`;
-  if (s.startsWith('.gc-embed')) return s;
-  return `.gc-embed ${s}`;
-}
-
-// The standalone stylesheet intentionally owns the document. Inline output
-// receives the same rules rewritten beneath one component root, including
-// rules nested in media queries, so it cannot restyle its host page.
-export function scopeViewerCss(source) {
-  let out = '';
-  let cursor = 0;
-  while (cursor < source.length) {
-    const ws = /^(?:\s+|\/\*[\s\S]*?\*\/)+/.exec(source.slice(cursor));
-    if (ws) { out += ws[0]; cursor += ws[0].length; }
-    if (cursor >= source.length) break;
-    const openAt = source.indexOf('{', cursor);
-    if (openAt === -1) { out += source.slice(cursor); break; }
-    const prelude = source.slice(cursor, openAt).trim();
-    const closeAt = matchingBrace(source, openAt);
-    const body = source.slice(openAt + 1, closeAt);
-    if (/^@(media|supports|container|layer)\b/.test(prelude)) {
-      out += `${prelude} {${scopeViewerCss(body)}}`;
-    } else if (prelude.startsWith('@')) {
-      out += `${prelude} {${body}}`;
-    } else {
-      const selectors = prelude.split(',').map(scopedSelector).join(', ');
-      out += `${selectors} {${body}}`;
-    }
-    cursor = closeAt + 1;
-  }
-  return out;
-}
 
 // legend is one of:
 //   { kind: 'series', toggleable, items: [{id, label, color, mark}],
@@ -155,7 +90,7 @@ function viewsHtml(payload, locale) {
   ).join('');
   return `<div class="gc-views" role="group" aria-label="${escapeXml(t(locale, 'ui.chapters'))}">${buttons}` +
     `<button type="button" class="gc-view-clear" data-view="">${escapeXml(t(locale, 'ui.views.clear'))}</button></div>` +
-    '<p class="gc-view-note" id="gc-view-note" data-gc-role="view-note" aria-live="polite"></p>';
+    '<p class="gc-view-note" id="gc-view-note" aria-live="polite"></p>';
 }
 
 function transformNoteHtml(payload, locale) {
@@ -183,7 +118,7 @@ function paletteOptionsHtml(locale, colorCount, ids, defaultPalette) {
   }).join('');
 }
 
-function assembleDocument(spec, svg, payload, legend, format) {
+export function assembleHtml(spec, svg, payload, legend = null) {
   const template = readFileSync(templatePath, 'utf8');
   const locale = resolveLocale(spec.meta.locale);
   const colorCount = Array.isArray(payload.series) && payload.series.length
@@ -217,7 +152,6 @@ function assembleDocument(spec, svg, payload, legend, format) {
   let html = template
     .replaceAll('{{LANG}}', locale)
     .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
-    .replaceAll('{{FORMAT}}', format)
     .replaceAll('{{PALETTE}}', defaultPalette)
     .replaceAll('{{PALETTE_SIZE}}', paletteSize)
     .replace('{{PALETTE_CSS}}', paletteCss())
@@ -234,23 +168,4 @@ function assembleDocument(spec, svg, payload, legend, format) {
   // Fixed viewer chrome: {{i18n:key}} placeholders resolve from the locale.
   html = html.replaceAll(/\{\{i18n:([a-z0-9.]+)\}\}/g, (_, key) => escapeXml(t(locale, key)));
   return html;
-}
-
-export function assembleHtml(spec, svg, payload, legend = null) {
-  return assembleDocument(spec, svg, payload, legend, 'standalone');
-}
-
-export function assembleInlineHtml(spec, svg, payload, legend = null) {
-  const documentHtml = assembleDocument(spec, svg, payload, legend, 'inline');
-  const style = /<style>([\s\S]*?)<\/style>/.exec(documentHtml);
-  const start = documentHtml.indexOf(COMPONENT_START);
-  const end = documentHtml.indexOf(COMPONENT_END);
-  if (!style || start === -1 || end === -1 || end <= start) {
-    throw new Error('viewer template is missing inline assembly boundaries');
-  }
-  const component = documentHtml.slice(start + COMPONENT_START.length, end).trim();
-  const openEnd = component.indexOf('>');
-  if (openEnd === -1) throw new Error('viewer component root is malformed');
-  const scopedStyle = `<style data-gc-inline-style>\n${scopeViewerCss(style[1])}\n</style>`;
-  return `${component.slice(0, openEnd + 1)}\n${scopedStyle}${component.slice(openEnd + 1)}\n`;
 }

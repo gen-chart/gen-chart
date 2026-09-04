@@ -48,7 +48,7 @@ export function parseMeasure(dom) {
   return JSON.parse(m[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'));
 }
 
-function chrome(bin, args) {
+export function runChrome(bin, args) {
   return execFileSync(bin, [
     '--headless=new', '--disable-gpu', '--hide-scrollbars',
     // Containers give Chrome a small /dev/shm and no sandbox privileges.
@@ -75,7 +75,7 @@ export function runVisualCheck(htmlPath, { env = process.env } = {}) {
       let contained = false;
       let metrics = null;
       try {
-        const dom = chrome(bin, [`--window-size=${w},${h}`, '--dump-dom', `file://${measurePath}`]);
+        const dom = runChrome(bin, [`--window-size=${w},${h}`, '--dump-dom', `file://${measurePath}`]);
         metrics = parseMeasure(dom);
         contained = !!metrics && metrics.sw <= metrics.iw;
       } catch {
@@ -92,7 +92,7 @@ export function runVisualCheck(htmlPath, { env = process.env } = {}) {
         const out = join(dirname(htmlPath),
           `${basename(htmlPath, '.html')}.visual-check.${w}x${h}.${theme}.png`);
         try {
-          chrome(bin, [`--window-size=${w},${h}`, `--screenshot=${out}`, `file://${themedPath}`]);
+          runChrome(bin, [`--window-size=${w},${h}`, `--screenshot=${out}`, `file://${themedPath}`]);
           screenshots.push(out);
         } catch {
           ok = false;

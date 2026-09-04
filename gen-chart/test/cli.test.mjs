@@ -5,6 +5,7 @@ import { readFileSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findChrome } from '../renderers/shared/visual-check.mjs';
 
 const cli = fileURLToPath(new URL('../bin/gen-chart.mjs', import.meta.url));
 const example = fileURLToPath(new URL('../examples/mau-trend.cartesian.json', import.meta.url));
@@ -26,12 +27,70 @@ test('help prints the command surface', () => {
   for (const cmd of ['validate', 'render', 'deliver', 'doctor', 'guide', 'inspect-data']) {
     assert.match(out, new RegExp(cmd));
   }
+  assert.match(out, /--preview png/);
+});
+
+test('deliver --preview png writes a sibling static image from the accepted HTML', { skip: findChrome() ? false : 'no Chrome/Chromium found' }, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  const r = JSON.parse(run(['deliver', 'cartesian', example, out, '--quality', 'showcase', '--preview', 'png', '--json']));
+  const png = join(dir, 'chart.png');
+  const bytes = readFileSync(png);
+  assert.equal(r.ok, true);
+  assert.equal(r.preview.output, png);
+  assert.equal(r.preview.media_type, 'image/png');
+  assert.equal(r.preview.theme, 'light');
+  assert.equal(r.preview.bytes, bytes.byteLength);
+  assert.match(r.preview.sha256, /^[0-9a-f]{64}$/);
+  assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.equal(bytes.readUInt32BE(16), r.preview.width);
+  assert.equal(bytes.readUInt32BE(20), r.preview.height);
+});
+
+test('preview failure preserves the previous HTML and PNG pair', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const out = join(dir, 'chart.html');
+  const png = join(dir, 'chart.png');
+  writeFileSync(out, 'old html');
+  writeFileSync(png, 'old png');
+  try {
+    execFileSync(process.execPath, [cli, 'deliver', 'cartesian', example, out, '--preview', 'png', '--json'], {
+      encoding: 'utf8', stdio: 'pipe', env: { ...process.env, GEN_CHART_CHROME: '/nonexistent/chrome' }
+    });
+    assert.fail('expected preview failure');
+  } catch (err) {
+    assert.equal(err.status, 1);
+    assert.match(err.stderr, /PREVIEW_BROWSER_UNAVAILABLE/);
+  }
+  assert.equal(readFileSync(out, 'utf8'), 'old html');
+  assert.equal(readFileSync(png, 'utf8'), 'old png');
+});
+
+test('render and deliver reject unsupported preview formats', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const err = runFail(['deliver', 'cartesian', example, join(dir, 'chart.html'), '--preview', 'svg']);
+  assert.equal(err.status, 1);
+  assert.match(err.stderr, /--preview must be png/);
+});
+
+test('--preview requires an explicit value', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const err = runFail(['deliver', 'cartesian', example, join(dir, 'chart.html'), '--preview']);
+  assert.equal(err.status, 1);
+  assert.match(err.stderr, /--preview requires a value/);
 });
 
 test('doctor exits 0 and reports assets', () => {
   const out = run(['doctor']);
   assert.match(out, /OK \(>=22\)/);
   assert.match(out, /template\.html OK/);
+  assert.match(out, /PNG preview:/);
+});
+
+test('--preview is limited to commands that write chart artifacts', () => {
+  const err = runFail(['validate', 'cartesian', example, '--preview', 'png']);
+  assert.equal(err.status, 1);
+  assert.match(err.stderr, /unknown option --preview/);
 });
 
 test('validate --json emits a machine-readable receipt', () => {
@@ -66,64 +125,6 @@ test('deliver writes the artifact atomically with hashes in the receipt', () => 
   assert.ok(existsSync(out));
   assert.match(r.sha256.html, /^[0-9a-f]{64}$/);
   assert.equal(r.bytes.html, readFileSync(out).byteLength);
-});
-
-test('render --format inline writes a fragment and describes its host requirements', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
-  const out = join(dir, 'chart.inline.html');
-  const r = JSON.parse(run(['render', 'cartesian', example, out, '--format', 'inline', '--json']));
-  const html = readFileSync(out, 'utf8');
-  assert.equal(r.ok, true);
-  assert.equal(r.format, 'inline');
-  assert.equal(r.output, out);
-  assert.equal(r.presentation.kind, 'html-fragment');
-  assert.equal(r.presentation.requires_script, true);
-  assert.deepEqual(r.presentation.required_primitives,
-    ['inline-script', 'blob-url', 'canvas-for-raster-exports']);
-  assert.doesNotMatch(html, /<!doctype|<\/?(?:html|head|body)\b/i);
-  assert.match(html, /data-gc-format="inline"/);
-});
-
-test('deliver --format both writes a linked standalone and inline pair', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
-  const out = join(dir, 'chart.html');
-  const inline = join(dir, 'chart.inline.html');
-  const r = JSON.parse(run(['deliver', 'cartesian', example, out, '--format', 'both', '--json']));
-  assert.equal(r.ok, true);
-  assert.equal(r.format, 'both');
-  assert.equal(r.outputs.standalone.path, out);
-  assert.equal(r.outputs.inline.path, inline);
-  assert.ok(existsSync(out));
-  assert.ok(existsSync(inline));
-  assert.match(r.outputs.standalone.sha256, /^[0-9a-f]{64}$/);
-  assert.match(r.outputs.inline.sha256, /^[0-9a-f]{64}$/);
-  assert.equal(r.outputs.standalone.bytes, readFileSync(out).byteLength);
-  assert.equal(r.outputs.inline.bytes, readFileSync(inline).byteLength);
-});
-
-test('a failed paired deliver preserves both previous artifacts', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
-  const out = join(dir, 'chart.html');
-  const inline = join(dir, 'chart.inline.html');
-  run(['deliver', 'cartesian', example, out, '--format', 'both', '--json']);
-  const previous = [readFileSync(out, 'utf8'), readFileSync(inline, 'utf8')];
-  const spec = JSON.parse(readFileSync(example, 'utf8'));
-  spec.series[0].y = 'missing';
-  const bad = join(dir, 'bad.json');
-  writeFileSync(bad, JSON.stringify(spec));
-  const err = runFail(['deliver', 'cartesian', bad, out, '--format', 'both', '--json']);
-  assert.equal(err.status, 1);
-  assert.equal(readFileSync(out, 'utf8'), previous[0]);
-  assert.equal(readFileSync(inline, 'utf8'), previous[1]);
-});
-
-test('--format is rejected where unsupported and validates its allowed values', () => {
-  assert.match(runFail(['validate', 'cartesian', example, '--format', 'inline']).stderr, /unknown option --format/);
-  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
-  assert.match(
-    runFail(['render', 'cartesian', example, join(dir, 'chart.html'), '--format', 'widget']).stderr,
-    /--format must be standalone, inline, or both/
-  );
 });
 
 test('a failed deliver preserves the previous artifact', () => {
