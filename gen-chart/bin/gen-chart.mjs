@@ -12,7 +12,7 @@ import { artifactReceipt, sha256 } from '../renderers/shared/delivery.mjs';
 import { receipt } from '../renderers/shared/diagnostics.mjs';
 import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 
-const VERSION = '0.9.0';
+const VERSION = '0.32.0';
 
 function usage() {
   return `gen-chart v${VERSION}

@@ -150,6 +150,13 @@ extracted copy to prove it runs standalone.
 request: the full suite, the three drift checks, deterministic packaging,
 and a standalone smoke test of the extracted package.
 
+## Releases
+
+Release identity is checked across package metadata, the CLI, skill metadata,
+README badges, generated gallery, and changelog by `npm run check:release`.
+Follow [RELEASING.md](RELEASING.md) to prepare the version PR and publish the
+tagged ZIP and SHA-256 checksum from merged `main`.
+
 ## Conventions
 
 - **No runtime dependencies.** Vendoring a small algorithm with attribution

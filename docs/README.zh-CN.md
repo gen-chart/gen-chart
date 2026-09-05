@@ -13,10 +13,10 @@ gen-chart 是一个 Agent Skill，也是一套零运行时依赖的 Node.js 渲�
 
 ![许可证](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
-![版本](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
+![版本](https://img.shields.io/badge/version-0.32.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
 
-**[项目主页](https://gen-chart.github.io/gen-chart/)** · **[中文路线图](ROADMAP.zh-CN.md)** · **[English roadmap](../ROADMAP.md)** · **[设计系统](../DESIGN.md)** · **[Skill 契约](../gen-chart/SKILL.md)**
+**[项目主页](https://gen-chart.github.io/gen-chart/)** · **[中文路线图](ROADMAP.zh-CN.md)** · **[更新日志](../CHANGELOG.md)** · **[安全策略](../SECURITY.md)** · **[发布流程](../RELEASING.md)** · **[English roadmap](../ROADMAP.md)** · **[设计系统](../DESIGN.md)** · **[Skill 契约](../gen-chart/SKILL.md)**
 
 项目主页也是最快的入门方式：选择 Cursor、Codex、Claude Code 或 OpenCode，复制对应的安装命令，然后通过任一已验证示例了解完整的**提示词 → 带类型的 JSON IR → 交互式图表**流程。每个示例都会公开展示级验证回执以及源文件和制品的精确摘要。
 
