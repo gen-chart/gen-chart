@@ -13,7 +13,7 @@ node bin/gen-chart.mjs validate <chart_type> <spec.json> --quality showcase --js
 Runs every check layer — schema, data integrity, semantics, honesty,
 composition — and writes nothing. Use it for a diagnostic-only check when an
 accepted result must not write an artifact. Routine chart creation should
-start with `deliver`, which performs the same checks before writing HTML.
+start with `deliver`, which performs the same checks before writing HTML or SVG.
 
 The receipt:
 
@@ -60,7 +60,7 @@ the user has explicitly accepted the warnings.
 ## deliver
 
 ```bash
-node bin/gen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --preview png --json
+node bin/gen-chart.mjs deliver <chart_type> <spec.json> <out.html> --quality showcase --json
 ```
 
 Runs the same checks, then renders. With `--preview png`, the commit is atomic
@@ -77,7 +77,10 @@ the title, chart, legends, and computed point-density note. The PNG is for
 ordinary Markdown image display; the HTML remains the interactive and
 accessible source of truth.
 
-Without `--preview png`, delivery remains HTML-only. If the browser is
+Without `--preview png`, delivery writes only the requested HTML or SVG and uses no browser.
+The output extension selects the format; SVG includes its styles, title, subtitle,
+legends, and disclosure notes. Its receipt uses `bytes.svg` and `sha256.svg`.
+`--preview png` is supported only with HTML output. If the browser is
 unavailable, preview delivery fails before either destination is changed; set
 `GEN_CHART_CHROME` or rerun without the preview option and report the fallback.
 
@@ -100,9 +103,29 @@ Adds to the receipt:
 }
 ```
 
-Embed the preview using ordinary Markdown image syntax, link the HTML, and
+Link the artifact; if a preview was requested, embed it and link the HTML. Then
 report the error and warning counts. Add hashes only for automation or when
 asked. A non-zero exit can never be described as success.
+
+## Separate preview
+
+```bash
+node bin/gen-chart.mjs preview chart.html chart.png --json
+```
+
+Captures an existing HTML artifact without parsing or validating its original
+JSON again. Only the PNG is atomically replaced; the source HTML is never
+modified. Failure leaves any previous PNG intact. The receipt records the source
+HTML hash, PNG hash, dimensions, and theme; it is not a fresh validation receipt.
+This explicit command still uses Chrome for measurement and capture.
+
+## Batch delivery
+
+`node bin/gen-chart.mjs batch jobs.json --quality showcase --json` validates all
+jobs before rendering, then atomically commits their separate HTML/SVG artifacts.
+A rejected job or commit failure preserves all previous output files. Each result
+contains its own validation and format-specific delivery receipt. No PNG is
+created implicitly. See [Rendering API and batch mode](rendering-api.md).
 
 ## visual-check
 
@@ -152,8 +175,9 @@ skipped and continue.
 
 ## Handoff
 
-By default, state the finding, embed the sibling PNG, link the interactive
-HTML, and give the receipt summary (errors, warnings, quality). Add hashes for
+By default, state the finding, link the HTML or SVG, and give the receipt
+summary (errors, warnings, quality). Embed a sibling PNG only when requested
+and successfully generated. Add hashes for
 automation or when requested. The delivery PNG is not visual-check evidence;
 mention containment or visual-review status only when `visual-check` actually
 ran. If anything failed, say what and quote the diagnostics.

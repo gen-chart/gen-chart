@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds the docs/ instruction gallery from the explicit case registry and
-// typed example specs. Every artifact is delivered through the public CLI at
+// typed example specs. Every artifact is delivered through the shared API at
 // showcase quality before a staged site replaces the last-good docs tree.
 
 import {
@@ -14,7 +14,9 @@ import {
   rmSync,
   writeFileSync
 } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { renderChart } from '../renderers/shared/render.mjs';
+import { artifactReceipt } from '../renderers/shared/delivery.mjs';
+import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 import { createHash } from 'node:crypto';
 import { basename, dirname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -205,17 +207,11 @@ function assertArtifact(html, name) {
   }
 }
 
-function parseReceipt(stdout, file) {
-  let receipt;
-  try {
-    receipt = JSON.parse(stdout);
-  } catch (error) {
-    throw new Error(`${file}: deliver did not return JSON: ${error.message}`);
-  }
+function checkReceipt(receipt, file) {
   if (receipt.ok !== true || receipt.command !== 'deliver' || receipt.quality !== 'showcase' ||
       receipt.errors !== 0 || receipt.warnings !== 0 || !SHA_RE.test(receipt.sha256?.spec ?? '') ||
       !SHA_RE.test(receipt.sha256?.html ?? '')) {
-    throw new Error(`${file}: invalid showcase delivery receipt`);
+    throw new Error(`${file}: invalid showcase delivery receipt: ${JSON.stringify(receipt.diagnostics)}`);
   }
   return receipt;
 }
@@ -288,7 +284,6 @@ function validateStage(stage, records, page) {
 export function buildGalleryStage(stage, {
   cases = GALLERY_CASES,
   examplesDir = join(root, 'examples'),
-  cli = join(root, 'bin', 'gen-chart.mjs'),
   packageFile = join(root, 'package.json'),
   rendererTemplateFile = join(root, 'assets', 'template.html'),
   galleryTemplateFile = join(root, 'scripts', 'gallery-template.html')
@@ -312,15 +307,9 @@ export function buildGalleryStage(stage, {
     }
     const htmlName = entry.spec.replace(SPEC_RE, '.html');
     const artifactPath = join(stage, 'gallery', htmlName);
-    let stdout;
-    try {
-      stdout = execFileSync(process.execPath, [cli, 'deliver', spec.chart_type, specPath, artifactPath,
-        '--quality', 'showcase', '--json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-    } catch (error) {
-      const detail = String(error.stdout || error.stderr || error.message).trim();
-      throw new Error(`${entry.spec}: showcase delivery failed${detail ? `\n${detail}` : ''}`);
-    }
-    const receipt = parseReceipt(stdout, entry.spec);
+    const rendered = renderChart(spec, { quality: 'showcase' });
+    const receipt = checkReceipt(artifactReceipt(rendered, sourceBytes, artifactPath), entry.spec);
+    commitAtomically([{ path: artifactPath, content: rendered.content }]);
     const htmlBytes = readFileSync(artifactPath);
     const html = htmlBytes.toString('utf8');
     assertArtifact(html, htmlName);

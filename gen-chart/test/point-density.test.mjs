@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { rendererFor } from '../renderers/shared/registry.mjs';
 import { accepted } from '../renderers/shared/diagnostics.mjs';
 import { assembleHtml } from '../renderers/shared/html.mjs';
+import { renderChart } from '../renderers/shared/render.mjs';
 
 const cartesian = rendererFor('cartesian');
 
@@ -31,6 +32,23 @@ function pointSpec(rows, mark = 'scatter') {
 function densityDiagnostic(spec) {
   return cartesian.analyze(spec).diagnostics.find((d) => d.code === 'composition/point-density');
 }
+
+test('standalone SVG preserves bubble size legends and point-sampling disclosures', () => {
+  const spec = pointSpec(3001, 'bubble');
+  spec.transforms = { point_density: 'downsample' };
+  spec.data.columns[2].label = 'Capacity';
+  spec.data.columns[2].unit = 'seats';
+  const result = renderChart(spec, { format: 'svg', quality: 'showcase' });
+  assert.equal(result.ok, true);
+  const legend = result.content.slice(result.content.indexOf('<g class="gc-export-legend">'));
+  assert.match(legend, /Capacity: 1 seats/);
+  assert.match(legend, /<circle[^>]+r="24"/);
+  assert.match(legend, /2000/);
+  assert.match(legend, /3001/);
+  assert.equal((result.content.match(/class="gc-dot gc-bubble"/g) ?? []).length, 2000);
+  assert.equal(spec.data.columns[0].values.length, 3001);
+  assert.doesNotMatch(result.content, /<table|gc-payload/);
+});
 
 test('point density warns only above 2,000 visible scatter points with a repair receipt', () => {
   assert.equal(densityDiagnostic(pointSpec(2000)), undefined);

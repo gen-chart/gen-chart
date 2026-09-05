@@ -3,8 +3,7 @@
 // All placeholder content is escaped; the payload is JSON inside a
 // <script type="application/json"> block.
 
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { getTemplate, getSvgCss } from './assets.mjs';
 import { escapeXml } from './format.mjs';
 import { t, templateStrings, resolveLocale } from './i18n.mjs';
 import {
@@ -12,7 +11,8 @@ import {
   paletteCss, paletteIds, palettePreviewColors, signPaletteIds, signPalettePreviewColors
 } from './palette.mjs';
 
-const templatePath = fileURLToPath(new URL('../../assets/template.html', import.meta.url));
+const chromeCache = new Map();
+let staticPaletteCss;
 
 // legend is one of:
 //   { kind: 'series', toggleable, items: [{id, label, color, mark}],
@@ -72,12 +72,17 @@ function cardsHtml(spec) {
 function tableHtml(payload, locale) {
   const { headers, rows } = payload.table;
   const head = headers.map((h) => `<th scope="col">${escapeXml(h)}</th>`).join('');
-  const body = rows.map((r) =>
-    '<tr>' + r.map((cell, i) => {
-      const value = cell === null || cell === undefined ? '' : escapeXml(cell);
-      return i === 0 ? `<th scope="row">${value}</th>` : `<td>${value}</td>`;
-    }).join('') + '</tr>'
-  ).join('');
+  const bodyRows = new Array(rows.length);
+  for (let row = 0; row < rows.length; row++) {
+    let html = '<tr>';
+    const cells = rows[row];
+    for (let i = 0; i < cells.length; i++) {
+      const value = cells[i] == null ? '' : escapeXml(cells[i]);
+      html += i === 0 ? `<th scope="row">${value}</th>` : `<td>${value}</td>`;
+    }
+    bodyRows[row] = html + '</tr>';
+  }
+  const body = bodyRows.join('');
   return `<table class="gc-sr-only gc-data-table"><caption>${escapeXml(t(locale, 'ui.table.caption'))}</caption>` +
     `<thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
@@ -118,16 +123,48 @@ function paletteOptionsHtml(locale, colorCount, ids, defaultPalette) {
   }).join('');
 }
 
+function viewerChrome(locale, paletteSize, signColored) {
+  const key = `${locale}/${paletteSize}/${signColored}`;
+  if (chromeCache.has(key)) return chromeCache.get(key);
+  const ids = signColored ? signPaletteIds() : paletteIds();
+  const defaultPalette = signColored ? DEFAULT_SIGN_PALETTE : DEFAULT_PALETTE;
+  // Compile fixed UI text before inserting authored content. Replacement values
+  // are never rescanned, so literal $&, $', and {{i18n:...}} remain data.
+  const template = getTemplate()
+    .replaceAll(/\{\{i18n:([a-z0-9.]+)\}\}/g, (_, name) => escapeXml(t(locale, name)))
+    .replace('{{PALETTE_CSS}}', () => staticPaletteCss ??= paletteCss())
+    .replace('{{SVG_CSS_JSON}}', () => JSON.stringify(getSvgCss()));
+  const placeholder = /\{\{([A-Z_]+)\}\}/g;
+  const parts = [];
+  let end = 0;
+  for (const match of template.matchAll(placeholder)) {
+    // Preserve the existing optional-block whitespace in golden output.
+    const indent = match[1] === 'SUBTITLE_BLOCK' ? 6 : match[1] === 'VIEWS' ? 2 : 0;
+    parts.push(template.slice(end, match.index - indent), { key: match[1] });
+    end = match.index + match[0].length;
+  }
+  parts.push(template.slice(end));
+  const chrome = {
+    parts, defaultPalette,
+    options: paletteOptionsHtml(locale, paletteSize === 'three' ? 3 : 6, ids, defaultPalette),
+    i18n: templateStrings(locale),
+    palettes: Object.fromEntries(ids.map((id) => [id, Object.hasOwn(SIGN_PALETTES, id) ? {
+      six: SIGN_PALETTES[id].light, three: SIGN_PALETTES[id].light
+    } : { six: PALETTES[id].six, three: PALETTES[id].three }]))
+  };
+  chromeCache.set(key, chrome);
+  return chrome;
+}
+
 export function assembleHtml(spec, svg, payload, legend = null) {
-  const template = readFileSync(templatePath, 'utf8');
   const locale = resolveLocale(spec.meta.locale);
   const colorCount = Array.isArray(payload.series) && payload.series.length
     ? payload.series.length
     : (svg.match(/class="(?:gc-series|gc-box|gc-slice)"/g) ?? []).length;
   const paletteSize = colorCount > 0 && colorCount <= 3 ? 'three' : 'six';
   const signColored = payload.series?.some((series) => series.colorBy === 'sign') ?? false;
-  const availablePaletteIds = signColored ? signPaletteIds() : paletteIds();
-  const defaultPalette = signColored ? DEFAULT_SIGN_PALETTE : DEFAULT_PALETTE;
+  const chrome = viewerChrome(locale, paletteSize, signColored);
+  const { defaultPalette } = chrome;
   const subtitle = spec.meta.subtitle
     ? `<p class="gc-subtitle">${escapeXml(spec.meta.subtitle)}</p>`
     : '';
@@ -137,35 +174,19 @@ export function assembleHtml(spec, svg, payload, legend = null) {
     ...payload,
     locale,
     defaultPalette,
-    i18n: templateStrings(locale),
-    palettes: Object.fromEntries(availablePaletteIds.map((id) => [id, Object.hasOwn(SIGN_PALETTES, id) ? {
-      six: [...SIGN_PALETTES[id].light],
-      three: [...SIGN_PALETTES[id].light]
-    } : {
-      six: [...PALETTES[id].six],
-      three: [...PALETTES[id].three]
-    }]))
+    i18n: chrome.i18n,
+    palettes: chrome.palettes
   };
   // `</` must not appear un-escaped inside the JSON script block.
   const payloadJson = JSON.stringify(withStrings).replaceAll('</', '<\\/');
 
-  let html = template
-    .replaceAll('{{LANG}}', locale)
-    .replaceAll('{{THEME}}', spec.meta.theme ?? 'auto')
-    .replaceAll('{{PALETTE}}', defaultPalette)
-    .replaceAll('{{PALETTE_SIZE}}', paletteSize)
-    .replace('{{PALETTE_CSS}}', paletteCss())
-    .replaceAll('{{TITLE}}', escapeXml(spec.meta.title))
-    .replace('      {{SUBTITLE_BLOCK}}', subtitle ? `      ${subtitle}` : '')
-    .replace('  {{VIEWS}}', views ? `  ${views}` : '')
-    .replace('{{PALETTE_OPTIONS}}', paletteOptionsHtml(locale, colorCount, availablePaletteIds, defaultPalette))
-    .replace('{{SVG}}', svg)
-    .replace('{{LEGEND}}', legendHtml(legend, locale) + transformNoteHtml(payload, locale))
-    .replace('{{DATA_TABLE}}', tableHtml(payload, locale))
-    .replace('{{CARDS_BLOCK}}', cardsHtml(spec))
-    .replace('{{PAYLOAD}}', payloadJson);
-
-  // Fixed viewer chrome: {{i18n:key}} placeholders resolve from the locale.
-  html = html.replaceAll(/\{\{i18n:([a-z0-9.]+)\}\}/g, (_, key) => escapeXml(t(locale, key)));
-  return html;
+  const values = {
+    LANG: locale, THEME: spec.meta.theme ?? 'auto', PALETTE: defaultPalette,
+    PALETTE_SIZE: paletteSize, TITLE: escapeXml(spec.meta.title),
+    SUBTITLE_BLOCK: subtitle ? `      ${subtitle}` : '',
+    VIEWS: views ? `  ${views}` : '', PALETTE_OPTIONS: chrome.options,
+    SVG: svg, LEGEND: legendHtml(legend, locale) + transformNoteHtml(payload, locale),
+    DATA_TABLE: tableHtml(payload, locale), CARDS_BLOCK: cardsHtml(spec), PAYLOAD: payloadJson
+  };
+  return chrome.parts.map((part) => typeof part === 'string' ? part : values[part.key]).join('');
 }

@@ -38,5 +38,5 @@ export function families() {
 }
 
 export function rendererFor(family) {
-  return RENDERERS[family] ?? null;
+  return Object.hasOwn(RENDERERS, family) ? RENDERERS[family] : null;
 }

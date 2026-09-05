@@ -4,17 +4,21 @@
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { renderBatch } from '../renderers/shared/render.mjs';
+import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 
 const dir = fileURLToPath(new URL('../examples/', import.meta.url));
-const cli = fileURLToPath(new URL('../bin/gen-chart.mjs', import.meta.url));
 // Only real specs — never the .visual-check.json sidecars beside them.
 const SPEC_RE = /\.(cartesian|distribution|proportion|matrix)\.json$/;
 
-for (const f of readdirSync(dir).filter((f) => SPEC_RE.test(f)).sort()) {
-  const spec = JSON.parse(readFileSync(dir + f, 'utf8'));
-  const out = dir + f.replace(/\.[a-z]+\.json$/, '.html');
-  execFileSync(process.execPath, [cli, 'deliver', spec.chart_type, dir + f, out,
-    '--quality', spec.meta.quality_profile ?? 'showcase']);
-  console.log(`rendered ${f} -> ${out.split('/').pop()}`);
+const jobs = readdirSync(dir).filter((f) => SPEC_RE.test(f)).sort().map((file) => {
+  const spec = JSON.parse(readFileSync(dir + file, 'utf8'));
+  return { spec, file, output: dir + file.replace(SPEC_RE, '.html'), quality: spec.meta.quality_profile ?? 'showcase' };
+});
+const batch = renderBatch(jobs);
+if (!batch.ok) {
+  console.error(JSON.stringify(batch.results, null, 2));
+  process.exit(1);
 }
+commitAtomically(batch.results.map((result, i) => ({ path: jobs[i].output, content: result.content })));
+for (const job of jobs) console.log(`rendered ${job.file} -> ${job.output.split('/').pop()}`);

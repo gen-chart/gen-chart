@@ -96,12 +96,15 @@ The selected theme and color palette are presentation choices and remain.
 
 ## Static delivery preview
 
-`deliver --preview png` creates a sibling PNG from the same accepted HTML for
+HTML/SVG delivery is browser-free by default. Explicit `deliver --preview png` creates a sibling PNG from the same accepted HTML for
 callers that display local images in Markdown. It forces the light theme and
 captures the canonical at-rest chart with its title and legends; toolbar,
 guided-view buttons, takeaway cards, tooltips, and focus state are excluded.
 The preview has no interactions or accessible table, so always link the HTML
 beside it. This is a handoff format, not `visual-check` evidence.
+
+For an already delivered HTML file, `preview chart.html chart.png --json` creates
+only the PNG and never modifies the HTML. Both preview modes use Chrome.
 
 ## visual-check
 

@@ -25,6 +25,7 @@ export function fmtValue(v) {
   const neg = v < 0 ? '-' : '';
   const abs = Math.abs(v);
   const fixed = Number.isInteger(abs) ? String(abs) : trimZeros(abs.toFixed(2));
+  if (abs < 1000 && Number(fixed) < 1000) return neg + fixed;
   const [int, frac] = fixed.split('.');
   const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return neg + grouped + (frac ? '.' + frac : '');
@@ -37,8 +38,9 @@ export function fmtDate(ms, granularity, { withYear = false, locale = 'en' } = {
   const y = d.getUTCFullYear();
   const m = d.getUTCMonth();
   const day = d.getUTCDate();
-  const hour = String(d.getUTCHours()).padStart(2, '0');
-  const minute = String(d.getUTCMinutes()).padStart(2, '0');
+  const intraday = granularity === 'minute' || granularity === 'hour';
+  const hour = intraday ? String(d.getUTCHours()).padStart(2, '0') : '';
+  const minute = intraday ? String(d.getUTCMinutes()).padStart(2, '0') : '';
   const names = months(locale);
   if (locale === 'zh-CN') {
     if (granularity === 'year') return `${y}年`;
@@ -53,6 +55,7 @@ export function fmtDate(ms, granularity, { withYear = false, locale = 'en' } = {
 }
 
 export function escapeXml(s) {
+  if (typeof s === 'number') return String(s);
   return String(s)
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
