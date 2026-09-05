@@ -35,10 +35,12 @@ for the CLI and JavaScript interfaces.
    arrays and repeated value passes, cache static assets/localization, and assemble
    templates once without interpreting authored text as replacement syntax.
    Preserve CSV values, accessible tables, and deterministic output.
-4. **Explicit previews.** Deliver HTML or SVG without Chrome by default. Keep
-   `deliver --preview png` as an explicit atomic HTML/PNG pair and provide a
-   separate preview command for an already delivered HTML artifact. Browser
-   measurement/screenshot reuse is a possible later optimization.
+4. **Capability-aware previews.** Keep the CLI browser-free unless
+   `--preview png` is supplied, and provide a separate preview command for an
+   already delivered HTML artifact. The skill supplies `--preview png` by
+   default for hosts that display local Markdown images, including Codex
+   desktop. Browser measurement/screenshot reuse is a possible later
+   optimization.
 5. **Later: module and algorithm cleanup.** Separate Cartesian validation/layout,
    geometry, and viewer/export responsibilities. Remove the unnecessary histogram
    sort and use sets for matrix category discovery. Splitting files alone is not

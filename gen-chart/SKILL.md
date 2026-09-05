@@ -2,8 +2,9 @@
 name: gen-chart
 description: >-
   Create polished, validated charts as a self-contained interactive HTML
-  artifact or standalone SVG, with an optional PNG preview. Interactive HTML
-  includes dark/light themes, crosshair tooltips, legend
+  artifact or standalone SVG. In callers that display local Markdown images,
+  also create an inline PNG preview. Interactive HTML includes dark/light
+  themes, crosshair tooltips, legend
   toggling, and honest-by-construction axes. Accept pasted data
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
@@ -58,13 +59,20 @@ the family you routed to.
    the title, subtitle, styles, legends, and disclosure notes without building
    the interactive HTML payload.
 
-   Generate PNG only when requested or when the caller explicitly requires an
-   inline raster preview. Add `--preview png` to HTML delivery for an atomic
-   HTML/PNG pair, or run `node bin/gen-chart.mjs preview <output.html> <output.png>
-   --json` afterward to leave the delivered HTML independent of preview success.
-   PNG generation uses local Chrome/Chromium. If unavailable, hand off the
-   accepted HTML and report that the optional preview was unavailable. Never
-   hand-draw or substitute a different chart image.
+   Determine the caller's display capability from the runtime or developer
+   context before delivery. If it says local Markdown images can be displayed
+   inline (for example, Codex desktop), treat that as a preview requirement and
+   add `--preview png` to HTML delivery even when the user did not name PNG.
+   Embed that PNG in the handoff. Respect an explicit request for no PNG or no
+   browser. For automation and callers without inline local-image display,
+   deliver HTML without a browser unless the user requests PNG.
+
+   `--preview png` commits the HTML/PNG pair atomically. Alternatively, run
+   `node bin/gen-chart.mjs preview <output.html> <output.png> --json` afterward
+   to leave delivered HTML independent of preview success. PNG generation uses
+   local Chrome/Chromium. If unavailable, hand off the accepted HTML and report
+   that the preview was unavailable. Never hand-draw or substitute a different
+   chart image.
 6. If delivery fails, change only each diagnostic's `subject` and choose only
    from its `supportedFixes` — one diagnosed repair per round. Re-run
    `deliver` after the edit; a failed delivery preserves the previous artifact set.
@@ -81,7 +89,8 @@ the family you routed to.
    and artifact; keep them for provenance, but see **Output** for when they
    belong in the reply.
 7. After successful delivery, link the HTML or SVG artifact. If PNG was
-   explicitly generated, embed it and link the HTML directly below it:
+   generated for a display-capable caller or explicitly requested, embed it and
+   link the HTML directly below it:
 
    ```markdown
    ![Concise description of the chart](/absolute/path/output.png)
@@ -89,8 +98,8 @@ the family you routed to.
    [Open the interactive chart](/absolute/path/output.html)
    ```
 
-   The optional image handoff works in callers that render local Markdown
-   images; HTML provides the interactive, accessible chart. Do not claim the PNG
+   The image handoff works in callers that render local Markdown images; HTML
+   provides the interactive, accessible chart. Do not claim the PNG
    is interactive. Do **not** run `visual-check` by default: the delivery PNG
    is a reader preview, while `visual-check` produces separate verification
    evidence. Run it only when the user asks for visual inspection,
@@ -248,18 +257,19 @@ provenance is noise until someone asks for it.
 **Default handoff:**
 
 - one sentence on what the chart shows, in the data's own terms
+- in a display-capable caller, the PNG embedded with
+  `![alt text](/absolute/path/chart.png)`
 - a direct HTML or SVG artifact link
 - one short line on checking, e.g. `Validated at showcase quality — 0 errors,
   0 warnings.`
 
-If a PNG preview was explicitly requested and generated, embed it with
-`![alt text](/absolute/path/chart.png)` above the HTML link.
+For callers without inline local-image display, omit the PNG unless requested.
 
 **Add the rest only when asked, when something failed, or when the caller is
 automation rather than a person:** SHA-256 receipts, per-viewport containment
 numbers, and full diagnostics.
 
-A handoff with an explicitly requested preview:
+A display-capable handoff:
 
 > Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%.
 >

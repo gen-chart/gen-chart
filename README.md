@@ -249,8 +249,10 @@ node bin/gen-chart.mjs inspect-data data.csv --spec-out draft.json --json
 
 HTML and standalone SVG delivery use no browser. Use a `.svg` destination for
 vector output with its title, subtitle, styles, legends, and disclosure notes.
-Add `--preview png` to HTML delivery only when you need an atomic HTML/PNG pair,
-or generate a preview separately after delivering HTML:
+The CLI adds PNG only when `--preview png` is supplied. The bundled skill treats
+a host that can display local Markdown images, including Codex desktop, as a
+preview-capable caller and adds that option automatically unless the user opts
+out. You can also generate a preview separately after delivering HTML:
 
 ```bash
 node bin/gen-chart.mjs deliver cartesian spec.json chart.svg --quality showcase --json

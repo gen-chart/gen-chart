@@ -96,9 +96,11 @@ The selected theme and color palette are presentation choices and remain.
 
 ## Static delivery preview
 
-HTML/SVG delivery is browser-free by default. Explicit `deliver --preview png` creates a sibling PNG from the same accepted HTML for
-callers that display local images in Markdown. It forces the light theme and
-captures the canonical at-rest chart with its title and legends; toolbar,
+HTML/SVG delivery is browser-free at the CLI level. `deliver --preview png`
+creates a sibling PNG from the same accepted HTML. The skill adds this option by
+default when its caller can display local Markdown images, and omits it for
+non-display automation or when the user opts out. The preview forces the light
+theme and captures the canonical at-rest chart with its title and legends; toolbar,
 guided-view buttons, takeaway cards, tooltips, and focus state are excluded.
 The preview has no interactions or accessible table, so always link the HTML
 beside it. This is a handoff format, not `visual-check` evidence.
