@@ -10,3 +10,4 @@ gen-chart/examples/*.html.tmp*
 # visual-check evidence (regenerated on demand)
 *.visual-check.json
 *.visual-check.*.png
+AGENTS.md
