@@ -381,11 +381,11 @@ function analyzeHorizontalCartesian(spec, columns, diagnostics, unit, seenSeries
 
 // ---------------------------------------------------------------- analyze
 
-export function analyzeCartesian(spec) {
+export function analyzeCartesian(spec, options = {}) {
   const diagnostics = checkSchema('cartesian', spec);
   if (diagnostics.length > 0) return { diagnostics };
 
-  const dataResult = checkData(spec);
+  const dataResult = checkData(spec, options);
   diagnostics.push(...dataResult.diagnostics);
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
   const columns = dataResult.columns;
@@ -1201,6 +1201,19 @@ function renderHorizontalSvg(spec, analysis) {
   return out.join('');
 }
 
+function xPixels(analysis) {
+  return analysis.xPixels ??= analysis.layout.xCenters.map(round);
+}
+
+function columnPixels(analysis, column) {
+  const cache = analysis.yPixels ??= new Map();
+  if (!cache.has(column)) {
+    cache.set(column, analysis.columns.get(column).values.map((value) =>
+      value === null ? null : round(analysis.layout.yScale(value))));
+  }
+  return cache.get(column);
+}
+
 export function renderSvg(spec, analysis) {
   if (analysis.layout.orientation === 'horizontal') return renderHorizontalSvg(spec, analysis);
   const { columns, layout } = analysis;
@@ -1354,21 +1367,22 @@ export function renderSvg(spec, analysis) {
   // lines
   for (const s of spec.series) {
     if (s.mark !== 'line') continue;
-    const values = columns.get(s.y).values;
+    const xs = xPixels(analysis);
+    const ys = columnPixels(analysis, s.y);
     let d = '';
     let pen = false;
-    values.forEach((v, i) => {
-      if (v === null) { pen = false; return; }
-      d += `${pen ? 'L' : 'M'}${round(xCenters[i])} ${round(yScale(v))}`;
+    for (let i = 0; i < ys.length; i++) {
+      if (ys[i] === null) { pen = false; continue; }
+      d += `${pen ? 'L' : 'M'}${xs[i]} ${ys[i]}`;
       pen = true;
-    });
+    }
     out.push(`<g class="gc-series" data-series="${escapeXml(s.id)}" style="--sc:${colors.get(s.id)}">`);
     out.push(`<path class="gc-line" d="${d}"/>`);
     if (s.point) {
-      values.forEach((v, i) => {
-        if (v === null) return;
-        out.push(`<circle class="gc-point" cx="${round(xCenters[i])}" cy="${round(yScale(v))}" r="3"/>`);
-      });
+      for (let i = 0; i < ys.length; i++) {
+        if (ys[i] === null) continue;
+        out.push(`<circle class="gc-point" cx="${xs[i]}" cy="${ys[i]}" r="3"/>`);
+      }
     }
     out.push('</g>');
   }
@@ -1420,6 +1434,17 @@ export function buildPayload(spec, analysis) {
         : v);
   const sizeSeries = spec.series.filter((s) => s.mark === 'bubble');
   const rangeLabel = (s) => `${s.label} — ${s.meaning}`;
+  const tableColumns = spec.series.flatMap((s) => s.mark === 'range'
+    ? [columns.get(s.lower).values, columns.get(s.upper).values]
+    : [columns.get(s.y).values]);
+  for (const s of sizeSeries) tableColumns.push(columns.get(s.size).values);
+  const tableRows = new Array(xCol.values.length);
+  for (let i = 0; i < tableRows.length; i++) {
+    const row = new Array(tableColumns.length + 1);
+    row[0] = xCol.values[i];
+    for (let j = 0; j < tableColumns.length; j++) row[j + 1] = tableColumns[j][i];
+    tableRows[i] = row;
+  }
   return {
     family: 'cartesian',
     hover: 'axis',
@@ -1431,7 +1456,7 @@ export function buildPayload(spec, analysis) {
     brush: spec.interactions?.brush ?? null,
     views: spec.meta.views ?? [],
     ...(layout.pointDensity ? { pointDensity: layout.pointDensity } : {}),
-    xPixels: layout.xCenters.map((x) => Number(x.toFixed(1))),
+    xPixels: xPixels(analysis),
     xLabels: xLabelsFull,
     table: {
       headers: [
@@ -1441,13 +1466,7 @@ export function buildPayload(spec, analysis) {
           : [s.label]),
         ...sizeSeries.map((s) => `${s.label} — ${columns.get(s.size).label ?? s.size}`)
       ],
-      rows: xCol.values.map((xv, i) => [
-        xv,
-        ...spec.series.flatMap((s) => s.mark === 'range'
-          ? [columns.get(s.lower).values[i], columns.get(s.upper).values[i]]
-          : [columns.get(s.y).values[i]]),
-        ...sizeSeries.map((s) => columns.get(s.size).values[i])
-      ])
+      rows: tableRows
     },
     plot: { left: layout.plotLeft, top: layout.plotTop, right: layout.plotRight, bottom: layout.plotBottom },
     width: layout.W,
@@ -1490,7 +1509,7 @@ export function buildPayload(spec, analysis) {
         unit: layout.percent ? null : layout.unit,
         values,
         formatted: layout.percent ? values.map(pct) : values.map(fmtValue),
-        pixels: values.map((v) => (v === null ? null : Number(layout.yScale(v).toFixed(1)))),
+        pixels: columnPixels(analysis, s.y),
         size: bubble ? {
           label: bubble.label,
           unit: bubble.unit,

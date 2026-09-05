@@ -35,12 +35,15 @@ gen-chart/                    the skill package — everything that ships
 ├── examples/                 specs, rendered artifacts, gallery case registry
 ├── scripts/                  validator, staged gallery/template, package builds
 └── test/                     node --test suites
-docs/                         generated gallery (do not edit by hand)
+docs/                         generated gallery plus authored top-level Markdown
 ```
 
 Every renderer exposes the same four calls — `analyze`, `renderSvg`,
 `buildPayload`, `buildLegend` — registered in `renderers/shared/registry.mjs`,
-so the CLI and tests stay family-agnostic.
+so the CLI and tests stay family-agnostic. `renderers/shared/render.mjs` exposes
+`renderChart` and `renderBatch`; the CLI and build scripts use the same validation
+and rendering pipeline. See [Rendering API and batch mode](gen-chart/references/rendering-api.md)
+and the [performance plan](docs/rendering-performance.md).
 
 ## Tests
 
@@ -48,7 +51,7 @@ so the CLI and tests stay family-agnostic.
 npm test
 ```
 
-181 tests via `node --test`, no framework. The suite covers scale and tick
+Tests use `node --test`, no framework. The suite covers scale and tick
 maths, statistics against published reference values, every honesty rule in
 both directions, golden byte-stable output, CLI receipts, atomic delivery,
 WCAG AA contrast, CIEDE2000 against the Sharma test vectors, and real-browser
@@ -74,6 +77,12 @@ browser suites launching Chrome at once starves them on a two-core runner.
 
 ## Regenerating artifacts
 
+For exploratory performance measurements, run `npm run bench`. To compare with
+an older checkout, use `npm run bench -- --baseline /path/to/older/gen-chart`.
+It alternates versions on identical inputs and reports wall/CPU medians, p95,
+and byte sizes. This is a warm renderer benchmark, not a CI timing gate; measure
+fresh-process CLI and browser preview latency separately.
+
 Three generated things are committed, and CI fails if any drift from source:
 
 ```bash
@@ -92,7 +101,7 @@ The validators are precompiled so the shipped skill needs no npm install.
 `npm test` runs `check:validators` first, so schema drift fails fast.
 
 The gallery registry is `examples/gallery-cases.mjs`; every typed example must
-appear there exactly once. `build:gallery` delivers each case through the CLI
+appear there exactly once. `build:gallery` delivers each case through the shared rendering API
 at showcase quality, checks its committed HTML golden, generates
 `docs/gallery/manifest.json`, and builds the complete site in a sibling stage
 directory. Validation failure leaves the last-good `docs/` tree untouched.

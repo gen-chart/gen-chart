@@ -843,29 +843,7 @@ svg.gc-chart { display: block; width: 100%; height: auto; }
     '--seq-ink-0', '--seq-ink-1', '--seq-ink-2', '--seq-ink-3', '--seq-ink-4', '--seq-ink-5',
     '--div-0', '--div-1', '--div-2', '--div-3', '--div-4', '--div-5',
     '--div-ink-0', '--div-ink-1', '--div-ink-2', '--div-ink-3', '--div-ink-4', '--div-ink-5'];
-  var SVG_CSS = 'text{font-family:system-ui,-apple-system,sans-serif}' +
-    '.gc-grid line{stroke:var(--grid)}.gc-axis{stroke:var(--axis)}' +
-    '.gc-yticks text,.gc-xticks text{fill:var(--muted);font-size:11px}' +
-    '.gc-axis-label{fill:var(--muted);font-size:11.5px;font-weight:600}' +
-    '.gc-series rect{fill:var(--sc)}' +
-    '.gc-line{fill:none;stroke:var(--sc);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}' +
-    '.gc-point{fill:var(--sc)}' +
-    '.gc-annotations line{stroke:var(--annotation-color,var(--muted));stroke-dasharray:4 3}' +
-    '.gc-annotations text{fill:var(--annotation-color,var(--muted));font-size:10.5px}' +
-    '.gc-annotations .gc-event-strip rect{fill:var(--event-color);stroke:none}' +
-    '.gc-dot{fill:var(--sc);fill-opacity:.78}.gc-bin{fill:var(--sc)}' +
-    '.gc-area{fill:var(--sc);fill-opacity:.55;stroke:var(--sc);stroke-width:1.5;stroke-linejoin:round}' +
-    '.gc-range{fill:var(--sc);fill-opacity:.2;stroke:var(--sc);stroke-opacity:.65;stroke-width:1;stroke-linejoin:round}' +
-    '.gc-box .gc-box-body{fill:var(--sc);fill-opacity:.45;stroke:var(--sc);stroke-width:1.5}' +
-    '.gc-box .gc-whisker,.gc-box .gc-cap{stroke:var(--sc);stroke-width:1.5}' +
-    '.gc-box .gc-median{stroke:var(--sc);stroke-width:2.5}.gc-box .gc-outlier{fill:var(--sc);fill-opacity:.7}' +
-    '.gc-slice{fill:var(--sc);stroke:var(--panel);stroke-width:1.5}' +
-    '.gc-slice-label{fill:#f8fafc;font-size:11px;font-weight:700}' +
-    '.gc-donut-total{fill:var(--ink);font-size:20px;font-weight:700}.gc-donut-unit{fill:var(--muted);font-size:11px}' +
-    '.gc-cell{fill:var(--sc)}.gc-cell-empty{fill:var(--grid)}' +
-    '.gc-cell-label{fill:var(--ci);font-size:10.5px;font-weight:600}' +
-    '.gc-row-label{fill:var(--muted);font-size:11px}' +
-    '.gc-ramp rect{fill:var(--sc)}.gc-ramp text{fill:var(--muted);font-size:10px}';
+  var SVG_CSS = "text{font-family:system-ui,-apple-system,sans-serif}\n.gc-grid line{stroke:var(--grid)}\n.gc-axis{stroke:var(--axis)}\n.gc-yticks text,.gc-xticks text{fill:var(--muted);font-size:11px}\n.gc-axis-label{fill:var(--muted);font-size:11.5px;font-weight:600}\n.gc-series rect{fill:var(--sc)}\n.gc-line{fill:none;stroke:var(--sc);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}\n.gc-point{fill:var(--sc)}\n.gc-annotations line{stroke:var(--annotation-color,var(--muted));stroke-dasharray:4 3}\n.gc-annotations text{fill:var(--annotation-color,var(--muted));font-size:10.5px}\n.gc-annotations .gc-event-strip rect{fill:var(--event-color);stroke:none}\n.gc-dot{fill:var(--sc);fill-opacity:.78}\n.gc-bin{fill:var(--sc)}\n.gc-area{fill:var(--sc);fill-opacity:.55;stroke:var(--sc);stroke-width:1.5;stroke-linejoin:round}\n.gc-range{fill:var(--sc);fill-opacity:.2;stroke:var(--sc);stroke-opacity:.65;stroke-width:1;stroke-linejoin:round}\n.gc-box .gc-box-body{fill:var(--sc);fill-opacity:.45;stroke:var(--sc);stroke-width:1.5}\n.gc-box .gc-whisker,.gc-box .gc-cap{stroke:var(--sc);stroke-width:1.5}\n.gc-box .gc-median{stroke:var(--sc);stroke-width:2.5}\n.gc-box .gc-outlier{fill:var(--sc);fill-opacity:.7}\n.gc-slice{fill:var(--sc);stroke:var(--panel);stroke-width:1.5}\n.gc-slice-label{fill:#f8fafc;font-size:11px;font-weight:700}\n.gc-donut-total{fill:var(--ink);font-size:20px;font-weight:700}\n.gc-donut-unit{fill:var(--muted);font-size:11px}\n.gc-cell{fill:var(--sc)}\n.gc-cell-empty{fill:var(--grid)}\n.gc-cell-label{fill:var(--ci);font-size:10.5px;font-weight:600}\n.gc-row-label{fill:var(--muted);font-size:11px}\n.gc-ramp rect{fill:var(--sc)}\n.gc-ramp text{fill:var(--muted);font-size:10px}\n.gc-zero-axis{stroke:var(--ink);stroke-width:1.5}\n.gc-value-ticks text{fill:var(--muted);font-size:10.5px}\n.gc-category-label{fill:var(--ink);font-size:11px}\n.gc-context-label{fill:var(--muted);font-size:11px;font-weight:600}\n.gc-bar-value{fill:var(--muted);font-size:10.5px;font-weight:600}\n.gc-diverging-bar{fill:var(--sc)}";
 
   function appendExportLegend(clone) {
     var items = [];

@@ -11,11 +11,11 @@ import { t } from '../shared/i18n.mjs';
 
 const MAX_SLICES = 7;
 
-export function analyzeProportion(spec) {
+export function analyzeProportion(spec, options = {}) {
   const diagnostics = checkSchema('proportion', spec);
   if (diagnostics.length > 0) return { diagnostics };
 
-  const dataResult = checkData(spec);
+  const dataResult = checkData(spec, options);
   diagnostics.push(...dataResult.diagnostics);
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
   const columns = dataResult.columns;

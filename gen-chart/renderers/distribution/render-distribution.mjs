@@ -15,11 +15,11 @@ import { t } from '../shared/i18n.mjs';
 const TICK_FONT = 11;
 const MIN_OBSERVATIONS = 5;
 
-export function analyzeDistribution(spec) {
+export function analyzeDistribution(spec, options = {}) {
   const diagnostics = checkSchema('distribution', spec);
   if (diagnostics.length > 0) return { diagnostics };
 
-  const dataResult = checkData(spec);
+  const dataResult = checkData(spec, options);
   diagnostics.push(...dataResult.diagnostics);
   if (diagnostics.some((d) => d.severity === 'error')) return { diagnostics };
   const columns = dataResult.columns;

@@ -1,9 +1,9 @@
 ---
 name: gen-chart
 description: >-
-  Create polished, validated charts as a static PNG preview plus a
-  self-contained interactive HTML artifact with inline SVG, dark/light
-  themes, crosshair tooltips, legend
+  Create polished, validated charts as a self-contained interactive HTML
+  artifact or standalone SVG, with an optional PNG preview. Interactive HTML
+  includes dark/light themes, crosshair tooltips, legend
   toggling, and honest-by-construction axes. Accept pasted data
   (CSV/TSV/JSON/markdown tables), data files in the workspace, or
   plain-language descriptions with numbers. Use when the user asks to chart,
@@ -48,24 +48,26 @@ the family you routed to.
 5. Deliver the first complete candidate directly:
 
    ```bash
-   node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --preview png --json
+   node bin/gen-chart.mjs deliver <chart_type> <candidate.json> <output.html> --quality showcase --json
    ```
 
    `deliver` runs the same schema, data-integrity, semantic, honesty, and
-   composition checks as `validate`; it writes the interactive HTML and its
-   sibling PNG atomically only when the candidate is accepted. The PNG is a
-   static, light-theme preview of the same rendered chart, with controls and
-   takeaway cards omitted. Do not run a separate `validate` before the first
-   delivery.
+   composition checks as `validate`; it writes accepted HTML atomically without
+   a browser. Do not run a separate `validate` before the first delivery.
+   For a static vector artifact, use an `.svg` destination: the renderer includes
+   the title, subtitle, styles, legends, and disclosure notes without building
+   the interactive HTML payload.
 
-   PNG generation uses local Chrome/Chromium. If delivery reports
-   `PREVIEW_BROWSER_UNAVAILABLE`, immediately repeat the same command without
-   `--preview png`, hand off the HTML, and say that the static preview was
-   unavailable. Never hand-draw or substitute a different chart image.
+   Generate PNG only when requested or when the caller explicitly requires an
+   inline raster preview. Add `--preview png` to HTML delivery for an atomic
+   HTML/PNG pair, or run `node bin/gen-chart.mjs preview <output.html> <output.png>
+   --json` afterward to leave the delivered HTML independent of preview success.
+   PNG generation uses local Chrome/Chromium. If unavailable, hand off the
+   accepted HTML and report that the optional preview was unavailable. Never
+   hand-draw or substitute a different chart image.
 6. If delivery fails, change only each diagnostic's `subject` and choose only
    from its `supportedFixes` — one diagnosed repair per round. Re-run
-   `deliver` after the edit; a failed delivery preserves the previous HTML
-   and PNG pair.
+   `deliver` after the edit; a failed delivery preserves the previous artifact set.
    Use `validate` separately only when you need a diagnostic-only check that
    must not write an accepted artifact:
 
@@ -78,8 +80,8 @@ the family you routed to.
    success. Successful delivery reports SHA-256 and byte counts for the spec
    and artifact; keep them for provenance, but see **Output** for when they
    belong in the reply.
-7. After successful delivery, embed the PNG with ordinary Markdown image
-   syntax, then link the HTML directly below it:
+7. After successful delivery, link the HTML or SVG artifact. If PNG was
+   explicitly generated, embed it and link the HTML directly below it:
 
    ```markdown
    ![Concise description of the chart](/absolute/path/output.png)
@@ -87,8 +89,8 @@ the family you routed to.
    [Open the interactive chart](/absolute/path/output.html)
    ```
 
-   This handoff works in callers that render local Markdown images; the HTML
-   remains the full-fidelity fallback everywhere else. Do not claim the PNG
+   The optional image handoff works in callers that render local Markdown
+   images; HTML provides the interactive, accessible chart. Do not claim the PNG
    is interactive. Do **not** run `visual-check` by default: the delivery PNG
    is a reader preview, while `visual-check` produces separate verification
    evidence. Run it only when the user asks for visual inspection,
@@ -243,19 +245,21 @@ Lead with the chart, not the receipt. The reader wants to know what it shows
 and where it is; hashes and per-viewport measurements are provenance, and
 provenance is noise until someone asks for it.
 
-**Default handoff — four things:**
+**Default handoff:**
 
 - one sentence on what the chart shows, in the data's own terms
-- the sibling PNG embedded with `![alt text](/absolute/path/chart.png)`
-- a direct `[Open the interactive chart](/absolute/path/chart.html)` link
+- a direct HTML or SVG artifact link
 - one short line on checking, e.g. `Validated at showcase quality — 0 errors,
   0 warnings.`
+
+If a PNG preview was explicitly requested and generated, embed it with
+`![alt text](/absolute/path/chart.png)` above the HTML link.
 
 **Add the rest only when asked, when something failed, or when the caller is
 automation rather than a person:** SHA-256 receipts, per-viewport containment
 numbers, and full diagnostics.
 
-A good handoff:
+A handoff with an explicitly requested preview:
 
 > Revenue grew 9.8% in Q2, led by Asia-Pacific at +21%.
 >

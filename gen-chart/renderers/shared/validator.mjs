@@ -16,7 +16,7 @@ export function supportedChartTypes() {
 }
 
 export function checkSchema(chartType, spec) {
-  const validate = VALIDATORS[chartType];
+  const validate = Object.hasOwn(VALIDATORS, chartType) ? VALIDATORS[chartType] : null;
   if (!validate) {
     return [diag('schema/unknown-chart-type', 'error', '/chart_type',
       `chart_type "${chartType}" is not implemented; supported: ${supportedChartTypes().join(', ')}`)];

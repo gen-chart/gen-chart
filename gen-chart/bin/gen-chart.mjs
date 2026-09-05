@@ -3,17 +3,13 @@
 // visual-check, doctor.
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-import { resolve, join, extname } from 'node:path';
+import { resolve, join, extname, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { rendererFor, families } from '../renderers/shared/registry.mjs';
-import { assembleHtml } from '../renderers/shared/html.mjs';
-import { receipt, accepted } from '../renderers/shared/diagnostics.mjs';
-import { guide } from '../renderers/shared/guide.mjs';
-import { parseInput, buildColumns, draftSpec } from '../renderers/shared/inspect.mjs';
-import { findChrome, runVisualCheck } from '../renderers/shared/visual-check.mjs';
-import { renderPngPreview } from '../renderers/shared/preview.mjs';
+import { renderChart, renderBatch } from '../renderers/shared/render.mjs';
+import { artifactReceipt, sha256 } from '../renderers/shared/delivery.mjs';
+import { receipt } from '../renderers/shared/diagnostics.mjs';
 import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
 
 const VERSION = '0.9.0';
@@ -23,8 +19,10 @@ function usage() {
 
 Usage:
   gen-chart validate <chart_type> <spec.json> [--quality standard|showcase] [--json]
-  gen-chart render   <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--preview png] [--json]
-  gen-chart deliver  <chart_type> <spec.json> <out.html> [--quality standard|showcase] [--preview png] [--json]
+  gen-chart render   <chart_type> <spec.json> <out.html|out.svg> [--quality standard|showcase] [--preview png] [--json]
+  gen-chart deliver  <chart_type> <spec.json> <out.html|out.svg> [--quality standard|showcase] [--preview png] [--json]
+  gen-chart batch <jobs.json> [--quality standard|showcase] [--json]
+  gen-chart preview <chart.html> <out.png> [--json]
   gen-chart guide "<scenario>" [--json]
   gen-chart inspect-data <file.csv|.tsv|.json> [--spec-out <draft.json>] [--json]
   gen-chart demo <output-directory>
@@ -95,12 +93,15 @@ function emit(r, options) {
   if (options.json) {
     console.log(JSON.stringify(r, null, 2));
   } else {
-    console.log(`${r.ok ? 'PASS' : 'FAIL'} ${r.command} (${r.quality}): ${r.errors} error(s), ${r.warnings} warning(s)`);
-    for (const d of r.diagnostics) {
+    console.log(`${r.ok ? 'PASS' : 'FAIL'} ${r.command}${r.quality ? ` (${r.quality})` : ''}: ${r.errors ?? 0} error(s), ${r.warnings ?? 0} warning(s)`);
+    for (const d of r.diagnostics ?? []) {
       console.log(`  [${d.severity}] ${d.code} at ${d.subject}: ${d.message}`);
       for (const f of d.supportedFixes ?? []) console.log(`      fix: ${f}`);
     }
-    if (r.output) console.log(`  output: ${r.output} (${r.bytes.html} bytes, sha256 ${r.sha256.html.slice(0, 16)}…)`);
+    for (const result of r.results ?? [r]) {
+      const format = result.format ?? 'html';
+      if (result.output) console.log(`  output: ${result.output} (${result.bytes[format]} bytes, sha256 ${result.sha256[format].slice(0, 16)}…)`);
+    }
     if (r.preview) console.log(`  preview: ${r.preview.output} (${r.preview.width}x${r.preview.height}, ${r.preview.bytes} bytes)`);
   }
   process.exit(r.ok ? 0 : 1);
@@ -116,74 +117,111 @@ function cmdValidate(argv) {
   emit(receipt({ command: 'validate', chartType, quality, diagnostics: analysis.diagnostics }), options);
 }
 
-function sha256(s) {
-  return createHash('sha256').update(s).digest('hex');
+function outputFormat(output) {
+  const format = extname(output).slice(1);
+  if (!['html', 'svg'].includes(format)) fail('output path must end with .html or .svg');
+  return format;
 }
 
-function cmdRenderOrDeliver(command, argv) {
+async function cmdRenderOrDeliver(command, argv) {
   const { positional, options } = parseArgs(argv, { allowPreview: true });
   const [chartType, input, output] = positional;
   if (!chartType || !input || !output || positional.length > 3) fail(usage());
-  if (!output.endsWith('.html')) fail('output path must end with .html');
+  const format = outputFormat(output);
+  if (options.preview && format !== 'html') fail('--preview png requires an HTML output; SVG delivery does not use Chrome');
+  if (!rendererFor(chartType)) fail(`chart_type "${chartType}" is not implemented; supported: ${families().join(', ')}`, 2);
   const { spec, raw } = loadSpec(input);
-  const quality = resolveQuality(options, spec);
-  const analysis = analyze(chartType, spec);
-
-  if (!accepted(analysis.diagnostics, quality)) {
-    emit(receipt({ command, chartType, quality, diagnostics: analysis.diagnostics }), options);
-    return;
-  }
-
-  const renderer = rendererFor(chartType);
-  const svg = renderer.renderSvg(spec, analysis);
-  const payload = renderer.buildPayload(spec, analysis);
-  const html = assembleHtml(spec, svg, payload, renderer.buildLegend(spec, analysis));
-  const outAbs = resolve(output);
-  const outputs = [{ path: outAbs, content: html }];
-  let preview = null;
+  const rendered = renderChart(spec, { chartType, format, quality: options.quality ?? undefined });
+  const result = artifactReceipt(rendered, raw, output, command);
+  if (!result.ok) return emit(result, options);
+  const outputs = [{ path: result.output, content: rendered.content }];
 
   if (options.preview === 'png') {
     try {
-      const rendered = renderPngPreview(html);
-      const previewOutput = outAbs.replace(/\.html$/, '.png');
-      outputs.push({ path: previewOutput, content: rendered.png });
-      preview = {
-        output: previewOutput,
-        media_type: 'image/png',
-        width: rendered.width,
-        height: rendered.height,
-        theme: rendered.theme,
-        bytes: rendered.png.byteLength,
-        sha256: sha256(rendered.png)
+      const { renderPngPreview } = await import('../renderers/shared/preview.mjs');
+      const preview = renderPngPreview(rendered.content);
+      const previewOutput = result.output.replace(/\.html$/, '.png');
+      outputs.push({ path: previewOutput, content: preview.png });
+      result.preview = {
+        output: previewOutput, media_type: 'image/png', width: preview.width,
+        height: preview.height, theme: preview.theme,
+        bytes: preview.png.byteLength, sha256: sha256(preview.png)
       };
     } catch (e) {
       fail(`PNG preview failed before delivery: ${e.code ? `${e.code}: ` : ''}${e.message}`);
     }
   }
-
-  if (command === 'deliver') {
-    try {
-      commitAtomically(outputs);
-    } catch (e) {
-      fail(`delivery failed while committing the artifact set: ${e.message}`);
-    }
-  } else {
-    for (const artifact of outputs) writeFileSync(artifact.path, artifact.content);
+  try {
+    if (command === 'deliver') commitAtomically(outputs);
+    else for (const artifact of outputs) writeFileSync(artifact.path, artifact.content);
+  } catch (e) {
+    fail(`delivery failed while committing the artifact set: ${e.message}`);
   }
-
-  emit(receipt({
-    command, chartType, quality,
-    diagnostics: analysis.diagnostics,
-    extra: {
-      output: outAbs,
-      bytes: { spec: Buffer.byteLength(raw), html: Buffer.byteLength(html) },
-      sha256: { spec: sha256(raw), html: sha256(html) },
-      ...(preview ? { preview } : {})
-    }
-  }), options);
+  emit(result, options);
 }
 
-function cmdGuide(argv) {
+function cmdBatch(argv) {
+  const { positional, options } = parseArgs(argv);
+  if (positional.length !== 1) fail(usage());
+  const { spec: manifest, abs } = loadSpec(positional[0]);
+  if (!manifest || !Array.isArray(manifest.charts) || manifest.charts.length === 0 ||
+      Object.keys(manifest).some((key) => !['data', 'charts'].includes(key))) {
+    fail('batch manifest requires charts: [{ spec, output, quality? }] and optional shared data');
+  }
+  const destinations = new Set();
+  const jobs = manifest.charts.map((job, i) => {
+    if (!job || !job.spec || typeof job.spec !== 'object' || Array.isArray(job.spec) ||
+        typeof job.output !== 'string' || !job.output ||
+        Object.keys(job).some((key) => !['spec', 'output', 'quality'].includes(key))) {
+      fail(`charts[${i}] requires a spec object, output path, and optional quality`);
+    }
+    const output = resolve(dirname(abs), job.output);
+    if (destinations.has(output)) fail(`duplicate batch output: ${output}`);
+    destinations.add(output);
+    const spec = job.spec.data === undefined && manifest.data !== undefined ? { ...job.spec, data: manifest.data } : job.spec;
+    return { spec, output, format: outputFormat(output), quality: job.quality };
+  });
+  let batch;
+  try { batch = renderBatch(jobs, { quality: options.quality ?? undefined }); }
+  catch (e) { fail(e.message); }
+  const results = batch.results.map((rendered, i) => batch.ok
+    ? artifactReceipt(rendered, JSON.stringify(jobs[i].spec), jobs[i].output)
+    : { ...rendered, command: 'deliver' });
+  if (batch.ok) {
+    try { commitAtomically(batch.results.map((result, i) => ({ path: jobs[i].output, content: result.content }))); }
+    catch (e) { fail(`batch delivery failed: ${e.message}`); }
+  }
+  emit({
+    ok: batch.ok, command: 'batch', results,
+    errors: results.reduce((sum, r) => sum + r.errors, 0),
+    warnings: results.reduce((sum, r) => sum + r.warnings, 0),
+    diagnostics: results.flatMap((r, i) => r.diagnostics.map((d) => ({ ...d, subject: `/charts/${i}/spec${d.subject}` })))
+  }, options);
+}
+
+async function cmdPreview(argv) {
+  const { positional, options } = parseArgs(argv);
+  const [input, output] = positional;
+  if (positional.length !== 2 || !input.endsWith('.html') || !output.endsWith('.png')) {
+    fail('usage: gen-chart preview <chart.html> <out.png> [--json]');
+  }
+  try {
+    const html = readFileSync(resolve(input), 'utf8');
+    const { renderPngPreview } = await import('../renderers/shared/preview.mjs');
+    const preview = renderPngPreview(html);
+    const out = resolve(output);
+    commitAtomically([{ path: out, content: preview.png }]);
+    emit({
+      ok: true, command: 'preview', format: 'png', source: resolve(input), output: out,
+      media_type: 'image/png', width: preview.width, height: preview.height, theme: preview.theme,
+      bytes: { html: Buffer.byteLength(html), png: preview.png.byteLength },
+      sha256: { html: sha256(html), png: sha256(preview.png) }
+    }, options);
+  } catch (e) { fail(`PNG preview failed: ${e.code ? `${e.code}: ` : ''}${e.message}`); }
+}
+
+async function cmdGuide(argv) {
+  const { guide } = await import('../renderers/shared/guide.mjs');
   const { positional, options } = parseArgs(argv);
   if (positional.length !== 1) fail(usage());
   const result = { command: 'guide', ...guide(positional[0]) };
@@ -198,7 +236,8 @@ function cmdGuide(argv) {
   }
 }
 
-function cmdInspectData(argv) {
+async function cmdInspectData(argv) {
+  const { parseInput, buildColumns, draftSpec } = await import('../renderers/shared/inspect.mjs');
   const { positional, options } = parseArgs(argv);
   if (positional.length !== 1) fail(usage());
   const path = resolve(positional[0]);
@@ -261,17 +300,17 @@ function cmdDemo(argv) {
   const specs = readdirSync(examplesDir).filter((f) => /\.(cartesian|distribution|proportion|matrix)\.json$/.test(f)).sort();
   for (const f of specs) {
     const spec = JSON.parse(readFileSync(examplesDir + f, 'utf8'));
-    const renderer = rendererFor(spec.chart_type);
-    const analysis = renderer.analyze(spec);
-    const html = assembleHtml(spec, renderer.renderSvg(spec, analysis), renderer.buildPayload(spec, analysis), renderer.buildLegend(spec, analysis));
+    const rendered = renderChart(spec);
+    if (!rendered.ok) fail(`demo validation failed: ${JSON.stringify(rendered.diagnostics)}`);
     const out = join(dir, f.replace(/\.[a-z]+\.json$/, '.html'));
-    writeFileSync(out, html);
+    writeFileSync(out, rendered.content);
     console.log(`demo: ${out}`);
   }
   console.log(`open any of the ${specs.length} files above in a browser`);
 }
 
-function cmdVisualCheck(argv) {
+async function cmdVisualCheck(argv) {
+  const { runVisualCheck } = await import('../renderers/shared/visual-check.mjs');
   const { positional, options } = parseArgs(argv);
   if (positional.length !== 1) fail(usage());
   const path = resolve(positional[0]);
@@ -293,12 +332,13 @@ function cmdVisualCheck(argv) {
   process.exit(r.exitCode);
 }
 
-function doctor() {
+async function doctor() {
+  const { findChrome } = await import('../renderers/shared/visual-check.mjs');
   const [major] = process.versions.node.split('.').map(Number);
   const nodeOk = major >= 22;
   console.log(`node ${process.versions.node} ${nodeOk ? 'OK (>=22)' : 'FAIL (need >=22)'}`);
   let assetsOk = true;
-  for (const rel of ['../assets/template.html', '../schemas/cartesian.schema.json', '../renderers/shared/generated-validators.mjs']) {
+  for (const rel of ['../assets/template.html', '../assets/svg.css', '../schemas/cartesian.schema.json', '../renderers/shared/generated-validators.mjs']) {
     const p = new URL(rel, import.meta.url);
     const ok = existsSync(p);
     if (!ok) assetsOk = false;
@@ -320,26 +360,32 @@ switch (command) {
     console.log(usage());
     break;
   case 'doctor':
-    doctor();
+    await doctor();
     break;
   case 'validate':
     cmdValidate(rest);
     break;
   case 'render':
   case 'deliver':
-    cmdRenderOrDeliver(command, rest);
+    await cmdRenderOrDeliver(command, rest);
+    break;
+  case 'batch':
+    cmdBatch(rest);
+    break;
+  case 'preview':
+    await cmdPreview(rest);
     break;
   case 'guide':
-    cmdGuide(rest);
+    await cmdGuide(rest);
     break;
   case 'inspect-data':
-    cmdInspectData(rest);
+    await cmdInspectData(rest);
     break;
   case 'demo':
     cmdDemo(rest);
     break;
   case 'visual-check':
-    cmdVisualCheck(rest);
+    await cmdVisualCheck(rest);
     break;
   default:
     console.error(`gen-chart: unknown command '${command}'\n`);

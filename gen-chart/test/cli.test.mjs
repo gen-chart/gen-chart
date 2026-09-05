@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, existsSync, chmodSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +27,7 @@ function runFail(args) {
 
 test('help prints the command surface', () => {
   const out = run(['help']);
-  for (const cmd of ['validate', 'render', 'deliver', 'doctor', 'guide', 'inspect-data']) {
+  for (const cmd of ['validate', 'render', 'deliver', 'batch', 'preview', 'doctor', 'guide', 'inspect-data']) {
     assert.match(out, new RegExp(cmd));
   }
   assert.match(out, /--preview png/);
@@ -215,4 +216,109 @@ test('demo writes runnable example artifacts', () => {
   const out = run(['demo', dir]);
   assert.match(out, /mau-trend\.html/);
   assert.ok(existsSync(join(dir, 'mau-trend.html')));
+});
+
+test('SVG delivery is browser-free and records exact format-specific bytes and hashes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-svg-'));
+  const out = join(dir, 'chart.svg');
+  const r = JSON.parse(execFileSync(process.execPath, [cli, 'deliver', 'cartesian', example, out, '--json'], {
+    encoding: 'utf8', env: { ...process.env, GEN_CHART_CHROME: '/nonexistent/chrome' }
+  }));
+  const svg = readFileSync(out);
+  assert.equal(r.ok, true);
+  assert.equal(r.format, 'svg');
+  assert.equal(r.bytes.svg, svg.byteLength);
+  assert.equal(r.sha256.svg, createHash('sha256').update(svg).digest('hex'));
+  assert.match(svg.toString(), /^<svg/);
+  assert.ok(!existsSync(join(dir, 'chart.png')));
+  const err = runFail(['deliver', 'cartesian', example, out, '--preview', 'png']);
+  assert.match(err.stderr, /requires an HTML output/);
+  assert.deepEqual(readFileSync(out), svg);
+});
+
+test('batch delivers mixed formats from one shared dataset relative to its manifest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-batch-'));
+  const spec = JSON.parse(readFileSync(example));
+  const data = spec.data;
+  delete spec.data;
+  const manifest = join(dir, 'jobs.json');
+  writeFileSync(manifest, JSON.stringify({ data, charts: [
+    { spec, output: 'chart.svg' }, { spec, output: 'chart.html' }
+  ] }));
+  const result = JSON.parse(run(['batch', manifest, '--quality', 'showcase', '--json']));
+  assert.equal(result.ok, true);
+  assert.equal(result.results.length, 2);
+  for (const r of result.results) {
+    assert.ok(r.output.startsWith(dir));
+    assert.equal(r.bytes[r.format], readFileSync(r.output).byteLength);
+  }
+  assert.ok(!existsSync(join(dir, 'chart.png')));
+});
+
+test('failed batch validation and duplicate destinations preserve all previous files', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-batch-'));
+  const spec = JSON.parse(readFileSync(example));
+  const bad = structuredClone(spec);
+  bad.series[0].y = 'missing';
+  const manifest = join(dir, 'jobs.json');
+  const first = join(dir, 'first.svg');
+  const second = join(dir, 'second.html');
+  writeFileSync(first, 'old svg');
+  writeFileSync(second, 'old html');
+  writeFileSync(manifest, JSON.stringify({ charts: [
+    { spec, output: first }, { spec: bad, output: second }
+  ] }));
+  const failure = JSON.parse(runFail(['batch', manifest, '--json']).stdout);
+  assert.equal(failure.ok, false);
+  assert.ok(failure.diagnostics.some((d) => d.subject.startsWith('/charts/1/spec/')));
+  assert.equal(readFileSync(first, 'utf8'), 'old svg');
+  assert.equal(readFileSync(second, 'utf8'), 'old html');
+  writeFileSync(manifest, JSON.stringify({ charts: [
+    { spec, output: 'first.svg' }, { spec, output: './first.svg' }
+  ] }));
+  assert.match(runFail(['batch', manifest]).stderr, /duplicate batch output/);
+  assert.equal(readFileSync(first, 'utf8'), 'old svg');
+});
+
+test('batch staging failure does not replace an earlier destination', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-batch-'));
+  const spec = JSON.parse(readFileSync(example));
+  writeFileSync(join(dir, 'first.svg'), 'old svg');
+  const manifest = join(dir, 'jobs.json');
+  writeFileSync(manifest, JSON.stringify({ charts: [
+    { spec, output: 'first.svg' }, { spec, output: 'missing/second.svg' }
+  ] }));
+  assert.match(runFail(['batch', manifest]).stderr, /batch delivery failed/);
+  assert.equal(readFileSync(join(dir, 'first.svg'), 'utf8'), 'old svg');
+});
+
+test('separate preview writes only the PNG and preserves the delivered HTML on success and failure', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-preview-'));
+  const html = join(dir, 'chart.html');
+  const png = join(dir, 'chart.png');
+  run(['deliver', 'cartesian', example, html, '--json']);
+  const original = readFileSync(html);
+  // Exercise the browser protocol without starting the user's desktop Chrome.
+  const fake = join(dir, 'fake-chrome');
+  writeFileSync(fake, `#!/usr/bin/env node
+const fs = require('node:fs');
+if (process.argv.includes('--dump-dom')) console.log('<html data-gc-preview-size="{&quot;width&quot;:1120,&quot;height&quot;:684}">');
+const target = process.argv.find(a => a.startsWith('--screenshot='));
+if (target) fs.writeFileSync(target.slice('--screenshot='.length), Buffer.from('preview fixture'));
+`);
+  chmodSync(fake, 0o755);
+  const result = JSON.parse(execFileSync(process.execPath, [cli, 'preview', html, png, '--json'], {
+    encoding: 'utf8', env: { ...process.env, GEN_CHART_CHROME: fake }
+  }));
+  assert.equal(result.ok, true);
+  assert.equal(result.width, 1120);
+  assert.equal(result.height, 684);
+  assert.equal(result.sha256.html, createHash('sha256').update(original).digest('hex'));
+  assert.equal(readFileSync(png, 'utf8'), 'preview fixture');
+  assert.deepEqual(readFileSync(html), original);
+  assert.throws(() => execFileSync(process.execPath, [cli, 'preview', html, png, '--json'], {
+    stdio: 'pipe', env: { ...process.env, GEN_CHART_CHROME: '/nonexistent/chrome' }
+  }), /Command failed/);
+  assert.deepEqual(readFileSync(html), original);
+  assert.equal(readFileSync(png, 'utf8'), 'preview fixture');
 });

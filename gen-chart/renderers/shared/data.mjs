@@ -9,7 +9,8 @@ import { parseDateValue } from './scales.mjs';
 //   number: { type, values (number|null)[] }
 //   date:   { type, values (string)[], ms (number)[], granularity }
 //   string: { type, values (string)[] }
-export function checkData(spec) {
+export function checkData(spec, { dataCache } = {}) {
+  if (dataCache?.has(spec.data)) return dataCache.get(spec.data);
   const diagnostics = [];
   const columns = new Map();
   const seen = new Set();
@@ -95,19 +96,24 @@ export function checkData(spec) {
       }));
   }
 
-  return { diagnostics, columns };
+  const result = { diagnostics, columns };
+  dataCache?.set(spec.data, result);
+  return result;
 }
 
 export function seriesStats(values) {
-  const nums = values.filter((v) => v !== null);
-  if (nums.length === 0) return null;
   let min = Infinity;
   let max = -Infinity;
   let sum = 0;
-  for (const v of nums) {
+  let count = 0;
+  let last = null;
+  for (const v of values) {
+    if (v === null) continue;
+    count++;
+    last = v;
     if (v < min) min = v;
     if (v > max) max = v;
     sum += v;
   }
-  return { min, max, mean: sum / nums.length, last: nums[nums.length - 1], count: nums.length };
+  return count === 0 ? null : { min, max, mean: sum / count, last, count };
 }

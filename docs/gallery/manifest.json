@@ -19,11 +19,11 @@
       "artifact": "gallery/build-times.html",
       "bytes": {
         "source": 1234,
-        "artifact": 71841
+        "artifact": 72031
       },
       "sha256": {
         "source": "9accd35ba71aa42ff8f82483a1e27a921323a2ba5c8f9a75e4d03b8324c9df65",
-        "artifact": "4d6df360cb2b35908e7afbd4db349a2d8fba9d37eb1f95e3684bdef2d91ade92"
+        "artifact": "939dd2f91ed3f8078eb4ac905fcd13ca8b62dd34f986ce7d55b18a304945b812"
       },
       "validation": {
         "quality": "showcase",
@@ -47,11 +47,11 @@
       "artifact": "gallery/deploy-outcomes.html",
       "bytes": {
         "source": 1449,
-        "artifact": 72318
+        "artifact": 72508
       },
       "sha256": {
         "source": "21fbc4633397ea0796b26409605841acfab0bfa8e23dc50c9c62391e44b7d0b3",
-        "artifact": "ba1faad95e4b1ec779263878405fcb655d1aae15508b0b1ef3fcf8a7e6f089ec"
+        "artifact": "ba71f1ef9f54ccbaf858b7845070e65eb5c6ed4c3631b5b176a0473713be52ba"
       },
       "validation": {
         "quality": "showcase",
@@ -76,11 +76,11 @@
       "artifact": "gallery/forecast-range.html",
       "bytes": {
         "source": 2208,
-        "artifact": 73103
+        "artifact": 73293
       },
       "sha256": {
         "source": "8ae738c37600ad72613959dc447294a15ce9e9f6e104765e2df8055519772046",
-        "artifact": "1da22c75b7745489f08e529d848199d2d185aebcfee8fc8826d248a389d783f0"
+        "artifact": "a87fe019274ce937d5cc20431d3020fd470e06aefbeab514f244ebd36cf012fe"
       },
       "validation": {
         "quality": "showcase",
@@ -103,11 +103,11 @@
       "artifact": "gallery/latency-distribution.html",
       "bytes": {
         "source": 848,
-        "artifact": 72832
+        "artifact": 73022
       },
       "sha256": {
         "source": "09452a0e9b45df037eff72960a123b274209d0dd7bbff683724ebdbd6f72e8ec",
-        "artifact": "b3602b365fa01b03ff83a172ea25a4774fa43821e1ea4072e17b0163acda3d7f"
+        "artifact": "150ff4599e6d81885b9980ae972a753b3e1cb65292e241064da357be72b13df9"
       },
       "validation": {
         "quality": "showcase",
@@ -132,11 +132,11 @@
       "artifact": "gallery/mau-trend.html",
       "bytes": {
         "source": 2710,
-        "artifact": 74511
+        "artifact": 74701
       },
       "sha256": {
         "source": "ad05cbd3d5a13c780363a3adee4490c058fb58dcc77825a543bada9031f5d9f4",
-        "artifact": "935ffe5e7c626a828af590bf4962519f8f3f96c06ce7dc687822dbaa49b68720"
+        "artifact": "51e62291ebd4043ff8d9fcca8680f0d1f4a898c332e3d2ef7230d1fbf70130d3"
       },
       "validation": {
         "quality": "showcase",
@@ -160,11 +160,11 @@
       "artifact": "gallery/observability-errors-by-version.html",
       "bytes": {
         "source": 10393,
-        "artifact": 89180
+        "artifact": 89370
       },
       "sha256": {
         "source": "0297ff8507f007a5f0275194837e1c150187e7e3fd44361bf861eb58395bbb08",
-        "artifact": "4b7e98dabea96d7fb4fbb70d632f0ac9ca0e70d212b119a54216e5c7d2cab8fe"
+        "artifact": "58122c14dc14095cca585921d73d2febbea77d6dc0d89a3e43e90d353de70735"
       },
       "validation": {
         "quality": "showcase",
@@ -188,11 +188,11 @@
       "artifact": "gallery/observability-ci-duration.html",
       "bytes": {
         "source": 6526,
-        "artifact": 80997
+        "artifact": 81187
       },
       "sha256": {
         "source": "8bad215bfffd724414faba5f74d037ee1b3ecb622513968987c23d7a7390cf10",
-        "artifact": "a13d037e71aec5314070bb00360165862e4be6e83aee1a3731b80b142b85b846"
+        "artifact": "fa734e67607e6412a3267f8ddcc0a9610c08251f6b4e3186d7fe110a9c68673b"
       },
       "validation": {
         "quality": "showcase",
@@ -216,11 +216,11 @@
       "artifact": "gallery/plan-mix.html",
       "bytes": {
         "source": 1370,
-        "artifact": 71949
+        "artifact": 72139
       },
       "sha256": {
         "source": "b9d3eae5c727d39fa75d4cd2da9142979084bc4dce3989223f2aa9769aedebaf",
-        "artifact": "caa7f07a045beec88f9481ccfb62645ef98b477e8c2cf89ba8366b10026fecd5"
+        "artifact": "7f4a6eb255f1eb722074a255b463ef0b10d63063040dbd7ada631c822f9be93b"
       },
       "validation": {
         "quality": "showcase",
@@ -244,11 +244,11 @@
       "artifact": "gallery/request-growth.html",
       "bytes": {
         "source": 1192,
-        "artifact": 70714
+        "artifact": 70904
       },
       "sha256": {
         "source": "eb9159b51461124edade3fb7daaf5910ee61b04eac5e87477f62f042e4d68266",
-        "artifact": "8def232ba30533442b88e7bf8a34230f146803faa89958f6adaf868b46c7b2d9"
+        "artifact": "c64a097309767a248aafacfd968f054b8879b01184a1bb878984cad9c7c26089"
       },
       "validation": {
         "quality": "showcase",
@@ -271,11 +271,11 @@
       "artifact": "gallery/revenue-by-region.html",
       "bytes": {
         "source": 998,
-        "artifact": 71198
+        "artifact": 71388
       },
       "sha256": {
         "source": "bd5c7ffe5bf0a59e6537ac5a6fe4d7862bcfa694d5e10c17d837e0d1ee4b25e0",
-        "artifact": "15598307ae7caf348caf6fc58f037741fc289306ee4c33003e1b2e15a1e25bb3"
+        "artifact": "afcd96eac2cbd8844d1ed6a8c123be9f46debcb1d18631dfbad7d14273a420c8"
       },
       "validation": {
         "quality": "showcase",
@@ -299,11 +299,11 @@
       "artifact": "gallery/signups-vs-target.html",
       "bytes": {
         "source": 1126,
-        "artifact": 72383
+        "artifact": 72573
       },
       "sha256": {
         "source": "80c09d20aeca3e8b1bdd6116f2d0c2844ca8d6c9a31046c9610c39d6386943fd",
-        "artifact": "db129bbead4eaea76d4f9f628ed27c195ad0e51c62dadfe9250530ed7ea5caa4"
+        "artifact": "4d28fb6c5605af92ce1e167a02629a7f1886b39f4e12b91134b352b9f4719fce"
       },
       "validation": {
         "quality": "showcase",
@@ -326,11 +326,11 @@
       "artifact": "gallery/service-memory-change.html",
       "bytes": {
         "source": 2445,
-        "artifact": 86888
+        "artifact": 87078
       },
       "sha256": {
         "source": "4d0c43f18e6ec4c7f0c99d067a5a68e16ee57317713d08f9244b0e7ba17c0fff",
-        "artifact": "81802f8d3a77d8f8271c6303c340e400a14e8e5846ae84accf266c3873175bb8"
+        "artifact": "6d882221574d0a825a8abb0abd067cace485b1251e242657f3080b0988acb812"
       },
       "validation": {
         "quality": "showcase",
@@ -354,11 +354,11 @@
       "artifact": "gallery/storage-mix.html",
       "bytes": {
         "source": 1806,
-        "artifact": 72317
+        "artifact": 72507
       },
       "sha256": {
         "source": "9313bf0a5f3f6f8b5b0bbe1e5ffa97de0376cacc3d2f787ecc16a60777ea23b5",
-        "artifact": "70484fb7cc5b91a6420a45d81e4d38a0a9e133c64dbfeb9319bac3be903c2cbe"
+        "artifact": "6e30465acda113b3ea2a80e47582c96d750ecd3da125c4e3ad62e5db90605c6c"
       },
       "validation": {
         "quality": "showcase",
@@ -382,11 +382,11 @@
       "artifact": "gallery/support-load.html",
       "bytes": {
         "source": 1369,
-        "artifact": 78870
+        "artifact": 79060
       },
       "sha256": {
         "source": "058d54911b7208cd4f742ebe5da16eb4908ad9823d33435471de028aadad6ecb",
-        "artifact": "87c80fb7b27c8c9676c000aa540c4c9d0219efe90bfa0d4889b63b5f3d83fe18"
+        "artifact": "ad52e05d1f0bf8b98907863006b9d9cd6d676a7f5fd0ea4fb2321866564fc97e"
       },
       "validation": {
         "quality": "showcase",
@@ -409,11 +409,11 @@
       "artifact": "gallery/traffic-sources.html",
       "bytes": {
         "source": 785,
-        "artifact": 72635
+        "artifact": 72825
       },
       "sha256": {
         "source": "95b0057d492483ca0e02bb54393b801ec00abd58f308d99ff9bf75c1d7a31695",
-        "artifact": "0ac8f7274944467a811739ccca35d423b0da42b36bd819b8e2da48e69f4e59a3"
+        "artifact": "5dd70cc5a12c9ba5ca849a2977fdf8db37810e1f57ac1ba92756932360085642"
       },
       "validation": {
         "quality": "showcase",
@@ -436,11 +436,11 @@
       "artifact": "gallery/venue-performance.html",
       "bytes": {
         "source": 1383,
-        "artifact": 71825
+        "artifact": 72015
       },
       "sha256": {
         "source": "8b6308c2d4d232a1e97fbe3458891d51f7656e4610634e1820b26b795f4312bd",
-        "artifact": "21933f5ad7d5de214715fa98b8a600b5f6a12748f2286920b35ac3f755a106e1"
+        "artifact": "83a86099a5cc457c1a7a5197987c00997b24adf73a73b663ce80f04be3074929"
       },
       "validation": {
         "quality": "showcase",
@@ -463,11 +463,11 @@
       "artifact": "gallery/zh-revenue.html",
       "bytes": {
         "source": 1100,
-        "artifact": 71081
+        "artifact": 71271
       },
       "sha256": {
         "source": "8f686b5cc667112e4d8879bfff56d56c39b9f5af44c23762dcda9a3165fad9b4",
-        "artifact": "51eeee0606f7d8b352de8c3646365b293160b63e53b4403b3c0fce9732c80852"
+        "artifact": "d976056bf2393803ab346b599e78372aeac1b46ba44dde7c332aaf430548e625"
       },
       "validation": {
         "quality": "showcase",

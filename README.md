@@ -228,7 +228,7 @@ Plus composition checks for tick collisions, annotation overlap, point density, 
 | **Profile**           | `inspect-data` returns typed column profiles, so numbers are never retyped from memory                           |
 | **Author**            | The agent writes a typed JSON spec with your data embedded verbatim                                              |
 | **Validate**          | Schema, data integrity, semantics, honesty, and composition checks; failures return repair receipts              |
-| **Deliver**           | Renders, checks, and atomically commits interactive HTML plus an optional PNG chat preview with SHA-256 receipts |
+| **Deliver**           | Renders, checks, and atomically commits HTML or SVG, with an optional PNG preview for HTML with SHA-256 receipts |
 | **Verify on request** | `visual-check` measures containment at four desktop sizes and captures light/dark screenshots                    |
 
 For the fast default path, run `deliver` directly—it performs showcase
@@ -236,7 +236,7 @@ validation before atomically writing the HTML. Use `validate` separately only
 when you need diagnostics without writing an accepted artifact.
 
 ```bash
-node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --preview png --json
+node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --json
 ```
 
 ```bash
@@ -247,10 +247,22 @@ node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
 node bin/gen-chart.mjs inspect-data data.csv --spec-out draft.json --json
 ```
 
-The command above also writes `chart.png`, suitable for an inline Markdown
-preview; link `chart.html` for the interactive, accessible version. Without
-`--preview png`, delivery remains HTML-only. Also available: `render`,
-`visual-check`, `guide`, `demo`, and `doctor`.
+HTML and standalone SVG delivery use no browser. Use a `.svg` destination for
+vector output with its title, subtitle, styles, legends, and disclosure notes.
+Add `--preview png` to HTML delivery only when you need an atomic HTML/PNG pair,
+or generate a preview separately after delivering HTML:
+
+```bash
+node bin/gen-chart.mjs deliver cartesian spec.json chart.svg --quality showcase --json
+node bin/gen-chart.mjs preview chart.html chart.png --json
+node bin/gen-chart.mjs batch jobs.json --quality showcase --json
+```
+
+The batch command generates separate charts in one Node process, with optional
+shared data. See the [API and batch guide](gen-chart/references/rendering-api.md)
+for the manifest and JavaScript API, and the
+[performance improvement plan](docs/rendering-performance.md) for the rationale.
+Also available: `render`, `visual-check`, `guide`, `demo`, and `doctor`.
 
 ## In the delivered chart
 

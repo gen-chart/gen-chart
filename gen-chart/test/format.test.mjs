@@ -18,6 +18,9 @@ test('value formatting groups thousands and keeps precision', () => {
   assert.equal(fmtValue(12.5), '12.5');
   assert.equal(fmtValue(-9800), '-9,800');
   assert.equal(fmtValue(null), '—');
+  assert.equal(fmtValue(999.999), '1,000', 'rounding across the grouping boundary stays formatted');
+  assert.equal(fmtValue(-999.999), '-1,000');
+  assert.equal(fmtValue(999.99), '999.99');
 });
 
 test('date formatting respects granularity and year flag', () => {

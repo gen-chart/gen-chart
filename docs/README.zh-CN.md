@@ -214,13 +214,13 @@ node bin/gen-chart.mjs guide "composition of accounts by plan tier over time" --
 | **Profile**           | `inspect-data` 返回带类型的列概况，避免从记忆中重新抄写数字             |
 | **Author**            | 智能体编写带类型的 JSON 规范，并逐字嵌入数据                            |
 | **Validate**          | 执行 Schema、数据完整性、语义、诚实性和构图检查；失败时返回修复回执     |
-| **Deliver**           | 渲染、检查并原子提交交互式 HTML，以及可选的 PNG 对话预览和 SHA-256 回执 |
+| **Deliver**           | 渲染、检查并原子提交 HTML 或 SVG；HTML 可选配 PNG 预览，均提供 SHA-256 回执 |
 | **Verify on request** | `visual-check` 在四种桌面尺寸下测量内容边界，并捕获浅色和深色截图       |
 
 默认快速流程可直接运行 `deliver`。它会在原子写入 HTML 前进行展示级验证。只有需要在不写入制品的情况下查看诊断信息时，才单独使用 `validate`。
 
 ```bash
-node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --preview png --json
+node bin/gen-chart.mjs deliver cartesian spec.json chart.html --quality showcase --json
 ```
 
 ```bash
@@ -231,7 +231,18 @@ node bin/gen-chart.mjs validate cartesian spec.json --quality showcase --json
 node bin/gen-chart.mjs inspect-data data.csv --spec-out draft.json --json
 ```
 
-第一条命令还会写入适合 Markdown 内联预览的 `chart.png`；交互式、无障碍版本应链接到 `chart.html`。省略 `--preview png` 时只交付 HTML。其他可用命令包括 `render`、`visual-check`、`guide`、`demo` 和 `doctor`。
+默认交付 HTML 或独立 SVG，无需浏览器。将目标文件扩展名改为 `.svg`，即可输出包含标题、副标题、样式、图例和计算说明的矢量图。
+需要同时原子提交 HTML 与 PNG 时，显式添加 `--preview png`；也可以在 HTML 交付完成后单独生成预览，预览失败不会影响已交付的 HTML：
+
+```bash
+node bin/gen-chart.mjs deliver cartesian spec.json chart.svg --quality showcase --json
+node bin/gen-chart.mjs preview chart.html chart.png --json
+node bin/gen-chart.mjs batch jobs.json --quality showcase --json
+```
+
+批量命令在同一个 Node 进程内生成多个独立制品，并可共享一份数据。
+清单格式与 JavaScript API 见 [API 与批量渲染指南](../gen-chart/references/rendering-api.md)；
+优化依据见[渲染性能改进计划](rendering-performance.md)。其他命令包括 `render`、`visual-check`、`guide`、`demo` 和 `doctor`。
 
 ## 交付图表中的操作
 
