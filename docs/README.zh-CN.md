@@ -232,7 +232,7 @@ node bin/gen-chart.mjs inspect-data data.csv --spec-out draft.json --json
 ```
 
 默认交付 HTML 或独立 SVG，无需浏览器。将目标文件扩展名改为 `.svg`，即可输出包含标题、副标题、样式、图例和计算说明的矢量图。
-需要同时原子提交 HTML 与 PNG 时，显式添加 `--preview png`；也可以在 HTML 交付完成后单独生成预览，预览失败不会影响已交付的 HTML：
+CLI 仅在提供 `--preview png` 时生成 PNG。若宿主可内联显示本地 Markdown 图片（包括 Codex 桌面端），随附的技能会自动添加该选项，除非用户明确要求不生成 PNG。也可以在 HTML 交付完成后单独生成预览，预览失败不会影响已交付的 HTML：
 
 ```bash
 node bin/gen-chart.mjs deliver cartesian spec.json chart.svg --quality showcase --json

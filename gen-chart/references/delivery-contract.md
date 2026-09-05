@@ -84,6 +84,11 @@ legends, and disclosure notes. Its receipt uses `bytes.svg` and `sha256.svg`.
 unavailable, preview delivery fails before either destination is changed; set
 `GEN_CHART_CHROME` or rerun without the preview option and report the fallback.
 
+The CLI does not infer host capabilities. The skill must inspect its runtime or
+developer context: when the caller can display local Markdown images inline,
+it uses `--preview png` for HTML by default and embeds the result. It omits the
+preview for non-display automation and when the user explicitly opts out.
+
 Adds to the receipt:
 
 ```json
@@ -103,9 +108,10 @@ Adds to the receipt:
 }
 ```
 
-Link the artifact; if a preview was requested, embed it and link the HTML. Then
-report the error and warning counts. Add hashes only for automation or when
-asked. A non-zero exit can never be described as success.
+Link the artifact; if a preview was generated for a display-capable caller or
+requested by the user, embed it and link the HTML. Then report the error and
+warning counts. Add hashes only for automation or when asked. A non-zero exit
+can never be described as success.
 
 ## Separate preview
 
