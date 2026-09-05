@@ -14,7 +14,7 @@ description: >-
   existing chart.
 license: MIT
 metadata:
-  version: "0.9"
+  version: "0.32.0"
   author: sses79
 ---
 

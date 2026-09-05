@@ -13,11 +13,11 @@ gen-chart is an Agent Skill plus a zero-dependency Node.js rendering and validat
 
 ![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
-![Version](https://img.shields.io/badge/version-0.9.0-0891b2?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.32.0-0891b2?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-226-0891b2?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-244-0891b2?style=flat-square)
 
-**[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[中文路线图](docs/ROADMAP.zh-CN.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
+**[Project page](https://gen-chart.github.io/gen-chart/)** · **[Roadmap](ROADMAP.md)** · **[Changelog](CHANGELOG.md)** · **[Security](SECURITY.md)** · **[中文路线图](docs/ROADMAP.zh-CN.md)** · **[Design system](DESIGN.md)** · **[Skill contract](gen-chart/SKILL.md)**
 
 The project page is also the quickest start: choose Cursor, Codex, Claude Code, or
 OpenCode, copy the matching install command, then use any verified example to
@@ -304,8 +304,9 @@ For a manual install, Claude Code reads `~/.claude/skills/` (or `.claude/skills/
 
 ## Development
 
-Contributions, local setup, the repository layout, and the test and release
-tooling are documented in **[DEVELOPMENT.md](DEVELOPMENT.md)**.
+Contributions, local setup, and the repository layout are documented in
+**[DEVELOPMENT.md](DEVELOPMENT.md)**. Version preparation, checksums, tagging,
+and GitHub publication are covered by **[RELEASING.md](RELEASING.md)**.
 
 ## License
 
