@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `batch --preview png` captures a PNG for every HTML chart with one shared
+  headless browser and commits them atomically with the HTML.
+
+### Changed
+
+- PNG previews launch the browser once and drive it over the DevTools protocol
+  with Node's built-in `WebSocket`, instead of launching Chrome twice. A single
+  preview drops from about 1.8 s to 0.7 s with desktop Chrome on an Apple M1;
+  output PNG bytes are unchanged.
+- Previews prefer an already installed `chrome-headless-shell` (on `PATH`, or
+  in the Puppeteer or Playwright cache) after `GEN_CHART_CHROME`, which brings a
+  preview to about 0.3 s. Nothing is downloaded and no dependency is added.
+
 ## [0.32.0] - 2026-09-05
 
 ### Added

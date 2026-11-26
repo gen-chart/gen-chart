@@ -292,6 +292,51 @@ test('batch staging failure does not replace an earlier destination', () => {
   assert.equal(readFileSync(join(dir, 'first.svg'), 'utf8'), 'old svg');
 });
 
+test('batch --preview png captures every chart with one browser before committing', {
+  skip: !browserTestsEnabled
+    ? 'set GEN_CHART_BROWSER_TESTS=1 to run real-browser tests locally'
+    : (browserTestChrome ? false : 'no Chrome/Chromium found')
+}, () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-batch-'));
+  const spec = JSON.parse(readFileSync(example));
+  const manifest = join(dir, 'jobs.json');
+  writeFileSync(manifest, JSON.stringify({ charts: [
+    { spec, output: 'first.html' }, { spec, output: 'second.html' }
+  ] }));
+  const result = JSON.parse(run(['batch', manifest, '--preview', 'png', '--json']));
+  assert.equal(result.ok, true);
+  for (const r of result.results) {
+    const bytes = readFileSync(r.preview.output);
+    assert.equal(r.preview.output, r.output.replace(/\.html$/, '.png'));
+    assert.equal(r.preview.bytes, bytes.byteLength);
+    assert.equal(r.preview.sha256, createHash('sha256').update(bytes).digest('hex'));
+    assert.equal(bytes.readUInt32BE(16), r.preview.width);
+    assert.equal(bytes.readUInt32BE(20), r.preview.height);
+  }
+  assert.equal(result.results[0].preview.sha256, result.results[1].preview.sha256);
+});
+
+test('batch --preview png rejects SVG outputs and preserves files when the browser is missing', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-batch-'));
+  const spec = JSON.parse(readFileSync(example));
+  const manifest = join(dir, 'jobs.json');
+  writeFileSync(manifest, JSON.stringify({ charts: [{ spec, output: 'chart.html' }, { spec, output: 'chart.svg' }] }));
+  assert.match(runFail(['batch', manifest, '--preview', 'png']).stderr, /charts\[1\] writes SVG/);
+  writeFileSync(join(dir, 'chart.html'), 'old html');
+  writeFileSync(manifest, JSON.stringify({ charts: [{ spec, output: 'chart.html' }] }));
+  try {
+    execFileSync(process.execPath, [cli, 'batch', manifest, '--preview', 'png'], {
+      encoding: 'utf8', stdio: 'pipe', env: { ...process.env, GEN_CHART_CHROME: '/nonexistent/chrome' }
+    });
+    assert.fail('expected preview failure');
+  } catch (err) {
+    assert.equal(err.status, 1);
+    assert.match(err.stderr, /PREVIEW_BROWSER_UNAVAILABLE/);
+  }
+  assert.equal(readFileSync(join(dir, 'chart.html'), 'utf8'), 'old html');
+  assert.ok(!existsSync(join(dir, 'chart.png')));
+});
+
 test('separate preview writes only the PNG and preserves the delivered HTML on success and failure', () => {
   const dir = mkdtempSync(join(tmpdir(), 'gen-chart-preview-'));
   const html = join(dir, 'chart.html');

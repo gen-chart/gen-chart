@@ -99,5 +99,10 @@ whole set; per-chart `ok` reports validation. Error subjects in the aggregate
 receipt are prefixed with `/charts/<index>/spec` and refer to the resolved spec
 (including inherited data).
 
+Add `--preview png` to capture a sibling PNG for every chart. All outputs must
+be HTML. One headless browser serves the whole batch, and the PNGs are staged
+and committed atomically with the HTML; a capture failure leaves every previous
+file untouched. Each chart's receipt gains a `preview` object.
+
 Batch mode produces separate artifacts. Several charts in one interactive HTML
 document remain a separate roadmap feature.

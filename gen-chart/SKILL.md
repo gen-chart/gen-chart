@@ -69,7 +69,8 @@ the family you routed to.
 
    `--preview png` commits the HTML/PNG pair atomically. Alternatively, run
    `node bin/gen-chart.mjs preview <output.html> <output.png> --json` afterward
-   to leave delivered HTML independent of preview success. PNG generation uses
+   to leave delivered HTML independent of preview success. For several charts,
+   `batch <jobs.json> --preview png` reuses one browser for every preview. PNG generation uses
    local Chrome/Chromium. If unavailable, hand off the accepted HTML and report
    that the preview was unavailable. Never hand-draw or substitute a different
    chart image.
