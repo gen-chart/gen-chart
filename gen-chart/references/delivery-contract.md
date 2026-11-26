@@ -84,6 +84,17 @@ legends, and disclosure notes. Its receipt uses `bytes.svg` and `sha256.svg`.
 unavailable, preview delivery fails before either destination is changed; set
 `GEN_CHART_CHROME` or rerun without the preview option and report the fallback.
 
+The preview launches one headless browser and drives it over the DevTools
+protocol using Node's built-in `WebSocket`; nothing is downloaded or added as a
+dependency. Browser discovery order is `GEN_CHART_CHROME`, then an already
+installed `chrome-headless-shell` (on `PATH`, or in the Puppeteer or Playwright
+browser cache), then system Chrome/Chromium. The headless shell starts several
+times faster; install it optionally with
+`npx @puppeteer/browsers install chrome-headless-shell@stable`. When the runtime
+has no `WebSocket` or the browser exposes no DevTools endpoint, the preview falls
+back to two one-shot Chrome launches with identical output. `doctor` reports the
+selected browser and mode.
+
 The CLI does not infer host capabilities. The skill must inspect its runtime or
 developer context: when the caller can display local Markdown images inline,
 it uses `--preview png` for HTML by default and embeds the result. It omits the

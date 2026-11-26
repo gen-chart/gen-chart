@@ -39,8 +39,8 @@ for the CLI and JavaScript interfaces.
    `--preview png` is supplied, and provide a separate preview command for an
    already delivered HTML artifact. The skill supplies `--preview png` by
    default for hosts that display local Markdown images, including Codex
-   desktop. Browser measurement/screenshot reuse is a possible later
-   optimization.
+   desktop. Browser measurement/screenshot reuse is implemented; see
+   [PNG preview launch](#png-preview-launch).
 5. **Later: module and algorithm cleanup.** Separate Cartesian validation/layout,
    geometry, and viewer/export responsibilities. Remove the unnecessary histogram
    sort and use sets for matrix category discovery. Splitting files alone is not
@@ -107,3 +107,33 @@ for a dark range/forecast chart, the event-overlay chart, and the Chinese bar
 chart. Full Chrome interaction tests remain opt-in locally. The deterministic
 ZIP was built twice and its extracted package delivered HTML and SVG at showcase
 quality without runtime dependencies.
+
+## PNG preview launch
+
+Profiling showed that PNG preview time was almost entirely browser startup: the
+preview launched desktop Chrome twice (once to measure the chart height, once
+to screenshot), about 850 ms each, while loading and capturing the page took
+about 60 ms. Previews now launch one browser and drive it over the DevTools
+protocol using Node's built-in `WebSocket`, measuring at a 2000 px viewport and
+reloading at the measured height so layout matches the previous fresh launch.
+Discovery prefers an already installed `chrome-headless-shell` after
+`GEN_CHART_CHROME`; it is never downloaded. Runtimes without `WebSocket` and
+browsers without a DevTools endpoint fall back to the two-launch path.
+
+End-to-end `deliver --preview png` for `mau-trend`, Node 26.7.0 / Apple M1,
+median of five runs after one warmup:
+
+| Path | Wall time |
+| --- | ---: |
+| Before: desktop Chrome 158, two launches | 1,773 ms |
+| After: desktop Chrome 158, one launch | 704 ms |
+| After: chrome-headless-shell 149, one launch | 313 ms |
+| No preview | 53 ms |
+
+Capturing all 17 examples in one session took 31.8 s with two launches per
+chart and 2.8 s with one reused desktop Chrome (1.9 s with the headless shell).
+All 17 PNGs were byte-identical between the one-launch and two-launch paths in
+each browser. Between the two browsers, 16 of 17 matched byte for byte; the
+Chinese example differs slightly in CJK title weight because the builds fall
+back to different system fonts. Previews are presentation output and are not
+golden-tested; receipts record the PNG hash.

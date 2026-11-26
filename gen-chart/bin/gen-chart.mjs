@@ -21,7 +21,7 @@ Usage:
   gen-chart validate <chart_type> <spec.json> [--quality standard|showcase] [--json]
   gen-chart render   <chart_type> <spec.json> <out.html|out.svg> [--quality standard|showcase] [--preview png] [--json]
   gen-chart deliver  <chart_type> <spec.json> <out.html|out.svg> [--quality standard|showcase] [--preview png] [--json]
-  gen-chart batch <jobs.json> [--quality standard|showcase] [--json]
+  gen-chart batch <jobs.json> [--quality standard|showcase] [--preview png] [--json]
   gen-chart preview <chart.html> <out.png> [--json]
   gen-chart guide "<scenario>" [--json]
   gen-chart inspect-data <file.csv|.tsv|.json> [--spec-out <draft.json>] [--json]
@@ -101,6 +101,7 @@ function emit(r, options) {
     for (const result of r.results ?? [r]) {
       const format = result.format ?? 'html';
       if (result.output) console.log(`  output: ${result.output} (${result.bytes[format]} bytes, sha256 ${result.sha256[format].slice(0, 16)}…)`);
+      if (result.preview && result !== r) console.log(`  preview: ${result.preview.output} (${result.preview.width}x${result.preview.height}, ${result.preview.bytes} bytes)`);
     }
     if (r.preview) console.log(`  preview: ${r.preview.output} (${r.preview.width}x${r.preview.height}, ${r.preview.bytes} bytes)`);
   }
@@ -139,14 +140,10 @@ async function cmdRenderOrDeliver(command, argv) {
   if (options.preview === 'png') {
     try {
       const { renderPngPreview } = await import('../renderers/shared/preview.mjs');
-      const preview = renderPngPreview(rendered.content);
+      const preview = await renderPngPreview(rendered.content);
       const previewOutput = result.output.replace(/\.html$/, '.png');
       outputs.push({ path: previewOutput, content: preview.png });
-      result.preview = {
-        output: previewOutput, media_type: 'image/png', width: preview.width,
-        height: preview.height, theme: preview.theme,
-        bytes: preview.png.byteLength, sha256: sha256(preview.png)
-      };
+      result.preview = previewReceipt(previewOutput, preview);
     } catch (e) {
       fail(`PNG preview failed before delivery: ${e.code ? `${e.code}: ` : ''}${e.message}`);
     }
@@ -160,8 +157,16 @@ async function cmdRenderOrDeliver(command, argv) {
   emit(result, options);
 }
 
-function cmdBatch(argv) {
-  const { positional, options } = parseArgs(argv);
+function previewReceipt(output, preview) {
+  return {
+    output, media_type: 'image/png', width: preview.width,
+    height: preview.height, theme: preview.theme,
+    bytes: preview.png.byteLength, sha256: sha256(preview.png)
+  };
+}
+
+async function cmdBatch(argv) {
+  const { positional, options } = parseArgs(argv, { allowPreview: true });
   if (positional.length !== 1) fail(usage());
   const { spec: manifest, abs } = loadSpec(positional[0]);
   if (!manifest || !Array.isArray(manifest.charts) || manifest.charts.length === 0 ||
@@ -179,7 +184,9 @@ function cmdBatch(argv) {
     if (destinations.has(output)) fail(`duplicate batch output: ${output}`);
     destinations.add(output);
     const spec = job.spec.data === undefined && manifest.data !== undefined ? { ...job.spec, data: manifest.data } : job.spec;
-    return { spec, output, format: outputFormat(output), quality: job.quality };
+    const format = outputFormat(output);
+    if (options.preview && format !== 'html') fail(`--preview png requires HTML outputs; charts[${i}] writes ${format.toUpperCase()}`);
+    return { spec, output, format, quality: job.quality };
   });
   let batch;
   try { batch = renderBatch(jobs, { quality: options.quality ?? undefined }); }
@@ -188,7 +195,26 @@ function cmdBatch(argv) {
     ? artifactReceipt(rendered, JSON.stringify(jobs[i].spec), jobs[i].output)
     : { ...rendered, command: 'deliver' });
   if (batch.ok) {
-    try { commitAtomically(batch.results.map((result, i) => ({ path: jobs[i].output, content: result.content }))); }
+    const outputs = batch.results.map((result, i) => ({ path: jobs[i].output, content: result.content }));
+    if (options.preview === 'png') {
+      // One browser serves every chart in the batch.
+      let session;
+      try {
+        const { openPreviewSession } = await import('../renderers/shared/preview.mjs');
+        session = await openPreviewSession();
+        for (let i = 0; i < batch.results.length; i++) {
+          const preview = await session.capture(batch.results[i].content);
+          const previewOutput = jobs[i].output.replace(/\.html$/, '.png');
+          outputs.push({ path: previewOutput, content: preview.png });
+          results[i].preview = previewReceipt(previewOutput, preview);
+        }
+      } catch (e) {
+        fail(`PNG preview failed before delivery: ${e.code ? `${e.code}: ` : ''}${e.message}`);
+      } finally {
+        await session?.close();
+      }
+    }
+    try { commitAtomically(outputs); }
     catch (e) { fail(`batch delivery failed: ${e.message}`); }
   }
   emit({
@@ -208,7 +234,7 @@ async function cmdPreview(argv) {
   try {
     const html = readFileSync(resolve(input), 'utf8');
     const { renderPngPreview } = await import('../renderers/shared/preview.mjs');
-    const preview = renderPngPreview(html);
+    const preview = await renderPngPreview(html);
     const out = resolve(output);
     commitAtomically([{ path: out, content: preview.png }]);
     emit({
@@ -333,7 +359,8 @@ async function cmdVisualCheck(argv) {
 }
 
 async function doctor() {
-  const { findChrome } = await import('../renderers/shared/visual-check.mjs');
+  const { findPreviewBrowser } = await import('../renderers/shared/preview.mjs');
+  const { cdpAvailable } = await import('../renderers/shared/cdp.mjs');
   const [major] = process.versions.node.split('.').map(Number);
   const nodeOk = major >= 22;
   console.log(`node ${process.versions.node} ${nodeOk ? 'OK (>=22)' : 'FAIL (need >=22)'}`);
@@ -345,8 +372,9 @@ async function doctor() {
     console.log(`${rel.replace('../', '')} ${ok ? 'OK' : 'MISSING'}`);
   }
   console.log(`renderers: ${families().join(', ')}`);
-  const chrome = findChrome();
-  console.log(`PNG preview: ${chrome ? `OK (${chrome})` : 'UNAVAILABLE (set GEN_CHART_CHROME; HTML delivery still works)'}`);
+  const chrome = findPreviewBrowser();
+  const mode = cdpAvailable() ? 'single launch' : 'two launches; Node.js WebSocket unavailable';
+  console.log(`PNG preview: ${chrome ? `OK (${chrome}; ${mode})` : 'UNAVAILABLE (set GEN_CHART_CHROME; HTML delivery still works)'}`);
   process.exit(nodeOk && assetsOk ? 0 : 1);
 }
 
@@ -370,7 +398,7 @@ switch (command) {
     await cmdRenderOrDeliver(command, rest);
     break;
   case 'batch':
-    cmdBatch(rest);
+    await cmdBatch(rest);
     break;
   case 'preview':
     await cmdPreview(rest);
