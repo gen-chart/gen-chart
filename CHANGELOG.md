@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- A runtime check in the skill: without Node.js the agent shows the authored
+  spec with install guidance instead of a chart, and never hand-writes one.
+  On Node.js older than 22, CLI commands print a one-line stderr upgrade
+  warning and still run; rendering was verified byte-identical on Node.js 18
+  and 20 for every example.
 - `batch --preview png` captures a PNG for every HTML chart with one shared
   headless browser and commits them atomically with the HTML.
 
