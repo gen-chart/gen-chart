@@ -11,6 +11,7 @@ import { renderChart, renderBatch } from '../renderers/shared/render.mjs';
 import { artifactReceipt, sha256 } from '../renderers/shared/delivery.mjs';
 import { receipt } from '../renderers/shared/diagnostics.mjs';
 import { commitAtomically } from '../renderers/shared/atomic-output.mjs';
+import { nodeSupported, nodeVersionWarning, MIN_NODE_MAJOR } from '../renderers/shared/runtime.mjs';
 
 const VERSION = '0.32.0';
 
@@ -361,9 +362,8 @@ async function cmdVisualCheck(argv) {
 async function doctor() {
   const { findPreviewBrowser } = await import('../renderers/shared/preview.mjs');
   const { cdpAvailable } = await import('../renderers/shared/cdp.mjs');
-  const [major] = process.versions.node.split('.').map(Number);
-  const nodeOk = major >= 22;
-  console.log(`node ${process.versions.node} ${nodeOk ? 'OK (>=22)' : 'FAIL (need >=22)'}`);
+  const nodeOk = nodeSupported();
+  console.log(`node ${process.versions.node} ${nodeOk ? `OK (>=${MIN_NODE_MAJOR})` : `FAIL (need >=${MIN_NODE_MAJOR})`}`);
   let assetsOk = true;
   for (const rel of ['../assets/template.html', '../assets/svg.css', '../schemas/cartesian.schema.json', '../renderers/shared/generated-validators.mjs']) {
     const p = new URL(rel, import.meta.url);
@@ -380,6 +380,8 @@ async function doctor() {
 
 const command = process.argv[2];
 const rest = process.argv.slice(3);
+const runtimeWarning = nodeVersionWarning();
+if (runtimeWarning && !['doctor', undefined, '-h', '--help', 'help'].includes(command)) console.error(runtimeWarning);
 switch (command) {
   case undefined:
   case '-h':

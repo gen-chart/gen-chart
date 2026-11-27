@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync, mkdtempSync, writeFileSync, existsSync, chmodSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
@@ -85,6 +85,14 @@ test('--preview requires an explicit value', () => {
   const err = runFail(['deliver', 'cartesian', example, join(dir, 'chart.html'), '--preview']);
   assert.equal(err.status, 1);
   assert.match(err.stderr, /--preview requires a value/);
+});
+
+test('supported Node.js runs commands without a runtime warning', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-chart-'));
+  const r = spawnSync(process.execPath, [cli, 'deliver', 'cartesian', example, join(dir, 'chart.html'), '--json'], { encoding: 'utf8' });
+  assert.equal(r.status, 0);
+  assert.equal(r.stderr, '');
+  assert.equal(JSON.parse(r.stdout).ok, true);
 });
 
 test('doctor exits 0 and reports assets', () => {

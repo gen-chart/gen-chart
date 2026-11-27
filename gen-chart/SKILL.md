@@ -29,6 +29,25 @@ All four chart families are implemented, with the full interactive viewer
 and `visual-check`. Substitute `<chart_type>` in the commands below with
 the family you routed to.
 
+## Runtime check
+
+The renderer has no npm dependencies but runs on Node.js. Before the first
+gen-chart command in a session, run `node --version` from the skill directory.
+
+- **22 or newer:** continue.
+- **Older than 22:** continue; commands print a one-line stderr warning and
+  still write receipts to stdout. Deliver normally, then tell the user their
+  Node.js version is below the supported minimum and suggest upgrading. If a
+  command fails with a syntax or missing-export error, report that error and
+  the upgrade instead of retrying.
+- **`node` not found:** do not hand-write chart SVG or HTML, and do not install
+  software without the user's agreement. Author the spec JSON anyway, show it,
+  and say rendering needs Node.js 22 or newer: install the LTS release from
+  https://nodejs.org (or `brew install node` on macOS,
+  `winget install OpenJS.NodeJS.LTS` on Windows, or a version manager such as
+  nvm on Linux), then rerun the `deliver` command shown. Keep the spec file so
+  the user can render it later.
+
 ## Fast authoring path
 
 1. Route the chart type from the question. When ambiguous, run
@@ -245,7 +264,8 @@ node bin/gen-chart.mjs doctor
 node bin/gen-chart.mjs demo <output-directory>
 ```
 
-When shell access is unavailable, author the spec JSON anyway, show it to the
+When shell access is unavailable, or Node.js is missing (see
+[Runtime check](#runtime-check)), author the spec JSON anyway, show it to the
 user, and explain that rendering needs `node bin/gen-chart.mjs deliver`; do
 not hand-write substitute HTML.
 
